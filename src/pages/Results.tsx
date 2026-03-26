@@ -110,6 +110,10 @@ export default function Results() {
             <RefreshCw className="h-4 w-4" />
             Gerar mais exercícios
           </Button>
+          <Button size="lg" variant="outline" className="w-full gap-2" onClick={handleShareWhatsApp}>
+            <Share2 className="h-4 w-4" />
+            Compartilhar no WhatsApp
+          </Button>
           <Button size="lg" variant="outline" className="w-full gap-2" onClick={handleNewSession}>
             <ArrowLeft className="h-4 w-4" />
             Novo estudo
