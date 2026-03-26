@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, RefreshCw, Trophy, XCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, RefreshCw, XCircle, CheckCircle, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useStudyStore } from '@/store/study-store';
@@ -41,8 +41,13 @@ export default function Results() {
   };
 
   const handleRetry = () => {
-    // Keep config, regenerate
     navigate('/confirmacao');
+  };
+
+  const handleShareWhatsApp = () => {
+    const text = `📚 *StudyApp — Resultado do Estudo*\n\n📖 ${config.subject} — ${config.topic} (${config.year})\n🏆 Acertei *${score} de ${total}* (${pct}%)\n\n${getMessage(pct)}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
   };
 
   return (
@@ -104,6 +109,10 @@ export default function Results() {
           <Button size="lg" className="w-full gap-2 font-display font-bold" onClick={handleRetry}>
             <RefreshCw className="h-4 w-4" />
             Gerar mais exercícios
+          </Button>
+          <Button size="lg" variant="outline" className="w-full gap-2" onClick={handleShareWhatsApp}>
+            <Share2 className="h-4 w-4" />
+            Compartilhar no WhatsApp
           </Button>
           <Button size="lg" variant="outline" className="w-full gap-2" onClick={handleNewSession}>
             <ArrowLeft className="h-4 w-4" />
