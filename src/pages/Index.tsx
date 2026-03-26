@@ -1,12 +1,13 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Camera, Mic, MicOff, Sparkles, X, Upload } from 'lucide-react';
+import { BookOpen, Camera, Mic, MicOff, Sparkles, X, Upload, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useStudyStore } from '@/store/study-store';
+import { GamificationBar } from '@/components/GamificationBar';
 import type { SchoolYear, Subject } from '@/types/study';
 
 const SUBJECTS: Subject[] = ['Matemática', 'Português', 'Ciências', 'História', 'Geografia', 'Inglês', 'Artes', 'Educação Física'];
@@ -87,6 +88,16 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background px-4 py-6 md:py-12">
       <div className="mx-auto max-w-lg">
+        {/* Gamification Bar */}
+        <div className="mb-4 flex items-center gap-2">
+          <div className="flex-1">
+            <GamificationBar />
+          </div>
+          <Button variant="ghost" size="icon" onClick={() => navigate('/perfis')}>
+            <Users className="h-5 w-5" />
+          </Button>
+        </div>
+
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5">

@@ -14,13 +14,98 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_emoji: string
+          created_at: string
+          id: string
+          last_study_date: string | null
+          level: number
+          name: string
+          streak_days: number
+          total_correct: number
+          total_exercises: number
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          avatar_emoji?: string
+          created_at?: string
+          id?: string
+          last_study_date?: string | null
+          level?: number
+          name: string
+          streak_days?: number
+          total_correct?: number
+          total_exercises?: number
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          avatar_emoji?: string
+          created_at?: string
+          id?: string
+          last_study_date?: string | null
+          level?: number
+          name?: string
+          streak_days?: number
+          total_correct?: number
+          total_exercises?: number
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
+      study_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string
+          score: number
+          subject: string
+          topic: string
+          total: number
+          xp_earned: number
+          year: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id: string
+          score: number
+          subject: string
+          topic: string
+          total: number
+          xp_earned?: number
+          year: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string
+          score?: number
+          subject?: string
+          topic?: string
+          total?: number
+          xp_earned?: number
+          year?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_sessions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      owns_profile: { Args: { _profile_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

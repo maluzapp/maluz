@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, RefreshCw, XCircle, CheckCircle, Share2 } from 'lucide-react';
+import { ArrowLeft, RefreshCw, XCircle, CheckCircle, Share2, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useStudyStore } from '@/store/study-store';
+import { useProfileStore } from '@/hooks/useProfile';
+import { supabase } from '@/integrations/supabase/client';
 
 function getEmoji(pct: number) {
   if (pct >= 90) return '🏆';
@@ -19,9 +21,19 @@ function getMessage(pct: number) {
   return 'Vamos revisar e tentar de novo!';
 }
 
+function calcXP(score: number, total: number) {
+  // Base: 10 XP per correct + bonus for perfection
+  const base = score * 10;
+  const bonus = score === total ? 20 : 0;
+  return base + bonus;
+}
+
 export default function Results() {
   const navigate = useNavigate();
   const { exercises, answers, config, reset } = useStudyStore();
+  const profileId = useProfileStore((s) => s.activeProfileId);
+  const [xpEarned, setXpEarned] = useState(0);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (!config || exercises.length === 0) {
@@ -29,11 +41,79 @@ export default function Results() {
     }
   }, []);
 
-  if (!config || exercises.length === 0) return null;
-
   const score = answers.filter((a) => a.isCorrect).length;
   const total = exercises.length;
-  const pct = Math.round((score / total) * 100);
+  const pct = total > 0 ? Math.round((score / total) * 100) : 0;
+
+  // Save results once
+  useEffect(() => {
+    if (saved || !config || !profileId || total === 0) return;
+    const xp = calcXP(score, total);
+    setXpEarned(xp);
+
+    const saveResults = async () => {
+      // Save session
+      await supabase.from('study_sessions').insert({
+        profile_id: profileId,
+        subject: config.subject,
+        topic: config.topic,
+        year: config.year,
+        score,
+        total,
+        xp_earned: xp,
+      });
+
+      // Get current profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('xp, level, streak_days, last_study_date, total_exercises, total_correct')
+        .eq('id', profileId)
+        .single();
+
+      if (profile) {
+        const newXp = (profile.xp || 0) + xp;
+        const newTotalEx = (profile.total_exercises || 0) + total;
+        const newTotalCorrect = (profile.total_correct || 0) + score;
+
+        // Level up: each level needs level * 100 XP
+        let newLevel = profile.level || 1;
+        let remainingXp = newXp;
+        while (remainingXp >= newLevel * 100) {
+          remainingXp -= newLevel * 100;
+          newLevel++;
+        }
+
+        // Streak
+        const today = new Date().toISOString().split('T')[0];
+        const lastDate = profile.last_study_date;
+        let newStreak = profile.streak_days || 0;
+        if (lastDate !== today) {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yesterdayStr = yesterday.toISOString().split('T')[0];
+          newStreak = lastDate === yesterdayStr ? newStreak + 1 : 1;
+        }
+
+        await supabase
+          .from('profiles')
+          .update({
+            xp: newXp,
+            level: newLevel,
+            streak_days: newStreak,
+            last_study_date: today,
+            total_exercises: newTotalEx,
+            total_correct: newTotalCorrect,
+          })
+          .eq('id', profileId);
+      }
+
+      setSaved(true);
+    };
+
+    saveResults();
+  }, [config, profileId, score, total, saved]);
+
+  if (!config || exercises.length === 0) return null;
 
   const handleNewSession = () => {
     reset();
@@ -45,7 +125,7 @@ export default function Results() {
   };
 
   const handleShareWhatsApp = () => {
-    const text = `📚 *StudyApp — Resultado do Estudo*\n\n📖 ${config.subject} — ${config.topic} (${config.year})\n🏆 Acertei *${score} de ${total}* (${pct}%)\n\n${getMessage(pct)}`;
+    const text = `📚 *StudyApp — Resultado do Estudo*\n\n📖 ${config.subject} — ${config.topic} (${config.year})\n🏆 Acertei *${score} de ${total}* (${pct}%)\n⭐ Ganhei ${xpEarned} XP!\n\n${getMessage(pct)}`;
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
@@ -71,6 +151,16 @@ export default function Results() {
             </div>
           </div>
         </Card>
+
+        {/* XP earned */}
+        {xpEarned > 0 && (
+          <Card className="mb-6">
+            <CardContent className="p-4 flex items-center justify-center gap-2 text-accent">
+              <Star className="h-5 w-5" />
+              <span className="font-display font-bold text-lg">+{xpEarned} XP</span>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Review wrong answers */}
         {answers.some((a) => !a.isCorrect) && (
