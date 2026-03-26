@@ -41,8 +41,13 @@ export default function Results() {
   };
 
   const handleRetry = () => {
-    // Keep config, regenerate
     navigate('/confirmacao');
+  };
+
+  const handleShareWhatsApp = () => {
+    const text = `📚 *StudyApp — Resultado do Estudo*\n\n📖 ${config.subject} — ${config.topic} (${config.year})\n🏆 Acertei *${score} de ${total}* (${pct}%)\n\n${getMessage(pct)}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
   };
 
   return (

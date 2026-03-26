@@ -159,7 +159,7 @@ export function Matching({ exercise, index, onAnswer }: Props) {
                   disabled={answered || isUsed || selectedLeft === null}
                   className={cn(
                     'w-full rounded-lg border-2 px-3 py-2.5 text-left text-sm font-medium transition-all',
-                    !answered && isUsed && colorClass.border && colorClass.bg,
+                    !answered && isUsed && colorClass && `${colorClass.border} ${colorClass.bg}`,
                     !answered && selectedLeft !== null && !isUsed && 'border-accent hover:bg-accent/10',
                     !answered && selectedLeft === null && !isUsed && 'border-border',
                     answered && isUsed && 'opacity-60',
@@ -167,7 +167,7 @@ export function Matching({ exercise, index, onAnswer }: Props) {
                 >
                   <span className="flex items-center justify-between gap-1">
                     <span>{item.text}</span>
-                    {isUsed && !answered && (
+                    {isUsed && !answered && colorClass && (
                       <span className={cn('text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center', colorClass.bg, colorClass.text)}>
                         {(matchIdx ?? 0) + 1}
                       </span>
