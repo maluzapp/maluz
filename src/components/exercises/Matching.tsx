@@ -86,8 +86,8 @@ export function Matching({ exercise, index, onAnswer }: Props) {
     return null;
   };
 
-  const getMatchColorClass = (matchIdx: number | null) => {
-    if (matchIdx === null) return {};
+  const getMatchColorClass = (matchIdx: number | null): typeof MATCH_COLORS[number] | null => {
+    if (matchIdx === null) return null;
     return MATCH_COLORS[matchIdx % MATCH_COLORS.length];
   };
 
@@ -128,14 +128,14 @@ export function Matching({ exercise, index, onAnswer }: Props) {
                   className={cn(
                     'w-full rounded-lg border-2 px-3 py-2.5 text-left text-sm font-medium transition-all relative',
                     selectedLeft === i && 'border-primary bg-primary/10 ring-2 ring-primary/30',
-                    !answered && isMatched && colorClass.border && colorClass.bg,
+                    !answered && isMatched && colorClass && `${colorClass.border} ${colorClass.bg}`,
                     !answered && !isMatched && selectedLeft !== i && 'border-border hover:border-primary/50',
                     answered && getResultColor(i),
                   )}
                 >
                   <span className="flex items-center justify-between gap-1">
                     <span>{pair.left}</span>
-                    {isMatched && !answered && (
+                    {isMatched && !answered && colorClass && (
                       <span className={cn('text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center', colorClass.bg, colorClass.text)}>
                         {(matchIdx ?? 0) + 1}
                       </span>
