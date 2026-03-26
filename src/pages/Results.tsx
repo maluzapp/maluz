@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, RefreshCw, Trophy, XCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, RefreshCw, XCircle, CheckCircle, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useStudyStore } from '@/store/study-store';
