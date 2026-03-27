@@ -3,17 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, LogOut, Trash2 } from 'lucide-react';
+import { Plus, LogOut, Trash2, Pencil } from 'lucide-react';
 
 const AVATARS = ['🧑‍🎓', '👧', '👦', '🦸', '🧙', '🦊', '🐱', '🦄', '🚀', '⭐'];
+const YEARS = ['6º ano', '7º ano', '8º ano', '9º ano'] as const;
 
 interface Profile {
   id: string;
   name: string;
   avatar_emoji: string;
+  school_year: string | null;
   xp: number;
   level: number;
   streak_days: number;
@@ -25,8 +28,10 @@ export default function Profiles() {
   const setActiveProfile = useProfileStore((s) => s.setActiveProfile);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [creating, setCreating] = useState(false);
+  const [editing, setEditing] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('🧑‍🎓');
+  const [selectedYear, setSelectedYear] = useState('');
   const [loadingProfiles, setLoadingProfiles] = useState(true);
 
   useEffect(() => {
@@ -40,7 +45,7 @@ export default function Profiles() {
   const fetchProfiles = async () => {
     const { data } = await supabase
       .from('profiles')
-      .select('id, name, avatar_emoji, xp, level, streak_days')
+      .select('id, name, avatar_emoji, school_year, xp, level, streak_days')
       .order('created_at');
     setProfiles((data as Profile[]) || []);
     setLoadingProfiles(false);
@@ -52,10 +57,36 @@ export default function Profiles() {
       user_id: user.id,
       name: newName.trim(),
       avatar_emoji: selectedAvatar,
+      school_year: selectedYear || null,
     });
-    setNewName('');
-    setCreating(false);
+    resetForm();
     fetchProfiles();
+  };
+
+  const startEditing = (p: Profile) => {
+    setEditing(p.id);
+    setNewName(p.name);
+    setSelectedAvatar(p.avatar_emoji);
+    setSelectedYear(p.school_year || '');
+  };
+
+  const saveEdit = async () => {
+    if (!editing || !newName.trim()) return;
+    await supabase.from('profiles').update({
+      name: newName.trim(),
+      avatar_emoji: selectedAvatar,
+      school_year: selectedYear || null,
+    }).eq('id', editing);
+    resetForm();
+    fetchProfiles();
+  };
+
+  const resetForm = () => {
+    setNewName('');
+    setSelectedAvatar('🧑‍🎓');
+    setSelectedYear('');
+    setCreating(false);
+    setEditing(null);
   };
 
   const deleteProfile = async (id: string) => {
