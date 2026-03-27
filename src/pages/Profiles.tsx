@@ -219,11 +219,6 @@ export default function Profiles() {
                 </Button>
               </div>
             </CardContent>
-          </Card>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         ) : (
           <Button
             variant="outline"
