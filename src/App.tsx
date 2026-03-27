@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Confirmation from "./pages/Confirmation";
 import Exercises from "./pages/Exercises";
 import Results from "./pages/Results";
+import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
 import type { ReactNode } from "react";
 
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/confirmacao" element={<RequireAuth><Confirmation /></RequireAuth>} />
             <Route path="/exercicios" element={<RequireAuth><Exercises /></RequireAuth>} />
             <Route path="/resultado" element={<RequireAuth><Results /></RequireAuth>} />
+            <Route path="/instalar" element={<Install />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
