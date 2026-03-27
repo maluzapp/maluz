@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Camera, Mic, MicOff, Sparkles, X, Upload, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useStudyStore } from '@/store/study-store';
 import { GamificationBar } from '@/components/GamificationBar';
+import { useProfileStore } from '@/hooks/useProfile';
+import { supabase } from '@/integrations/supabase/client';
 import type { SchoolYear, Subject } from '@/types/study';
 
 const SUBJECTS: Subject[] = ['Matemática', 'Português', 'Ciências', 'História', 'Geografia', 'Inglês', 'Artes', 'Educação Física'];
@@ -27,6 +29,21 @@ export default function Index() {
   const navigate = useNavigate();
   const { setConfig, setLoading } = useStudyStore();
   const [year, setYear] = useState<SchoolYear | ''>('');
+  const activeProfileId = useProfileStore((s) => s.activeProfileId);
+
+  useEffect(() => {
+    if (!activeProfileId) return;
+    supabase
+      .from('profiles')
+      .select('school_year')
+      .eq('id', activeProfileId)
+      .single()
+      .then(({ data }) => {
+        if (data?.school_year) {
+          setYear(data.school_year as SchoolYear);
+        }
+      });
+  }, [activeProfileId]);
   const [subject, setSubject] = useState<Subject | ''>('');
   const [topic, setTopic] = useState('');
   const [images, setImages] = useState<File[]>([]);
