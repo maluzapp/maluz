@@ -3,17 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, LogOut, Trash2 } from 'lucide-react';
+import { Plus, LogOut, Trash2, Pencil } from 'lucide-react';
 
 const AVATARS = ['🧑‍🎓', '👧', '👦', '🦸', '🧙', '🦊', '🐱', '🦄', '🚀', '⭐'];
+const YEARS = ['6º ano', '7º ano', '8º ano', '9º ano'] as const;
 
 interface Profile {
   id: string;
   name: string;
   avatar_emoji: string;
+  school_year: string | null;
   xp: number;
   level: number;
   streak_days: number;
@@ -25,8 +28,10 @@ export default function Profiles() {
   const setActiveProfile = useProfileStore((s) => s.setActiveProfile);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [creating, setCreating] = useState(false);
+  const [editing, setEditing] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('🧑‍🎓');
+  const [selectedYear, setSelectedYear] = useState('');
   const [loadingProfiles, setLoadingProfiles] = useState(true);
 
   useEffect(() => {
@@ -40,7 +45,7 @@ export default function Profiles() {
   const fetchProfiles = async () => {
     const { data } = await supabase
       .from('profiles')
-      .select('id, name, avatar_emoji, xp, level, streak_days')
+      .select('id, name, avatar_emoji, school_year, xp, level, streak_days')
       .order('created_at');
     setProfiles((data as Profile[]) || []);
     setLoadingProfiles(false);
@@ -52,10 +57,36 @@ export default function Profiles() {
       user_id: user.id,
       name: newName.trim(),
       avatar_emoji: selectedAvatar,
+      school_year: selectedYear || null,
     });
-    setNewName('');
-    setCreating(false);
+    resetForm();
     fetchProfiles();
+  };
+
+  const startEditing = (p: Profile) => {
+    setEditing(p.id);
+    setNewName(p.name);
+    setSelectedAvatar(p.avatar_emoji);
+    setSelectedYear(p.school_year || '');
+  };
+
+  const saveEdit = async () => {
+    if (!editing || !newName.trim()) return;
+    await supabase.from('profiles').update({
+      name: newName.trim(),
+      avatar_emoji: selectedAvatar,
+      school_year: selectedYear || null,
+    }).eq('id', editing);
+    resetForm();
+    fetchProfiles();
+  };
+
+  const resetForm = () => {
+    setNewName('');
+    setSelectedAvatar('🧑‍🎓');
+    setSelectedYear('');
+    setCreating(false);
+    setEditing(null);
   };
 
   const deleteProfile = async (id: string) => {
@@ -103,6 +134,9 @@ export default function Profiles() {
                   <span className="text-4xl">{p.avatar_emoji}</span>
                   <div className="flex-1">
                     <p className="font-display font-bold text-foreground">{p.name}</p>
+                    {p.school_year && (
+                      <p className="text-xs text-primary font-medium">{p.school_year}</p>
+                    )}
                     <div className="flex gap-3 text-xs text-muted-foreground mt-1">
                       <span>⭐ {p.xp} XP</span>
                       <span>📊 Nível {p.level}</span>
@@ -110,29 +144,54 @@ export default function Profiles() {
                     </div>
                   </div>
                 </button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-muted-foreground hover:text-destructive shrink-0"
-                  onClick={(e) => { e.stopPropagation(); deleteProfile(p.id); }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="flex flex-col gap-1 shrink-0">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-primary h-8 w-8"
+                    onClick={(e) => { e.stopPropagation(); startEditing(p); }}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-destructive h-8 w-8"
+                    onClick={(e) => { e.stopPropagation(); deleteProfile(p.id); }}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {creating ? (
+        {(creating || editing) ? (
           <Card>
             <CardContent className="p-5 space-y-4">
-              <h2 className="font-display font-bold text-foreground">Novo perfil</h2>
+              <h2 className="font-display font-bold text-foreground">
+                {editing ? 'Editar perfil' : 'Novo perfil'}
+              </h2>
               <Input
                 placeholder="Nome do estudante"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 autoFocus
               />
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Série:</p>
+                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a série" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {YEARS.map((y) => (
+                      <SelectItem key={y} value={y}>{y}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Escolha um avatar:</p>
                 <div className="flex flex-wrap gap-2">
@@ -152,10 +211,10 @@ export default function Profiles() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button className="flex-1 font-display font-bold" onClick={createProfile} disabled={!newName.trim()}>
-                  Criar
+                <Button className="flex-1 font-display font-bold" onClick={editing ? saveEdit : createProfile} disabled={!newName.trim()}>
+                  {editing ? 'Salvar' : 'Criar'}
                 </Button>
-                <Button variant="outline" onClick={() => setCreating(false)}>
+                <Button variant="outline" onClick={resetForm}>
                   Cancelar
                 </Button>
               </div>

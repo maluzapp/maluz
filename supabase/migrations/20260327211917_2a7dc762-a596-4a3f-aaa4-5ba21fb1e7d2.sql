@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN school_year text;
