@@ -134,6 +134,9 @@ export default function Profiles() {
                   <span className="text-4xl">{p.avatar_emoji}</span>
                   <div className="flex-1">
                     <p className="font-display font-bold text-foreground">{p.name}</p>
+                    {p.school_year && (
+                      <p className="text-xs text-primary font-medium">{p.school_year}</p>
+                    )}
                     <div className="flex gap-3 text-xs text-muted-foreground mt-1">
                       <span>⭐ {p.xp} XP</span>
                       <span>📊 Nível {p.level}</span>
@@ -141,29 +144,54 @@ export default function Profiles() {
                     </div>
                   </div>
                 </button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-muted-foreground hover:text-destructive shrink-0"
-                  onClick={(e) => { e.stopPropagation(); deleteProfile(p.id); }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="flex flex-col gap-1 shrink-0">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-primary h-8 w-8"
+                    onClick={(e) => { e.stopPropagation(); startEditing(p); }}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-destructive h-8 w-8"
+                    onClick={(e) => { e.stopPropagation(); deleteProfile(p.id); }}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {creating ? (
+        {(creating || editing) ? (
           <Card>
             <CardContent className="p-5 space-y-4">
-              <h2 className="font-display font-bold text-foreground">Novo perfil</h2>
+              <h2 className="font-display font-bold text-foreground">
+                {editing ? 'Editar perfil' : 'Novo perfil'}
+              </h2>
               <Input
                 placeholder="Nome do estudante"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 autoFocus
               />
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Série:</p>
+                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a série" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {YEARS.map((y) => (
+                      <SelectItem key={y} value={y}>{y}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Escolha um avatar:</p>
                 <div className="flex flex-wrap gap-2">
@@ -183,11 +211,15 @@ export default function Profiles() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button className="flex-1 font-display font-bold" onClick={createProfile} disabled={!newName.trim()}>
-                  Criar
+                <Button className="flex-1 font-display font-bold" onClick={editing ? saveEdit : createProfile} disabled={!newName.trim()}>
+                  {editing ? 'Salvar' : 'Criar'}
                 </Button>
-                <Button variant="outline" onClick={() => setCreating(false)}>
+                <Button variant="outline" onClick={resetForm}>
                   Cancelar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
                 </Button>
               </div>
             </CardContent>
