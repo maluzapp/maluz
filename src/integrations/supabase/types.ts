@@ -22,6 +22,7 @@ export type Database = {
           last_study_date: string | null
           level: number
           name: string
+          school_year: string | null
           streak_days: number
           total_correct: number
           total_exercises: number
@@ -35,6 +36,7 @@ export type Database = {
           last_study_date?: string | null
           level?: number
           name: string
+          school_year?: string | null
           streak_days?: number
           total_correct?: number
           total_exercises?: number
@@ -48,6 +50,7 @@ export type Database = {
           last_study_date?: string | null
           level?: number
           name?: string
+          school_year?: string | null
           streak_days?: number
           total_correct?: number
           total_exercises?: number
