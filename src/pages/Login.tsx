@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { lovable } from '@/integrations/lovable/index';
+import { Download } from 'lucide-react';
 
 export default function Login() {
   const { user, loading } = useAuth();
@@ -60,6 +61,11 @@ export default function Login() {
             </Button>
           </CardContent>
         </Card>
+
+        <Link to="/instalar" className="mt-4 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Download className="h-4 w-4" />
+          Instalar no celular
+        </Link>
       </div>
     </div>
   );
