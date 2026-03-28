@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
-import { Flame, Star, TrendingUp, BookOpen, Trophy, Target, Calendar, Zap, BarChart3 } from 'lucide-react';
+import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProfileData {
