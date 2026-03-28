@@ -85,8 +85,11 @@ export default function Index() {
 
   if (loading || !profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+      <div className="min-h-screen flex items-center justify-center bg-background animate-fade-in">
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+          <p className="text-xs text-muted-foreground font-mono">Carregando...</p>
+        </div>
       </div>
     );
   }
@@ -97,7 +100,7 @@ export default function Index() {
   const accuracy = profile.total_exercises > 0 ? Math.round((profile.total_correct / profile.total_exercises) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 pb-36">
+    <div className="min-h-screen bg-background px-4 py-6 pb-36 animate-fade-in">
       <div className="mx-auto max-w-lg space-y-5">
 
         {/* Profile hero */}
