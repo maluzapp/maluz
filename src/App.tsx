@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { useProfileStore } from "@/hooks/useProfile";
 import { BottomNav } from "@/components/BottomNav";
 import Login from "./pages/Login";
+import Landing from "./pages/Landing";
 import Profiles from "./pages/Profiles";
 import Index from "./pages/Index";
 import Confirmation from "./pages/Confirmation";
