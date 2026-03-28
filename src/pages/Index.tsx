@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Camera, Mic, MicOff, Sparkles, X, Upload, Users } from 'lucide-react';
+import { BookOpen, Camera, Mic, MicOff, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,7 @@ import { useStudyStore } from '@/store/study-store';
 import { GamificationBar } from '@/components/GamificationBar';
 import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
+import { YEAR_OPTIONS } from '@/constants/years';
 import type { SchoolYear, Subject } from '@/types/study';
 
 const SUBJECTS: Subject[] = ['Matemática', 'Português', 'Ciências', 'História', 'Geografia', 'Inglês', 'Artes', 'Educação Física'];
@@ -44,6 +45,7 @@ export default function Index() {
         }
       });
   }, [activeProfileId]);
+
   const [subject, setSubject] = useState<Subject | ''>('');
   const [topic, setTopic] = useState('');
   const [images, setImages] = useState<File[]>([]);
@@ -103,20 +105,15 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 md:py-12">
+    <div className="min-h-screen bg-background px-4 py-6 pb-24 md:py-12">
       <div className="mx-auto max-w-lg">
         {/* Gamification Bar */}
-        <div className="mb-4 flex items-center gap-2">
-          <div className="flex-1">
-            <GamificationBar />
-          </div>
-          <Button variant="ghost" size="icon" onClick={() => navigate('/perfis')}>
-            <Users className="h-5 w-5" />
-          </Button>
+        <div className="mb-4">
+          <GamificationBar />
         </div>
 
         {/* Header */}
-        <div className="mb-8 text-center">
+        <div className="mb-8 text-center animate-fade-in">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5">
             <BookOpen className="h-4 w-4 text-primary" />
             <span className="text-sm font-semibold text-primary font-display">StudyApp</span>
@@ -131,7 +128,7 @@ export default function Index() {
 
         <div className="space-y-5">
           {/* Year */}
-          <Card>
+          <Card className="animate-fade-in" style={{ animationDelay: '100ms' }}>
             <CardContent className="p-4">
               <Label className="mb-2 block font-semibold">Ano escolar</Label>
               <Select value={year} onValueChange={(v) => setYear(v as SchoolYear)}>
@@ -139,17 +136,16 @@ export default function Index() {
                   <SelectValue placeholder="Selecione o ano" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="6">6º ano</SelectItem>
-                  <SelectItem value="7">7º ano</SelectItem>
-                  <SelectItem value="8">8º ano</SelectItem>
-                  <SelectItem value="9">9º ano</SelectItem>
+                  {YEAR_OPTIONS.map((y) => (
+                    <SelectItem key={y.value} value={y.value}>{y.label}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </CardContent>
           </Card>
 
           {/* Subject */}
-          <Card>
+          <Card className="animate-fade-in" style={{ animationDelay: '200ms' }}>
             <CardContent className="p-4">
               <Label className="mb-2 block font-semibold">Matéria</Label>
               <Select value={subject} onValueChange={(v) => setSubject(v as Subject)}>
@@ -168,7 +164,7 @@ export default function Index() {
           </Card>
 
           {/* Topic */}
-          <Card>
+          <Card className="animate-fade-in" style={{ animationDelay: '300ms' }}>
             <CardContent className="p-4">
               <Label className="mb-2 block font-semibold">Assunto</Label>
               <Input
@@ -180,7 +176,7 @@ export default function Index() {
           </Card>
 
           {/* Images */}
-          <Card>
+          <Card className="animate-fade-in" style={{ animationDelay: '400ms' }}>
             <CardContent className="p-4">
               <Label className="mb-2 block font-semibold">📷 Fotos do livro (opcional)</Label>
               <p className="mb-3 text-sm text-muted-foreground">
@@ -205,7 +201,7 @@ export default function Index() {
               {images.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {images.map((img, i) => (
-                    <div key={i} className="relative h-16 w-16 overflow-hidden rounded-md border">
+                    <div key={i} className="relative h-16 w-16 overflow-hidden rounded-md border animate-scale-in">
                       <img
                         src={URL.createObjectURL(img)}
                         alt={`Página ${i + 1}`}
@@ -225,7 +221,7 @@ export default function Index() {
           </Card>
 
           {/* Audio */}
-          <Card>
+          <Card className="animate-fade-in" style={{ animationDelay: '500ms' }}>
             <CardContent className="p-4">
               <Label className="mb-2 block font-semibold">🎤 Áudio com resumo (opcional)</Label>
               <p className="mb-3 text-sm text-muted-foreground">
@@ -249,7 +245,7 @@ export default function Index() {
                 )}
               </Button>
               {audioBlob && !isRecording && (
-                <div className="mt-3 flex items-center gap-2 rounded-md bg-success/10 px-3 py-2 text-sm text-success">
+                <div className="mt-3 flex items-center gap-2 rounded-md bg-success/10 px-3 py-2 text-sm text-success animate-fade-in">
                   ✅ Áudio gravado com sucesso
                 </div>
               )}
@@ -259,7 +255,8 @@ export default function Index() {
           {/* Submit */}
           <Button
             size="lg"
-            className="w-full gap-2 font-display text-lg font-bold"
+            className="w-full gap-2 font-display text-lg font-bold animate-fade-in"
+            style={{ animationDelay: '600ms' }}
             disabled={!canSubmit}
             onClick={handleSubmit}
           >
