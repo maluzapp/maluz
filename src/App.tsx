@@ -46,6 +46,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/landing" element={<Landing />} />
             <Route path="/perfis" element={<Profiles />} />
             <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />
             <Route path="/confirmacao" element={<RequireAuth><Confirmation /></RequireAuth>} />
