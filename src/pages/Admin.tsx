@@ -70,6 +70,12 @@ const VOICE_FIELDS: FieldConfig[] = [
   { key: 'phrase_4', label: 'Frase de incentivo 2', type: 'text', category: 'voice' },
 ];
 
+const SHARE_FIELDS: FieldConfig[] = [
+  { key: 'share_header', label: 'Cabeçalho do compartilhamento', type: 'text', category: 'share' },
+  { key: 'share_cta', label: 'CTA para amigos experimentarem', type: 'textarea', category: 'share' },
+  { key: 'share_app_url', label: 'Link do app no compartilhamento', type: 'text', category: 'share' },
+];
+
 const LANDING_FIELDS: FieldConfig[] = [
   { key: 'hero_title', label: 'Título Hero', type: 'text', category: 'landing' },
   { key: 'hero_subtitle', label: 'Subtítulo Hero', type: 'text', category: 'landing' },
