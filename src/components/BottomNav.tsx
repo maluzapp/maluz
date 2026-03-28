@@ -1,44 +1,84 @@
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, Users, Trophy, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import lampadaIcon from '@/assets/lampada.png';
 
-const NAV_ITEMS = [
+const NAV_ITEMS_LEFT = [
   { path: '/', icon: Home, label: 'Início' },
   { path: '/perfis', icon: Users, label: 'Perfis' },
+];
+
+const NAV_ITEMS_RIGHT = [
   { path: '/resultado', icon: Trophy, label: 'Resultado' },
   { path: '/instalar', icon: Download, label: 'Instalar' },
 ];
 
+const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/landing'];
+
 export function BottomNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [lampLit, setLampLit] = useState(false);
 
-  if (['/exercicios', '/confirmacao', '/login', '/landing'].includes(pathname)) return null;
+  if (HIDDEN_ROUTES.includes(pathname)) return null;
+
+  const handleLampClick = () => {
+    setLampLit(true);
+    setTimeout(() => {
+      navigate('/gerar');
+      setLampLit(false);
+    }, 400);
+  };
+
+  const isGeneratePage = pathname === '/gerar';
+
+  const renderItem = ({ path, icon: Icon, label }: { path: string; icon: typeof Home; label: string }) => {
+    const active = pathname === path;
+    return (
+      <button
+        key={path}
+        onClick={() => navigate(path)}
+        className={cn(
+          'flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors font-mono relative',
+          active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+        )}
+      >
+        <Icon className={cn('h-5 w-5 transition-transform', active && 'scale-110')} />
+        <span>{label}</span>
+        {active && <span className="absolute top-0 h-0.5 w-8 rounded-b-full bg-primary" />}
+      </button>
+    );
+  };
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-primary/15 bg-card/95 backdrop-blur-md safe-bottom">
-      <div className="mx-auto flex max-w-lg items-stretch justify-around">
-        {NAV_ITEMS.map(({ path, icon: Icon, label }) => {
-          const active = pathname === path;
-          return (
-            <button
-              key={path}
-              onClick={() => navigate(path)}
+      <div className="mx-auto flex max-w-lg items-stretch justify-around relative">
+        {NAV_ITEMS_LEFT.map(renderItem)}
+
+        {/* Center lamp button */}
+        <div className="flex items-center justify-center" style={{ width: '72px' }}>
+          <button
+            onClick={handleLampClick}
+            className={cn(
+              'absolute -top-6 flex items-center justify-center w-14 h-14 rounded-full border-4 border-card/95 transition-all duration-300',
+              isGeneratePage || lampLit
+                ? 'bg-primary shadow-[0_0_20px_hsl(var(--primary)/0.5)] scale-110'
+                : 'bg-card hover:bg-primary/20 shadow-lg'
+            )}
+          >
+            <img
+              src={lampadaIcon}
+              alt="Gerar exercícios"
               className={cn(
-                'flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors font-mono',
-                active
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
+                'h-7 w-7 object-contain transition-all duration-300',
+                (isGeneratePage || lampLit) ? 'brightness-150 drop-shadow-[0_0_8px_rgba(245,200,66,0.8)]' : 'opacity-70'
               )}
-            >
-              <Icon className={cn('h-5 w-5 transition-transform', active && 'scale-110')} />
-              <span>{label}</span>
-              {active && (
-                <span className="absolute top-0 h-0.5 w-8 rounded-b-full bg-primary" />
-              )}
-            </button>
-          );
-        })}
+            />
+          </button>
+        </div>
+
+        {NAV_ITEMS_RIGHT.map(renderItem)}
       </div>
     </nav>
   );
