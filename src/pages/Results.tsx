@@ -347,6 +347,15 @@ export default function Results() {
                 Novo estudo
               </Button>
             </div>
+
+            {/* Past sessions */}
+            <div className="mt-8">
+              <h2 className="font-display text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+                <History className="h-5 w-5 text-primary" />
+                Sessões anteriores
+              </h2>
+              <SessionHistory />
+            </div>
           </>
         ) : (
           <>
