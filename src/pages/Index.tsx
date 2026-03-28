@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useProfileStore } from '@/hooks/useProfile';
+import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
 import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3 } from 'lucide-react';

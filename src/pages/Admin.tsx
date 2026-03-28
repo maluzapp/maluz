@@ -60,6 +60,7 @@ const LOGO_FIELDS: LogoFieldConfig[] = [
   { key: 'symbol_landing_hero', label: 'Símbolo Hero (Landing)', sizeKey: 'symbol_height_landing_hero', min: 32, max: 256 },
   { key: 'symbol_index', label: 'Símbolo Index', sizeKey: 'symbol_height_index', min: 32, max: 128 },
   { key: 'symbol_login', label: 'Símbolo Login', sizeKey: 'symbol_height_login', min: 32, max: 256 },
+  { key: 'icon_pwa', label: 'Ícone do App (PWA)', sizeKey: 'icon_pwa_size', min: 128, max: 512 },
 ];
 
 const VOICE_FIELDS: FieldConfig[] = [
