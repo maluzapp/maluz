@@ -47,7 +47,6 @@ export default function Profiles() {
   const [loadingProfiles, setLoadingProfiles] = useState(true);
 
   // Invite code states
-  const [inviteCode, setInviteCode] = useState('');
   const [generatedCode, setGeneratedCode] = useState('');
   const [linkingCode, setLinkingCode] = useState('');
   const [viewingChild, setViewingChild] = useState<Profile | null>(null);
