@@ -585,6 +585,9 @@ export default function Admin() {
             <TabsContent value="share">
               <TabSection fields={SHARE_FIELDS} icon={<Share2 className="h-5 w-5 text-primary" />} title="Mensagem de Compartilhamento (WhatsApp)" />
             </TabsContent>
+            <TabsContent value="users">
+              <UsersSection />
+            </TabsContent>
           </div>
         </Tabs>
       </div>
