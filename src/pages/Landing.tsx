@@ -113,15 +113,15 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 mt-12">
           <div className="p-5 rounded-2xl border border-primary/15 bg-primary/[0.04]">
             <p className="font-mono text-[0.62rem] tracking-[0.18em] uppercase text-primary/70 mb-2">Missão</p>
-            <p className="font-display text-sm leading-relaxed text-foreground/85">Iluminar a jornada de estudos das crianças, transformando dúvidas em entendimento de forma leve e motivadora.</p>
+            <p className="font-display text-sm leading-relaxed text-foreground/85">{t('mission_text', 'Iluminar a jornada de estudos das crianças, transformando dúvidas em entendimento de forma leve e motivadora.')}</p>
           </div>
           <div className="p-5 rounded-2xl bg-primary text-primary-foreground">
             <p className="font-mono text-[0.62rem] tracking-[0.18em] uppercase opacity-60 mb-2">Visão</p>
-            <p className="font-display text-sm leading-relaxed">Ser o companheiro digital mais querido para o estudo personalizado, unindo tecnologia e afeto.</p>
+            <p className="font-display text-sm leading-relaxed">{t('vision_text', 'Ser o companheiro digital mais querido para o estudo personalizado, unindo tecnologia e afeto.')}</p>
           </div>
           <div className="p-5 rounded-2xl border border-primary/15 bg-primary/[0.04]">
             <p className="font-mono text-[0.62rem] tracking-[0.18em] uppercase text-primary/70 mb-2">Essência</p>
-            <p className="font-display text-sm leading-relaxed text-foreground/85">Tecnologia com afeto. Por trás de cada exercício existe uma relação real de cuidado e incentivo.</p>
+            <p className="font-display text-sm leading-relaxed text-foreground/85">{t('essence_text', 'Tecnologia com afeto. Por trás de cada exercício existe uma relação real de cuidado e incentivo.')}</p>
           </div>
         </div>
       </section>
