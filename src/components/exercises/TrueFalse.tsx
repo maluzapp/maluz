@@ -22,14 +22,16 @@ export function TrueFalse({ exercise, index, onAnswer }: Props) {
   };
 
   return (
-    <Card>
+    <Card className="animate-slide-up overflow-hidden">
       <CardContent className="p-5">
-        <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">
+        <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary animate-fade-in">
           Verdadeiro ou Falso
         </div>
-        <h2 className="mb-6 text-lg font-bold text-foreground">{exercise.statement}</h2>
+        <h2 className="mb-6 text-lg font-bold text-foreground animate-fade-in" style={{ animationDelay: '100ms' }}>
+          {exercise.statement}
+        </h2>
         <div className="grid grid-cols-2 gap-3">
-          {[true, false].map((val) => {
+          {[true, false].map((val, i) => {
             const isCorrectAnswer = val === exercise.correct;
             const isSelected = val === selected;
             return (
@@ -40,11 +42,12 @@ export function TrueFalse({ exercise, index, onAnswer }: Props) {
                 onClick={() => handleSelect(val)}
                 disabled={answered}
                 className={cn(
-                  'text-base font-bold',
-                  answered && isCorrectAnswer && 'animate-pop border-success bg-success/10 text-success',
+                  'text-base font-bold h-16 rounded-xl transition-all duration-300 animate-fade-in hover:scale-[1.03] active:scale-[0.97]',
+                  answered && isCorrectAnswer && 'animate-bounce-in border-success bg-success/10 text-success shadow-md shadow-success/20',
                   answered && isSelected && !isCorrectAnswer && 'animate-shake border-destructive bg-destructive/10 text-destructive',
-                  answered && !isSelected && !isCorrectAnswer && 'opacity-50'
+                  answered && !isSelected && !isCorrectAnswer && 'opacity-40 scale-95'
                 )}
+                style={{ animationDelay: `${(i + 2) * 100}ms` }}
               >
                 {val ? '✅ Verdadeiro' : '❌ Falso'}
               </Button>
@@ -53,11 +56,11 @@ export function TrueFalse({ exercise, index, onAnswer }: Props) {
         </div>
         {answered && (
           <div className={cn(
-            'mt-4 rounded-lg px-4 py-3 text-sm',
+            'mt-4 rounded-xl px-4 py-3 text-sm animate-slide-up',
             selected === exercise.correct ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'
           )}>
-            <p className="font-semibold">
-              {selected === exercise.correct ? '✅ Correto!' : '❌ Incorreto'}
+            <p className="font-semibold text-base">
+              {selected === exercise.correct ? '🎉 Correto!' : '😔 Incorreto'}
             </p>
             <p className="mt-1 opacity-80">{exercise.explanation}</p>
           </div>
