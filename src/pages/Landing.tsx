@@ -287,13 +287,13 @@ export default function Landing() {
         <div className="max-w-lg mx-auto">
           <img src={lampadaIcon} alt="Maluz" className="h-20 mx-auto mb-6 animate-float" />
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-foreground">
-            Acenda a <em className="text-primary">luz</em> do saber
+            {t('app_slogan', 'Acenda a luz do saber')}
           </h2>
           <p className="text-sm text-foreground/60 mb-8">
-            Comece agora e transforme o estudo do seu filho em uma jornada iluminada.
+            {t('cta_text', 'Comece agora e transforme o estudo do seu filho em uma jornada iluminada.')}
           </p>
           <Link to="/login" className="inline-block px-10 py-4 rounded-full bg-primary text-primary-foreground font-display font-bold text-base tracking-wide hover:opacity-90 transition-all hover:scale-105">
-            Criar conta grátis ✨
+            {t('cta_button', 'Criar conta grátis ✨')}
           </Link>
         </div>
       </section>
@@ -301,10 +301,10 @@ export default function Landing() {
       {/* Footer */}
       <footer className="py-10 border-t border-primary/10 text-center">
         <img src={logoMaluz} alt="Maluz" className="h-16 mx-auto mb-3" />
-        <p className="text-xs tracking-widest uppercase text-foreground/40 mb-4">O conhecimento que ilumina</p>
+        <p className="text-xs tracking-widest uppercase text-foreground/40 mb-4">{t('app_tagline', 'O conhecimento que ilumina')}</p>
         <div className="w-8 h-px bg-primary mx-auto mb-4 opacity-40" />
         <p className="text-[0.65rem] text-foreground/25 tracking-wide">
-          © {new Date().getFullYear()} Maluz · Iluminando mentes, um exercício por vez
+          {t('footer_text', `© ${new Date().getFullYear()} Maluz · Iluminando mentes, um exercício por vez`)}
         </p>
       </footer>
     </div>
