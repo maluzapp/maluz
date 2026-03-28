@@ -65,7 +65,7 @@ export default function Exercises() {
   };
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 md:py-12">
+    <div className="min-h-screen bg-background px-4 py-6 pb-24 md:py-12">
       <div className="mx-auto max-w-lg">
         <div className="mb-6">
           <div className="mb-2 flex items-center justify-between text-sm text-muted-foreground">

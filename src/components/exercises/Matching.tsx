@@ -101,7 +101,7 @@ export function Matching({ exercise, index, onAnswer }: Props) {
   const allMatched = matches.size === exercise.pairs.length;
 
   return (
-    <Card>
+    <Card className="animate-slide-up overflow-hidden">
       <CardContent className="p-5">
         <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">
           Associação

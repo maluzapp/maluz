@@ -8,9 +8,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, LogOut, Trash2, Pencil } from 'lucide-react';
+import { YEAR_OPTIONS, getYearLabel } from '@/constants/years';
 
 const AVATARS = ['🧑‍🎓', '👧', '👦', '🦸', '🧙', '🦊', '🐱', '🦄', '🚀', '⭐'];
-const YEARS = ['6º ano', '7º ano', '8º ano', '9º ano'] as const;
 
 interface Profile {
   id: string;
@@ -114,7 +114,7 @@ export default function Profiles() {
   }
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 md:py-12">
+    <div className="min-h-screen bg-background px-4 py-6 pb-24 md:py-12">
       <div className="mx-auto max-w-md">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -127,15 +127,19 @@ export default function Profiles() {
         </div>
 
         <div className="space-y-3 mb-6">
-          {profiles.map((p) => (
-            <Card key={p.id} className="cursor-pointer hover:border-primary/50 transition-colors">
+          {profiles.map((p, idx) => (
+            <Card
+              key={p.id}
+              className="cursor-pointer hover:border-primary/50 transition-all animate-fade-in"
+              style={{ animationDelay: `${idx * 80}ms` }}
+            >
               <CardContent className="p-4 flex items-center gap-4">
                 <button onClick={() => selectProfile(p.id)} className="flex-1 flex items-center gap-4 text-left">
                   <span className="text-4xl">{p.avatar_emoji}</span>
                   <div className="flex-1">
                     <p className="font-display font-bold text-foreground">{p.name}</p>
                     {p.school_year && (
-                      <p className="text-xs text-primary font-medium">{p.school_year}</p>
+                      <p className="text-xs text-primary font-medium">{getYearLabel(p.school_year)}</p>
                     )}
                     <div className="flex gap-3 text-xs text-muted-foreground mt-1">
                       <span>⭐ {p.xp} XP</span>
@@ -168,7 +172,7 @@ export default function Profiles() {
         </div>
 
         {(creating || editing) ? (
-          <Card>
+          <Card className="animate-scale-in">
             <CardContent className="p-5 space-y-4">
               <h2 className="font-display font-bold text-foreground">
                 {editing ? 'Editar perfil' : 'Novo perfil'}
@@ -186,8 +190,8 @@ export default function Profiles() {
                     <SelectValue placeholder="Selecione a série" />
                   </SelectTrigger>
                   <SelectContent>
-                    {YEARS.map((y) => (
-                      <SelectItem key={y} value={y}>{y}</SelectItem>
+                    {YEAR_OPTIONS.map((y) => (
+                      <SelectItem key={y.value} value={y.value}>{y.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

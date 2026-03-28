@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { useProfileStore } from "@/hooks/useProfile";
+import { BottomNav } from "@/components/BottomNav";
 import Login from "./pages/Login";
 import Profiles from "./pages/Profiles";
 import Index from "./pages/Index";
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/instalar" element={<Install />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <BottomNav />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
