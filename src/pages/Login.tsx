@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { lovable } from '@/integrations/lovable/index';
 import { Download } from 'lucide-react';
+import logoMaluz from '@/assets/logo_maluz.png';
 
 export default function Login() {
   const { user, loading } = useAuth();
@@ -27,24 +28,28 @@ export default function Login() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-secondary">
         <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm text-center">
-        <div className="mb-8">
-          <div className="text-5xl mb-3">📚</div>
-          <h1 className="font-display text-3xl font-bold text-foreground">StudyApp</h1>
-          <p className="mt-2 text-muted-foreground">
-            Exercícios inteligentes para seus estudos
+    <div className="min-h-screen flex items-center justify-center bg-secondary px-4 relative overflow-hidden">
+      {/* Glow effect */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: 'radial-gradient(ellipse 80% 60% at 50% 40%, hsla(42, 91%, 61%, 0.12) 0%, transparent 70%)'
+      }} />
+
+      <div className="w-full max-w-sm text-center relative z-10">
+        <div className="mb-8 animate-fade-in">
+          <img src={logoMaluz} alt="Maluz" className="h-32 mx-auto mb-4" />
+          <p className="text-secondary-foreground/70 font-body text-sm italic font-display">
+            O conhecimento que ilumina ✨
           </p>
         </div>
 
-        <Card>
+        <Card className="border-primary/15 bg-card/80 backdrop-blur-sm animate-fade-in" style={{ animationDelay: '200ms' }}>
           <CardContent className="p-6">
             <Button
               size="lg"
@@ -62,10 +67,16 @@ export default function Login() {
           </CardContent>
         </Card>
 
-        <Link to="/instalar" className="mt-4 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-          <Download className="h-4 w-4" />
-          Instalar no celular
-        </Link>
+        <div className="mt-6 flex items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: '400ms' }}>
+          <Link to="/instalar" className="inline-flex items-center gap-2 text-sm text-secondary-foreground/50 hover:text-primary transition-colors">
+            <Download className="h-4 w-4" />
+            Instalar
+          </Link>
+          <span className="text-secondary-foreground/20">·</span>
+          <Link to="/landing" className="text-sm text-secondary-foreground/50 hover:text-primary transition-colors">
+            Conheça o Maluz
+          </Link>
+        </div>
       </div>
     </div>
   );

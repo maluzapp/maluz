@@ -13,11 +13,10 @@ export function BottomNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  // Hide on exercise/confirmation flow
-  if (['/exercicios', '/confirmacao', '/login'].includes(pathname)) return null;
+  if (['/exercicios', '/confirmacao', '/login', '/landing'].includes(pathname)) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md safe-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-primary/15 bg-card/95 backdrop-blur-md safe-bottom">
       <div className="mx-auto flex max-w-lg items-stretch justify-around">
         {NAV_ITEMS.map(({ path, icon: Icon, label }) => {
           const active = pathname === path;
@@ -26,7 +25,7 @@ export function BottomNav() {
               key={path}
               onClick={() => navigate(path)}
               className={cn(
-                'flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors',
+                'flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors font-mono',
                 active
                   ? 'text-primary'
                   : 'text-muted-foreground hover:text-foreground'
