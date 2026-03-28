@@ -208,7 +208,7 @@ export default function Index() {
                     <CardContent className="p-3 flex items-center gap-3">
                       <div className={cn(
                         'w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold shrink-0',
-                        pct >= 70 ? 'bg-green-500/15 text-green-400' : pct >= 50 ? 'bg-primary/15 text-primary' : 'bg-destructive/15 text-destructive'
+                        pct >= 70 ? 'bg-accent/15 text-accent' : pct >= 50 ? 'bg-primary/15 text-primary' : 'bg-destructive/15 text-destructive'
                       )}>
                         {pct}%
                       </div>
