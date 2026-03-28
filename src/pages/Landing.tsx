@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useBrandingByCategory } from '@/hooks/useBrandingSettings';
 import logoMaluz from '@/assets/logo_maluz.png';
 import lampadaIcon from '@/assets/lampada.png';
 
