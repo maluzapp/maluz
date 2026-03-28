@@ -1,0 +1,1 @@
+ALTER TABLE public.branding_settings ADD CONSTRAINT branding_settings_key_unique UNIQUE (key);

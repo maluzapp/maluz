@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useBrandingByCategory } from '@/hooks/useBrandingSettings';
 import logoMaluz from '@/assets/logo_maluz.png';
 import lampadaIcon from '@/assets/lampada.png';
 
@@ -25,14 +26,20 @@ const UX_STEPS = [
 ];
 
 export default function Landing() {
+  const { data: settings } = useBrandingByCategory();
+  const t = (key: string, fallback: string) => settings?.landing?.[key]?.value ?? settings?.general?.[key]?.value ?? fallback;
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-3 bg-background/93 backdrop-blur-xl border-b border-primary/15">
         <span className="font-display text-xl font-bold text-foreground">Ma<span className="text-primary italic">luz</span></span>
-        <Link to="/login" className="text-xs font-mono tracking-[0.12em] uppercase text-primary hover:text-primary/80 transition-colors">
-          Entrar
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link to="/admin" className="text-[0.6rem] font-mono tracking-[0.1em] uppercase text-foreground/30 hover:text-primary transition-colors">⚙</Link>
+          <Link to="/login" className="text-xs font-mono tracking-[0.12em] uppercase text-primary hover:text-primary/80 transition-colors">
+            Entrar
+          </Link>
+        </div>
       </nav>
 
       {/* Hero */}
@@ -42,14 +49,14 @@ export default function Landing() {
         <div className="text-center relative z-10 px-5 animate-fade-in">
           <img src={lampadaIcon} alt="Maluz símbolo" className="h-24 mx-auto mb-6 animate-float" />
           <p className="font-mono text-[0.6rem] tracking-[0.2em] uppercase text-primary/80 mb-4">
-            Estudos personalizados por IA
+            {t('hero_subtitle', 'Estudos personalizados por IA')}
           </p>
           <h1 className="font-display text-6xl md:text-8xl font-black leading-[0.9] mb-4 text-foreground">
             Ma<span className="text-primary italic">luz</span>
           </h1>
           <div className="w-12 h-0.5 bg-primary mx-auto mb-4 opacity-60" />
           <p className="font-display text-lg md:text-xl italic text-foreground/70 mb-4">
-            O conhecimento que ilumina
+            {t('app_tagline', 'O conhecimento que ilumina')}
           </p>
           <p className="text-xs tracking-widest uppercase text-foreground/42 flex items-center justify-center gap-2 flex-wrap">
             <span>Exercícios</span>
@@ -59,7 +66,7 @@ export default function Landing() {
             <span>Gamificação</span>
           </p>
           <Link to="/login" className="inline-block mt-8 px-8 py-3 rounded-full bg-primary text-primary-foreground font-display font-bold text-sm tracking-wide hover:opacity-90 transition-all hover:scale-105">
-            Começar agora ✨
+            {t('cta_button', 'Começar agora ✨')}
           </Link>
         </div>
         {/* Scroll indicator */}
@@ -80,13 +87,10 @@ export default function Landing() {
               Uma luz chamada <em className="text-primary">Malu</em>
             </h2>
             <blockquote className="font-display text-lg md:text-xl italic leading-relaxed border-l-[3px] border-primary pl-5 mb-6 text-foreground/90">
-              "Malu era uma menina curiosa que adorava estudar, mas às vezes sentia dificuldade em revisar sozinha."
+              "{t('brand_story', 'Malu era uma menina curiosa que adorava estudar, mas às vezes sentia dificuldade em revisar sozinha.')}"
             </blockquote>
             <p className="text-sm leading-relaxed text-foreground/70">
-              Seu pai, inspirado por ela, criou um app onde bastava tirar uma foto do livro para ganhar exercícios feitos sob medida.
-              Com o tempo, percebeu que o app não apenas ajudava Malu — trazia uma <strong className="text-primary">luz nova</strong>: mais autonomia, mais diversão e mais brilho nos olhos a cada acerto.
-              <br /><br />
-              Assim nasceu o <strong className="text-primary">Maluz</strong> — a fusão de "Malu" com "Luz". A luz do conhecimento que cabe na palma da mão.
+              {t('brand_story_detail', 'Seu pai, inspirado por ela, criou um app onde bastava tirar uma foto do livro para ganhar exercícios feitos sob medida. Com o tempo, percebeu que o app não apenas ajudava Malu — trazia uma luz nova: mais autonomia, mais diversão e mais brilho nos olhos a cada acerto. Assim nasceu o Maluz — a fusão de "Malu" com "Luz". A luz do conhecimento que cabe na palma da mão.')}
             </p>
           </div>
           {/* Animated visual */}
@@ -109,15 +113,15 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 mt-12">
           <div className="p-5 rounded-2xl border border-primary/15 bg-primary/[0.04]">
             <p className="font-mono text-[0.62rem] tracking-[0.18em] uppercase text-primary/70 mb-2">Missão</p>
-            <p className="font-display text-sm leading-relaxed text-foreground/85">Iluminar a jornada de estudos das crianças, transformando dúvidas em entendimento de forma leve e motivadora.</p>
+            <p className="font-display text-sm leading-relaxed text-foreground/85">{t('mission_text', 'Iluminar a jornada de estudos das crianças, transformando dúvidas em entendimento de forma leve e motivadora.')}</p>
           </div>
           <div className="p-5 rounded-2xl bg-primary text-primary-foreground">
             <p className="font-mono text-[0.62rem] tracking-[0.18em] uppercase opacity-60 mb-2">Visão</p>
-            <p className="font-display text-sm leading-relaxed">Ser o companheiro digital mais querido para o estudo personalizado, unindo tecnologia e afeto.</p>
+            <p className="font-display text-sm leading-relaxed">{t('vision_text', 'Ser o companheiro digital mais querido para o estudo personalizado, unindo tecnologia e afeto.')}</p>
           </div>
           <div className="p-5 rounded-2xl border border-primary/15 bg-primary/[0.04]">
             <p className="font-mono text-[0.62rem] tracking-[0.18em] uppercase text-primary/70 mb-2">Essência</p>
-            <p className="font-display text-sm leading-relaxed text-foreground/85">Tecnologia com afeto. Por trás de cada exercício existe uma relação real de cuidado e incentivo.</p>
+            <p className="font-display text-sm leading-relaxed text-foreground/85">{t('essence_text', 'Tecnologia com afeto. Por trás de cada exercício existe uma relação real de cuidado e incentivo.')}</p>
           </div>
         </div>
       </section>
@@ -283,13 +287,13 @@ export default function Landing() {
         <div className="max-w-lg mx-auto">
           <img src={lampadaIcon} alt="Maluz" className="h-20 mx-auto mb-6 animate-float" />
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-foreground">
-            Acenda a <em className="text-primary">luz</em> do saber
+            {t('app_slogan', 'Acenda a luz do saber')}
           </h2>
           <p className="text-sm text-foreground/60 mb-8">
-            Comece agora e transforme o estudo do seu filho em uma jornada iluminada.
+            {t('cta_text', 'Comece agora e transforme o estudo do seu filho em uma jornada iluminada.')}
           </p>
           <Link to="/login" className="inline-block px-10 py-4 rounded-full bg-primary text-primary-foreground font-display font-bold text-base tracking-wide hover:opacity-90 transition-all hover:scale-105">
-            Criar conta grátis ✨
+            {t('cta_button', 'Criar conta grátis ✨')}
           </Link>
         </div>
       </section>
@@ -297,10 +301,10 @@ export default function Landing() {
       {/* Footer */}
       <footer className="py-10 border-t border-primary/10 text-center">
         <img src={logoMaluz} alt="Maluz" className="h-16 mx-auto mb-3" />
-        <p className="text-xs tracking-widest uppercase text-foreground/40 mb-4">O conhecimento que ilumina</p>
+        <p className="text-xs tracking-widest uppercase text-foreground/40 mb-4">{t('app_tagline', 'O conhecimento que ilumina')}</p>
         <div className="w-8 h-px bg-primary mx-auto mb-4 opacity-40" />
         <p className="text-[0.65rem] text-foreground/25 tracking-wide">
-          © {new Date().getFullYear()} Maluz · Iluminando mentes, um exercício por vez
+          {t('footer_text', `© ${new Date().getFullYear()} Maluz · Iluminando mentes, um exercício por vez`)}
         </p>
       </footer>
     </div>
