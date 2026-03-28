@@ -11,6 +11,7 @@ import { GamificationBar } from '@/components/GamificationBar';
 import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { YEAR_OPTIONS } from '@/constants/years';
+import lampadaIcon from '@/assets/lampada.png';
 import type { SchoolYear, Subject } from '@/types/study';
 
 const SUBJECTS: Subject[] = ['Matemática', 'Português', 'Ciências', 'História', 'Geografia', 'Inglês', 'Artes', 'Educação Física'];
@@ -114,23 +115,20 @@ export default function Index() {
 
         {/* Header */}
         <div className="mb-8 text-center animate-fade-in">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5">
-            <BookOpen className="h-4 w-4 text-primary" />
-            <span className="text-sm font-semibold text-primary font-display">StudyApp</span>
-          </div>
+          <img src={lampadaIcon} alt="Maluz" className="h-16 mx-auto mb-3" />
           <h1 className="font-display text-3xl font-bold text-foreground">
-            Bora estudar! 📚
+            Acenda a <span className="text-primary italic">luz</span> do saber! 💡
           </h1>
-          <p className="mt-2 text-muted-foreground">
-            Configure o estudo e a IA gera exercícios pra você
+          <p className="mt-2 text-muted-foreground font-body">
+            Vamos clarear as dúvidas? A IA gera exercícios sob medida ✨
           </p>
         </div>
 
         <div className="space-y-5">
           {/* Year */}
-          <Card className="animate-fade-in" style={{ animationDelay: '100ms' }}>
+          <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '100ms' }}>
             <CardContent className="p-4">
-              <Label className="mb-2 block font-semibold">Ano escolar</Label>
+              <Label className="mb-2 block font-semibold font-display">Ano escolar</Label>
               <Select value={year} onValueChange={(v) => setYear(v as SchoolYear)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o ano" />
@@ -145,9 +143,9 @@ export default function Index() {
           </Card>
 
           {/* Subject */}
-          <Card className="animate-fade-in" style={{ animationDelay: '200ms' }}>
+          <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '200ms' }}>
             <CardContent className="p-4">
-              <Label className="mb-2 block font-semibold">Matéria</Label>
+              <Label className="mb-2 block font-semibold font-display">Matéria</Label>
               <Select value={subject} onValueChange={(v) => setSubject(v as Subject)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione a matéria" />
@@ -164,9 +162,9 @@ export default function Index() {
           </Card>
 
           {/* Topic */}
-          <Card className="animate-fade-in" style={{ animationDelay: '300ms' }}>
+          <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '300ms' }}>
             <CardContent className="p-4">
-              <Label className="mb-2 block font-semibold">Assunto</Label>
+              <Label className="mb-2 block font-semibold font-display">Assunto</Label>
               <Input
                 placeholder="Ex: Equações do 1º grau, Revolução Francesa..."
                 value={topic}
@@ -176,9 +174,9 @@ export default function Index() {
           </Card>
 
           {/* Images */}
-          <Card className="animate-fade-in" style={{ animationDelay: '400ms' }}>
+          <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '400ms' }}>
             <CardContent className="p-4">
-              <Label className="mb-2 block font-semibold">📷 Fotos do livro (opcional)</Label>
+              <Label className="mb-2 block font-semibold font-display">📷 Fotos do livro (opcional)</Label>
               <p className="mb-3 text-sm text-muted-foreground">
                 Tire foto ou envie imagens das páginas
               </p>
@@ -221,9 +219,9 @@ export default function Index() {
           </Card>
 
           {/* Audio */}
-          <Card className="animate-fade-in" style={{ animationDelay: '500ms' }}>
+          <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '500ms' }}>
             <CardContent className="p-4">
-              <Label className="mb-2 block font-semibold">🎤 Áudio com resumo (opcional)</Label>
+              <Label className="mb-2 block font-semibold font-display">🎤 Áudio com resumo (opcional)</Label>
               <p className="mb-3 text-sm text-muted-foreground">
                 Grave um resumo da matéria com suas palavras
               </p>
@@ -261,7 +259,7 @@ export default function Index() {
             onClick={handleSubmit}
           >
             <Sparkles className="h-5 w-5" />
-            Gerar Exercícios
+            Gerar Exercícios ✨
           </Button>
         </div>
       </div>

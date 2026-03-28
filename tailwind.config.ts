@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Space Grotesk"', 'sans-serif'],
-        body: ['"Nunito"', 'sans-serif'],
+        display: ['"Playfair Display"', 'serif'],
+        body: ['"DM Sans"', 'sans-serif'],
+        mono: ['"Space Mono"', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -113,6 +114,10 @@ export default {
           "50%": { transform: "scale(1.2) rotate(180deg)", opacity: "1" },
           "100%": { transform: "scale(1) rotate(360deg)", opacity: "1" },
         },
+        "glow-pulse": {
+          "0%, 100%": { opacity: "0.6" },
+          "50%": { opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -124,6 +129,7 @@ export default {
         "slide-up": "slide-up 0.4s ease-out both",
         "bounce-in": "bounce-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both",
         "confetti": "confetti 0.5s ease-out both",
+        "glow-pulse": "glow-pulse 3s ease-in-out infinite",
       },
     },
   },
