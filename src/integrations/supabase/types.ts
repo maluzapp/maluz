@@ -38,6 +38,87 @@ export type Database = {
         }
         Relationships: []
       }
+      invite_codes: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          profile_id: string
+          used: boolean
+          used_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          profile_id: string
+          used?: boolean
+          used_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          profile_id?: string
+          used?: boolean
+          used_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invite_codes_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invite_codes_used_by_fkey"
+            columns: ["used_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parent_child_links: {
+        Row: {
+          child_profile_id: string
+          created_at: string
+          id: string
+          parent_profile_id: string
+        }
+        Insert: {
+          child_profile_id: string
+          created_at?: string
+          id?: string
+          parent_profile_id: string
+        }
+        Update: {
+          child_profile_id?: string
+          created_at?: string
+          id?: string
+          parent_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_child_links_child_profile_id_fkey"
+            columns: ["child_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_child_links_parent_profile_id_fkey"
+            columns: ["parent_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_emoji: string
@@ -46,6 +127,7 @@ export type Database = {
           last_study_date: string | null
           level: number
           name: string
+          profile_type: string
           school_year: string | null
           streak_days: number
           total_correct: number
@@ -60,6 +142,7 @@ export type Database = {
           last_study_date?: string | null
           level?: number
           name: string
+          profile_type?: string
           school_year?: string | null
           streak_days?: number
           total_correct?: number
@@ -74,6 +157,7 @@ export type Database = {
           last_study_date?: string | null
           level?: number
           name?: string
+          profile_type?: string
           school_year?: string | null
           streak_days?: number
           total_correct?: number
