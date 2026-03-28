@@ -66,7 +66,7 @@ export default function Landing() {
             <span>Gamificação</span>
           </p>
           <Link to="/login" className="inline-block mt-8 px-8 py-3 rounded-full bg-primary text-primary-foreground font-display font-bold text-sm tracking-wide hover:opacity-90 transition-all hover:scale-105">
-            Começar agora ✨
+            {t('cta_button', 'Começar agora ✨')}
           </Link>
         </div>
         {/* Scroll indicator */}
