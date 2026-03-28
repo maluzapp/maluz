@@ -72,10 +72,15 @@ export default function Profiles() {
     setProfiles(list);
     setLoadingProfiles(false);
 
-    // Auto-select first profile if none active
+    // Auto-select first profile if none active, or clear if stale
     const current = useProfileStore.getState().activeProfileId;
-    if (!current && list.length > 0) {
+    if (current && list.length > 0 && !list.find(p => p.id === current)) {
+      // Active profile no longer exists — reset
       setActiveProfile(list[0].id);
+    } else if (!current && list.length > 0) {
+      setActiveProfile(list[0].id);
+    } else if (list.length === 0) {
+      setActiveProfile(null);
     }
   };
 
@@ -153,6 +158,11 @@ export default function Profiles() {
   };
 
   const deleteProfile = async (id: string) => {
+    // Clear active profile if it's the one being deleted
+    const current = useProfileStore.getState().activeProfileId;
+    if (current === id) {
+      setActiveProfile(null);
+    }
     await supabase.from('profiles').delete().eq('id', id);
     fetchProfiles();
   };

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Users, Trophy, Download } from 'lucide-react';
+import { Home, Users, Trophy, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProfileStore } from '@/hooks/useProfile';
 import lampadaIcon from '@/assets/lampada-2.png';
@@ -12,7 +12,7 @@ const NAV_ITEMS_LEFT = [
 
 const NAV_ITEMS_RIGHT = [
   { path: '/resultado', icon: Trophy, label: 'Resultado' },
-  { path: '/instalar', icon: Download, label: 'Instalar' },
+  { path: '/creditos', icon: Info, label: 'Créditos' },
 ];
 
 const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/landing'];
@@ -73,7 +73,7 @@ export function BottomNav() {
               src={lampadaIcon}
               alt="Gerar exercícios"
               className={cn(
-                'h-7 w-7 object-contain transition-all duration-300',
+                'h-9 w-9 object-contain transition-all duration-300',
                 (isGeneratePage || lampLit) ? 'brightness-150 drop-shadow-[0_0_8px_rgba(245,200,66,0.8)]' : 'opacity-70'
               )}
             />
