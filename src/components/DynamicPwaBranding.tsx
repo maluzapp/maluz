@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-const DEFAULT_ICON = '/icon-192.png';
 const DEFAULT_NAME = 'Maluz';
 const DEFAULT_DESCRIPTION = 'Maluz: exercícios personalizados para crianças do 6º ano ao 3º médio. Acenda a luz do saber.';
 
