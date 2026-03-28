@@ -6,52 +6,7 @@
 
 @layer base {
   :root {
-    /* Maluz Brand — Light Mode */
-    --background: 43 87% 94%;
-    --foreground: 213 50% 11%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 213 50% 11%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 213 50% 11%;
-
-    --primary: 42 91% 61%;
-    --primary-foreground: 213 50% 11%;
-
-    --secondary: 213 50% 14%;
-    --secondary-foreground: 43 87% 94%;
-
-    --muted: 43 30% 88%;
-    --muted-foreground: 213 20% 40%;
-
-    --accent: 160 94% 64%;
-    --accent-foreground: 213 50% 11%;
-
-    --destructive: 14 100% 64%;
-    --destructive-foreground: 0 0% 100%;
-
-    --success: 160 94% 64%;
-    --success-foreground: 213 50% 11%;
-
-    --border: 43 30% 85%;
-    --input: 43 30% 85%;
-    --ring: 42 91% 61%;
-
-    --radius: 0.75rem;
-
-    --sidebar-background: 43 87% 94%;
-    --sidebar-foreground: 213 50% 11%;
-    --sidebar-primary: 42 91% 61%;
-    --sidebar-primary-foreground: 213 50% 11%;
-    --sidebar-accent: 43 30% 90%;
-    --sidebar-accent-foreground: 213 50% 11%;
-    --sidebar-border: 43 30% 85%;
-    --sidebar-ring: 42 91% 61%;
-  }
-
-  .dark {
-    /* Maluz Brand — Dark Mode (Navy) */
+    /* Maluz Brand — Dark Navy (default) */
     --background: 213 50% 11%;
     --foreground: 43 87% 94%;
 
@@ -64,8 +19,8 @@
     --primary: 42 91% 61%;
     --primary-foreground: 213 50% 11%;
 
-    --secondary: 43 87% 94%;
-    --secondary-foreground: 213 50% 11%;
+    --secondary: 214 30% 18%;
+    --secondary-foreground: 43 87% 94%;
 
     --muted: 214 30% 20%;
     --muted-foreground: 43 20% 60%;
@@ -82,6 +37,8 @@
     --border: 214 30% 22%;
     --input: 214 30% 22%;
     --ring: 42 91% 61%;
+
+    --radius: 0.75rem;
 
     --sidebar-background: 213 50% 11%;
     --sidebar-foreground: 43 87% 94%;
@@ -103,6 +60,44 @@
     @apply bg-background text-foreground font-body;
   }
 }
+
+/* Stars background */
+.stars-bg {
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, hsla(42, 91%, 61%, 0.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 25% 35%, hsla(0, 0%, 100%, 0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 10%, hsla(42, 91%, 61%, 0.5) 0%, transparent 100%),
+    radial-gradient(2px 2px at 60% 20%, hsla(0, 0%, 100%, 0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 8%, hsla(42, 91%, 61%, 0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 60%, hsla(42, 91%, 61%, 0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 75%, hsla(0, 0%, 100%, 0.3) 0%, transparent 100%),
+    radial-gradient(2px 2px at 55% 85%, hsla(42, 91%, 61%, 0.5) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 92% 55%, hsla(42, 91%, 61%, 0.6) 0%, transparent 100%);
+}
+
+.hero-glow {
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, hsla(42, 91%, 61%, 0.12) 0%, transparent 70%);
+}
+
+@keyframes orbit-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(5px); }
+}
+
+.animate-orbit { animation: orbit-spin 20s linear infinite; }
+.animate-orbit-reverse { animation: orbit-spin 30s linear infinite reverse; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-scroll-bounce { animation: scroll-bounce 2s infinite; }
 
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
