@@ -281,7 +281,7 @@ export default function Results() {
                   <h1 className="font-display text-4xl font-bold text-foreground">{pct}%</h1>
                   <p className="mt-1 text-muted-foreground">{getMessage(pct)}</p>
                   <div className="mt-4 flex justify-center gap-6 text-sm">
-                    <div className="flex items-center gap-1.5 text-green-400">
+                    <div className="flex items-center gap-1.5 text-emerald-400">
                       <CheckCircle className="h-4 w-4" />
                       <span className="font-semibold">{score} certas</span>
                     </div>
