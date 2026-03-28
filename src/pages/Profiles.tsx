@@ -50,6 +50,7 @@ export default function Profiles() {
   const [generatedCode, setGeneratedCode] = useState('');
   const [linkingCode, setLinkingCode] = useState('');
   const [viewingChild, setViewingChild] = useState<Profile | null>(null);
+  const [activeTab, setActiveTab] = useState('meus');
 
   useEffect(() => {
     if (!loading && !user) navigate('/login');
