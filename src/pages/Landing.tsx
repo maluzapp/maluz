@@ -49,7 +49,7 @@ export default function Landing() {
         <div className="text-center relative z-10 px-5 animate-fade-in">
           <img src={lampadaIcon} alt="Maluz símbolo" className="h-24 mx-auto mb-6 animate-float" />
           <p className="font-mono text-[0.6rem] tracking-[0.2em] uppercase text-primary/80 mb-4">
-            {t('hero_subtitle', 'Estudos personalizados por IA')}
+            {t('hero_subtitle', 'Estudos personalizados pela Maluz')}
           </p>
           <h1 className="font-display text-6xl md:text-8xl font-black leading-[0.9] mb-4 text-foreground">
             Ma<span className="text-primary italic">luz</span>
