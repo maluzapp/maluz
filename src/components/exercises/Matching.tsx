@@ -9,6 +9,8 @@ interface Props {
   exercise: MatchingExercise;
   index: number;
   onAnswer: (answer: ExerciseAnswer) => void;
+  readOnly?: boolean;
+  savedAnswer?: ExerciseAnswer;
 }
 
 const MATCH_COLORS = [

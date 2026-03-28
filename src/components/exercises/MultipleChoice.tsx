@@ -7,10 +7,17 @@ interface Props {
   exercise: MultipleChoiceExercise;
   index: number;
   onAnswer: (answer: ExerciseAnswer) => void;
+  readOnly?: boolean;
+  savedAnswer?: ExerciseAnswer;
 }
 
-export function MultipleChoice({ exercise, index, onAnswer }: Props) {
-  const [selected, setSelected] = useState<number | null>(null);
+export function MultipleChoice({ exercise, index, onAnswer, readOnly, savedAnswer }: Props) {
+  const [selected, setSelected] = useState<number | null>(() => {
+    if (readOnly && savedAnswer) {
+      return exercise.options.indexOf(savedAnswer.userAnswer);
+    }
+    return null;
+  });
   const answered = selected !== null;
 
   const handleSelect = (optIndex: number) => {
