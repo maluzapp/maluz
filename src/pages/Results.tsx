@@ -203,8 +203,8 @@ export default function Results() {
         score,
         total,
         xp_earned: xp,
-        exercises_data: exercises,
-        answers_data: answers,
+        exercises_data: JSON.parse(JSON.stringify(exercises)),
+        answers_data: JSON.parse(JSON.stringify(answers)),
       });
 
       const { data: profile } = await supabase
