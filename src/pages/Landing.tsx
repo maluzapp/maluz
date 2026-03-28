@@ -87,13 +87,10 @@ export default function Landing() {
               Uma luz chamada <em className="text-primary">Malu</em>
             </h2>
             <blockquote className="font-display text-lg md:text-xl italic leading-relaxed border-l-[3px] border-primary pl-5 mb-6 text-foreground/90">
-              "Malu era uma menina curiosa que adorava estudar, mas às vezes sentia dificuldade em revisar sozinha."
+              "{t('brand_story', 'Malu era uma menina curiosa que adorava estudar, mas às vezes sentia dificuldade em revisar sozinha.')}"
             </blockquote>
             <p className="text-sm leading-relaxed text-foreground/70">
-              Seu pai, inspirado por ela, criou um app onde bastava tirar uma foto do livro para ganhar exercícios feitos sob medida.
-              Com o tempo, percebeu que o app não apenas ajudava Malu — trazia uma <strong className="text-primary">luz nova</strong>: mais autonomia, mais diversão e mais brilho nos olhos a cada acerto.
-              <br /><br />
-              Assim nasceu o <strong className="text-primary">Maluz</strong> — a fusão de "Malu" com "Luz". A luz do conhecimento que cabe na palma da mão.
+              {t('brand_story_detail', 'Seu pai, inspirado por ela, criou um app onde bastava tirar uma foto do livro para ganhar exercícios feitos sob medida. Com o tempo, percebeu que o app não apenas ajudava Malu — trazia uma luz nova: mais autonomia, mais diversão e mais brilho nos olhos a cada acerto. Assim nasceu o Maluz — a fusão de "Malu" com "Luz". A luz do conhecimento que cabe na palma da mão.')}
             </p>
           </div>
           {/* Animated visual */}
