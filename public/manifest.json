@@ -1,11 +1,11 @@
 {
-  "name": "StudyApp - Exercícios Inteligentes",
-  "short_name": "StudyApp",
-  "description": "App de estudos com IA para Fundamental II",
+  "name": "Maluz — O conhecimento que ilumina",
+  "short_name": "Maluz",
+  "description": "Maluz: exercícios personalizados para crianças do 6º ano ao 3º médio. Acenda a luz do saber.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F0F4FF",
-  "theme_color": "#6366F1",
+  "background_color": "#0A1628",
+  "theme_color": "#F5C842",
   "orientation": "portrait",
   "icons": [
     {
