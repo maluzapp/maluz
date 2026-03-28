@@ -203,6 +203,14 @@ export default function Results() {
         score,
         total,
         xp_earned: xp,
+        exercises_data: exercises,
+        answers_data: answers,
+      });
+        topic: config.topic,
+        year: config.year,
+        score,
+        total,
+        xp_earned: xp,
       });
 
       const { data: profile } = await supabase

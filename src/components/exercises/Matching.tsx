@@ -22,7 +22,7 @@ const MATCH_COLORS = [
   { bg: 'bg-accent/10', border: 'border-accent/60', text: 'text-accent-foreground' },
 ];
 
-export function Matching({ exercise, index, onAnswer }: Props) {
+export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: Props) {
   const [shuffledRight] = useState(() => {
     const items = exercise.pairs.map((p, i) => ({ text: p.right, originalIndex: i }));
     for (let i = items.length - 1; i > 0; i--) {
