@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, RefreshCw, XCircle, CheckCircle, Share2, Star } from 'lucide-react';
+import { ArrowLeft, RefreshCw, XCircle, CheckCircle, Share2, Star, History, BookOpen, Trophy, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useStudyStore } from '@/store/study-store';
 import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
+import { getYearLabel } from '@/constants/years';
+import { cn } from '@/lib/utils';
 
 function getEmoji(pct: number) {
   if (pct >= 90) return '🏆';
@@ -22,10 +24,154 @@ function getMessage(pct: number) {
 }
 
 function calcXP(score: number, total: number) {
-  // Base: 10 XP per correct + bonus for perfection
   const base = score * 10;
   const bonus = score === total ? 20 : 0;
   return base + bonus;
+}
+
+interface SessionRecord {
+  id: string;
+  subject: string;
+  topic: string;
+  year: string;
+  score: number;
+  total: number;
+  xp_earned: number;
+  created_at: string;
+}
+
+function formatDate(dateStr: string) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function SessionHistory() {
+  const profileId = useProfileStore((s) => s.activeProfileId);
+  const [sessions, setSessions] = useState<SessionRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!profileId) return;
+    const fetch = async () => {
+      const { data } = await supabase
+        .from('study_sessions')
+        .select('id, subject, topic, year, score, total, xp_earned, created_at')
+        .eq('profile_id', profileId)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      setSessions((data as SessionRecord[]) || []);
+      setLoading(false);
+    };
+    fetch();
+  }, [profileId]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (sessions.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <h2 className="font-display text-xl font-bold text-foreground mb-2">Nenhum estudo ainda</h2>
+        <p className="text-muted-foreground mb-6">Complete exercícios para ver seu histórico aqui</p>
+        <Button onClick={() => navigate('/')} className="gap-2">
+          <BookOpen className="h-4 w-4" />
+          Começar a estudar
+        </Button>
+      </div>
+    );
+  }
+
+  // Stats summary
+  const totalSessions = sessions.length;
+  const totalXP = sessions.reduce((sum, s) => sum + s.xp_earned, 0);
+  const avgScore = Math.round(sessions.reduce((sum, s) => sum + (s.score / s.total) * 100, 0) / totalSessions);
+
+  return (
+    <div className="space-y-6">
+      {/* Stats cards */}
+      <div className="grid grid-cols-3 gap-3">
+        <Card className="animate-fade-in">
+          <CardContent className="p-3 text-center">
+            <Trophy className="h-5 w-5 text-primary mx-auto mb-1" />
+            <p className="font-display font-bold text-lg text-foreground">{totalSessions}</p>
+            <p className="text-[10px] text-muted-foreground">Sessões</p>
+          </CardContent>
+        </Card>
+        <Card className="animate-fade-in" style={{ animationDelay: '100ms' }}>
+          <CardContent className="p-3 text-center">
+            <Star className="h-5 w-5 text-accent mx-auto mb-1" />
+            <p className="font-display font-bold text-lg text-foreground">{totalXP}</p>
+            <p className="text-[10px] text-muted-foreground">XP Total</p>
+          </CardContent>
+        </Card>
+        <Card className="animate-fade-in" style={{ animationDelay: '200ms' }}>
+          <CardContent className="p-3 text-center">
+            <CheckCircle className="h-5 w-5 text-success mx-auto mb-1" />
+            <p className="font-display font-bold text-lg text-foreground">{avgScore}%</p>
+            <p className="text-[10px] text-muted-foreground">Média</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Session list */}
+      <div>
+        <h2 className="font-display text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+          <History className="h-5 w-5 text-primary" />
+          Histórico de Estudos
+        </h2>
+        <div className="space-y-2.5">
+          {sessions.map((s, idx) => {
+            const pct = Math.round((s.score / s.total) * 100);
+            return (
+              <Card
+                key={s.id}
+                className="animate-fade-in overflow-hidden"
+                style={{ animationDelay: `${(idx + 3) * 60}ms` }}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-display font-bold text-foreground truncate">
+                        {s.subject}
+                      </p>
+                      <p className="text-sm text-muted-foreground truncate">{s.topic}</p>
+                      <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {formatDate(s.created_at)}
+                        </span>
+                        {s.year && (
+                          <span>{getYearLabel(s.year) || s.year}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className={cn(
+                        'text-lg font-display font-bold',
+                        pct >= 70 ? 'text-success' : pct >= 50 ? 'text-accent' : 'text-destructive'
+                      )}>
+                        {getEmoji(pct)} {pct}%
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {s.score}/{s.total} • +{s.xp_earned} XP
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function Results() {
@@ -35,11 +181,7 @@ export default function Results() {
   const [xpEarned, setXpEarned] = useState(0);
   const [saved, setSaved] = useState(false);
 
-  useEffect(() => {
-    if (!config || exercises.length === 0) {
-      navigate('/');
-    }
-  }, []);
+  const hasActiveSession = config && exercises.length > 0;
 
   const score = answers.filter((a) => a.isCorrect).length;
   const total = exercises.length;
@@ -52,7 +194,6 @@ export default function Results() {
     setXpEarned(xp);
 
     const saveResults = async () => {
-      // Save session
       await supabase.from('study_sessions').insert({
         profile_id: profileId,
         subject: config.subject,
@@ -63,7 +204,6 @@ export default function Results() {
         xp_earned: xp,
       });
 
-      // Get current profile
       const { data: profile } = await supabase
         .from('profiles')
         .select('xp, level, streak_days, last_study_date, total_exercises, total_correct')
@@ -75,7 +215,6 @@ export default function Results() {
         const newTotalEx = (profile.total_exercises || 0) + total;
         const newTotalCorrect = (profile.total_correct || 0) + score;
 
-        // Level up: each level needs level * 100 XP
         let newLevel = profile.level || 1;
         let remainingXp = newXp;
         while (remainingXp >= newLevel * 100) {
@@ -83,7 +222,6 @@ export default function Results() {
           newLevel++;
         }
 
-        // Streak
         const today = new Date().toISOString().split('T')[0];
         const lastDate = profile.last_study_date;
         let newStreak = profile.streak_days || 0;
@@ -113,8 +251,6 @@ export default function Results() {
     saveResults();
   }, [config, profileId, score, total, saved]);
 
-  if (!config || exercises.length === 0) return null;
-
   const handleNewSession = () => {
     reset();
     navigate('/');
@@ -125,6 +261,7 @@ export default function Results() {
   };
 
   const handleShareWhatsApp = () => {
+    if (!config) return;
     const text = `📚 *StudyApp — Resultado do Estudo*\n\n📖 ${config.subject} — ${config.topic} (${config.year})\n🏆 Acertei *${score} de ${total}* (${pct}%)\n⭐ Ganhei ${xpEarned} XP!\n\n${getMessage(pct)}`;
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
@@ -133,82 +270,97 @@ export default function Results() {
   return (
     <div className="min-h-screen bg-background px-4 py-6 pb-24 md:py-12">
       <div className="mx-auto max-w-lg">
-        {/* Score card */}
-        <Card className="mb-6 overflow-hidden">
-          <div className="bg-primary px-6 py-8 text-center text-primary-foreground">
-            <div className="mb-2 text-5xl">{getEmoji(pct)}</div>
-            <h1 className="font-display text-3xl font-bold">{pct}%</h1>
-            <p className="mt-1 text-primary-foreground/80">{getMessage(pct)}</p>
-            <div className="mt-4 flex justify-center gap-6 text-sm">
-              <div className="flex items-center gap-1">
-                <CheckCircle className="h-4 w-4" />
-                <span>{score} certas</span>
+        {hasActiveSession ? (
+          <>
+            {/* Score card */}
+            <Card className="mb-6 overflow-hidden animate-scale-in">
+              <div className="bg-primary px-6 py-8 text-center text-primary-foreground">
+                <div className="mb-2 text-5xl">{getEmoji(pct)}</div>
+                <h1 className="font-display text-3xl font-bold">{pct}%</h1>
+                <p className="mt-1 text-primary-foreground/80">{getMessage(pct)}</p>
+                <div className="mt-4 flex justify-center gap-6 text-sm">
+                  <div className="flex items-center gap-1">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>{score} certas</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    <span>{total - score} erradas</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-1">
-                <XCircle className="h-4 w-4" />
-                <span>{total - score} erradas</span>
+            </Card>
+
+            {/* XP earned */}
+            {xpEarned > 0 && (
+              <Card className="mb-6 animate-bounce-in">
+                <CardContent className="p-4 flex items-center justify-center gap-2 text-accent">
+                  <Star className="h-5 w-5" />
+                  <span className="font-display font-bold text-lg">+{xpEarned} XP</span>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Review wrong answers */}
+            {answers.some((a) => !a.isCorrect) && (
+              <div className="mb-6">
+                <h2 className="mb-3 font-display text-lg font-bold text-foreground">
+                  📝 Revise seus erros
+                </h2>
+                <div className="space-y-3">
+                  {answers.filter((a) => !a.isCorrect).map((a) => {
+                    const ex = exercises[a.exerciseIndex];
+                    return (
+                      <Card key={a.exerciseIndex} className="animate-fade-in">
+                        <CardContent className="p-4">
+                          <p className="mb-1 text-sm font-semibold text-destructive">
+                            ❌ Questão {a.exerciseIndex + 1}
+                          </p>
+                          <p className="mb-2 text-sm text-foreground">
+                            {ex.type === 'multiple_choice' && ex.question}
+                            {ex.type === 'true_false' && ex.statement}
+                            {ex.type === 'fill_blank' && ex.sentence}
+                            {ex.type === 'matching' && 'Associação de conceitos'}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {ex.explanation}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          </div>
-        </Card>
+            )}
 
-        {/* XP earned */}
-        {xpEarned > 0 && (
-          <Card className="mb-6">
-            <CardContent className="p-4 flex items-center justify-center gap-2 text-accent">
-              <Star className="h-5 w-5" />
-              <span className="font-display font-bold text-lg">+{xpEarned} XP</span>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Review wrong answers */}
-        {answers.some((a) => !a.isCorrect) && (
-          <div className="mb-6">
-            <h2 className="mb-3 font-display text-lg font-bold text-foreground">
-              📝 Revise seus erros
-            </h2>
+            {/* Actions */}
             <div className="space-y-3">
-              {answers.filter((a) => !a.isCorrect).map((a) => {
-                const ex = exercises[a.exerciseIndex];
-                return (
-                  <Card key={a.exerciseIndex}>
-                    <CardContent className="p-4">
-                      <p className="mb-1 text-sm font-semibold text-destructive">
-                        ❌ Questão {a.exerciseIndex + 1}
-                      </p>
-                      <p className="mb-2 text-sm text-foreground">
-                        {ex.type === 'multiple_choice' && ex.question}
-                        {ex.type === 'true_false' && ex.statement}
-                        {ex.type === 'fill_blank' && ex.sentence}
-                        {ex.type === 'matching' && 'Associação de conceitos'}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {ex.explanation}
-                      </p>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+              <Button size="lg" className="w-full gap-2 font-display font-bold" onClick={handleRetry}>
+                <RefreshCw className="h-4 w-4" />
+                Gerar mais exercícios
+              </Button>
+              <Button size="lg" variant="outline" className="w-full gap-2" onClick={handleShareWhatsApp}>
+                <Share2 className="h-4 w-4" />
+                Compartilhar no WhatsApp
+              </Button>
+              <Button size="lg" variant="outline" className="w-full gap-2" onClick={handleNewSession}>
+                <ArrowLeft className="h-4 w-4" />
+                Novo estudo
+              </Button>
             </div>
-          </div>
-        )}
+          </>
+        ) : (
+          <>
+            {/* Header */}
+            <div className="mb-6 animate-fade-in">
+              <h1 className="font-display text-2xl font-bold text-foreground">📊 Seus Resultados</h1>
+              <p className="text-sm text-muted-foreground">Acompanhe seu progresso de estudos</p>
+            </div>
 
-        {/* Actions */}
-        <div className="space-y-3">
-          <Button size="lg" className="w-full gap-2 font-display font-bold" onClick={handleRetry}>
-            <RefreshCw className="h-4 w-4" />
-            Gerar mais exercícios
-          </Button>
-          <Button size="lg" variant="outline" className="w-full gap-2" onClick={handleShareWhatsApp}>
-            <Share2 className="h-4 w-4" />
-            Compartilhar no WhatsApp
-          </Button>
-          <Button size="lg" variant="outline" className="w-full gap-2" onClick={handleNewSession}>
-            <ArrowLeft className="h-4 w-4" />
-            Novo estudo
-          </Button>
-        </div>
+            {/* History */}
+            <SessionHistory />
+          </>
+        )}
       </div>
     </div>
   );
