@@ -179,7 +179,7 @@ export default function Index() {
                         <div
                           className={cn(
                             'h-full rounded-full transition-all duration-500',
-                            pct >= 70 ? 'bg-green-500' : pct >= 50 ? 'bg-primary' : 'bg-destructive'
+                            pct >= 70 ? 'bg-accent' : pct >= 50 ? 'bg-primary' : 'bg-destructive'
                           )}
                           style={{ width: `${pct}%` }}
                         />
