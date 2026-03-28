@@ -55,6 +55,7 @@ function formatRelativeDate(dateStr: string) {
 
 export default function Index() {
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const profileId = useProfileStore((s) => s.activeProfileId);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [recentSessions, setRecentSessions] = useState<RecentSession[]>([]);
