@@ -1,60 +1,65 @@
 
 
-# 📚 StudyApp — App de Estudos com IA para Fundamental II
+# Painel de Administração Maluz
 
-## Visão Geral
-App mobile-friendly onde o pai/mãe insere o ano escolar (6º-9º), matéria, assunto — e opcionalmente envia fotos do livro ou áudio com resumo. A IA analisa o conteúdo e gera exercícios interativos variados para a criança praticar no celular.
+## Objetivo
+Criar uma página `/admin` completa para gerenciar visualmente todos os parâmetros de branding da landing page e do app, lendo e gravando na tabela `branding_settings`.
 
-## Fluxo Principal
+## Mudanças necessárias
 
-### 1. Tela Inicial — Configurar Estudo
-- Selecionar **ano escolar** (6º ao 9º)
-- Selecionar **matéria** (Matemática, Português, Ciências, História, Geografia, Inglês, etc.)
-- Campo de texto para **assunto** (ex: "Equações do 1º grau", "Revolução Francesa")
-- Upload de **fotos** das páginas do livro (múltiplas imagens)
-- Gravação/upload de **áudio** com resumo da matéria
-- Botão "Gerar Exercícios"
+### 1. Migração: permitir UPDATE/INSERT para admins
+Atualmente a tabela `branding_settings` só permite SELECT. Precisamos:
+- Criar enum `app_role` e tabela `user_roles` para controle de admin
+- Adicionar RLS policies para INSERT e UPDATE na `branding_settings` permitindo apenas admins
+- Criar função `has_role()` security definer
 
-### 2. Tela de Confirmação
-- A IA analisa os inputs (texto, imagens, áudio) e mostra um resumo do conteúdo identificado
-- Usuário confirma ou ajusta antes de gerar
+### 2. Página `/admin` (novo arquivo `src/pages/Admin.tsx`)
+Painel com abas/seções organizadas por categoria:
 
-### 3. Exercícios Interativos
-Gerados pela IA, com 4 tipos:
-- **Múltipla escolha** — 4-5 alternativas com feedback imediato (certo/errado + explicação)
-- **Verdadeiro ou Falso** — Afirmações para julgar, com explicação
-- **Preencher lacunas** — Frases com campo de input para completar
-- **Associação** — Arrastar/conectar conceitos relacionados (drag & drop)
+**Aba "Geral"**
+- Nome do app, tagline, slogan
 
-Cada exercício mostra:
-- Feedback instantâneo (✅/❌ com explicação breve)
-- Barra de progresso
-- Pontuação final com resumo de acertos
+**Aba "Cores"**
+- Color pickers para: navy, gold, cream, mint, coral, lilac, sky_blue, etc.
+- Preview em tempo real das cores
 
-### 4. Resultado Final
-- Nota/porcentagem de acertos
-- Revisão dos erros com explicações
-- Botão para gerar mais exercícios sobre o mesmo tema
+**Aba "Tipografia"**
+- Selects para font_display, font_body, font_mono
 
-## Design & UX
-- Interface **colorida mas limpa**, adequada para pré-adolescentes (não infantil demais)
-- Layout **mobile-first** otimizado para celular
-- Animações suaves nos exercícios de arrastar
-- Emojis e ícones para tornar divertido sem ser poluído
+**Aba "Tamanhos (Logos)"**
+- Sliders para cada tamanho de logo/símbolo (hero, footer, login, nav, index)
+- Preview visual do tamanho
 
-## Tecnologia
-- **Lovable AI (Gemini)** no backend para:
-  - Analisar fotos do livro (visão computacional)
-  - Transcrever áudio
-  - Identificar conteúdo/assunto
-  - Gerar exercícios variados e contextualizados
-- **Lovable Cloud** para edge functions
-- Sem necessidade de login (uso pessoal)
-- Dados salvos localmente no navegador (histórico de sessões)
+**Aba "Tom de Voz"**
+- Campos editáveis para as frases motivacionais (phrase_1 a phrase_4)
 
-## Páginas
-1. **Home** — Formulário de configuração do estudo
-2. **Confirmação** — Resumo do conteúdo pela IA
-3. **Exercícios** — Tela interativa com os exercícios
-4. **Resultado** — Pontuação e revisão
+**Aba "Textos da Landing"**
+- Adicionar à tabela campos para os textos principais da landing (hero title, hero subtitle, brand story, missão, visão, essência)
+- Campos textarea editáveis no painel
+
+Cada seção terá botão "Salvar" que faz UPDATE na tabela.
+
+### 3. Rota protegida
+- Adicionar rota `/admin` em `App.tsx`
+- Criar guard que verifica role admin via `has_role()`
+- Botão discreto no BottomNav ou acessível por URL direta
+
+### 4. Landing page dinâmica
+- Refatorar `Landing.tsx` para buscar textos editáveis da `branding_settings` ao carregar, usando os valores do banco como fallback para os hardcoded atuais
+
+### 5. Inserir textos da landing no banco
+- Inserir registros iniciais para textos da landing (hero_title, hero_subtitle, brand_story, mission, vision, essence, cta_text)
+
+## Estrutura técnica
+- Hook `useBrandingSettings()` para fetch/update dos settings
+- Componentes: `ColorPickerField`, `SliderField`, `TextEditField`
+- Tabs do shadcn/ui para organizar as seções
+- Toast de confirmação ao salvar
+
+## Arquivos envolvidos
+- `supabase/migrations/` -- nova migration (roles + RLS + textos landing)
+- `src/pages/Admin.tsx` -- novo
+- `src/hooks/useBrandingSettings.ts` -- novo
+- `src/pages/Landing.tsx` -- refatorar para usar dados dinâmicos
+- `src/App.tsx` -- adicionar rota /admin
 
