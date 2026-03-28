@@ -73,7 +73,7 @@ export function BottomNav() {
               src={lampadaIcon}
               alt="Gerar exercícios"
               className={cn(
-                'h-7 w-7 object-contain transition-all duration-300',
+                'h-9 w-9 object-contain transition-all duration-300',
                 (isGeneratePage || lampLit) ? 'brightness-150 drop-shadow-[0_0_8px_rgba(245,200,66,0.8)]' : 'opacity-70'
               )}
             />
