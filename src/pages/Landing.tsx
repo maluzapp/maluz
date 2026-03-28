@@ -7,7 +7,7 @@ const FEATURES = [
   { icon: '📸', title: 'Entrada por Foto', desc: 'A criança fotografa a página do seu livro. O exercício é 100% alinhado ao que está sendo estudado naquele momento.' },
   { icon: '🧠', title: 'Personalização Profunda', desc: 'Conteúdo gerado sob demanda conforme ano, matéria, assunto e livro. Cada sessão é única e contextualizada.' },
   { icon: '🎯', title: 'Formatos Variados', desc: 'Múltipla escolha, lacunas, verdadeiro ou falso. Correção instantânea com feedback encorajador em cada resposta.' },
-  { icon: '🤖', title: 'IA Adaptativa', desc: 'A IA ajusta a dificuldade com base no desempenho, mantendo o desafio sempre na zona ideal de aprendizado.' },
+  { icon: '🤖', title: 'Aprendizado Adaptativo', desc: 'A Maluz ajusta a dificuldade com base no desempenho, mantendo o desafio sempre na zona ideal de aprendizado.' },
   { icon: '💛', title: 'Afeto na Tecnologia', desc: 'A Maluz tem uma história real. O nome carrega uma homenagem verdadeira que cria conexão emocional única.' },
   { icon: '📶', title: 'Funciona Offline', desc: 'Exercícios previamente gerados ficam disponíveis sem internet. O estudo nunca é interrompido.' },
 ];
