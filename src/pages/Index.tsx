@@ -106,7 +106,7 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 pb-24 md:py-12">
+    <div className="min-h-screen bg-background px-4 py-6 pb-36 md:py-12 md:pb-36">
       <div className="mx-auto max-w-lg">
         {/* Gamification Bar */}
         <div className="mb-4">
