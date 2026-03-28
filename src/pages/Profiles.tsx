@@ -370,7 +370,7 @@ export default function Profiles() {
           </Card>
         )}
 
-        <Tabs defaultValue="meus" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full grid grid-cols-2 h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl mb-4">
             <TabsTrigger value="meus" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2.5">
               <Baby className="h-3.5 w-3.5 mr-1" /> Meus Perfis
