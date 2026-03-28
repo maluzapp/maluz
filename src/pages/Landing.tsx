@@ -49,14 +49,14 @@ export default function Landing() {
         <div className="text-center relative z-10 px-5 animate-fade-in">
           <img src={lampadaIcon} alt="Maluz símbolo" className="h-24 mx-auto mb-6 animate-float" />
           <p className="font-mono text-[0.6rem] tracking-[0.2em] uppercase text-primary/80 mb-4">
-            Estudos personalizados por IA
+            {t('hero_subtitle', 'Estudos personalizados por IA')}
           </p>
           <h1 className="font-display text-6xl md:text-8xl font-black leading-[0.9] mb-4 text-foreground">
             Ma<span className="text-primary italic">luz</span>
           </h1>
           <div className="w-12 h-0.5 bg-primary mx-auto mb-4 opacity-60" />
           <p className="font-display text-lg md:text-xl italic text-foreground/70 mb-4">
-            O conhecimento que ilumina
+            {t('app_tagline', 'O conhecimento que ilumina')}
           </p>
           <p className="text-xs tracking-widest uppercase text-foreground/42 flex items-center justify-center gap-2 flex-wrap">
             <span>Exercícios</span>
