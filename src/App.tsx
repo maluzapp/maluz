@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import Profiles from "./pages/Profiles";
 import Index from "./pages/Index";
+import Generate from "./pages/Generate";
 import Confirmation from "./pages/Confirmation";
 import Exercises from "./pages/Exercises";
 import Results from "./pages/Results";
