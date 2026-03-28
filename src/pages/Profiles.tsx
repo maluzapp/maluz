@@ -56,12 +56,15 @@ export default function Profiles() {
     if (!loading && !user) navigate('/login');
   }, [user, loading, navigate]);
 
+  const hasFetchedRef = useState({ done: false })[0];
+
   useEffect(() => {
-    if (user) {
-      fetchProfiles();
-      fetchLinkedChildren();
-    }
-  }, [user]);
+    if (!user || loading) return;
+    if (hasFetchedRef.done) return;
+    hasFetchedRef.done = true;
+    fetchProfiles();
+    fetchLinkedChildren();
+  }, [user, loading]);
 
   const fetchProfiles = async () => {
     const { data } = await supabase
