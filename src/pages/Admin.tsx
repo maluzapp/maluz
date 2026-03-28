@@ -467,6 +467,9 @@ export default function Admin() {
             <TabsContent value="landing">
               <TabSection fields={LANDING_FIELDS} icon={<FileText className="h-5 w-5 text-primary" />} title="Textos da Landing Page" />
             </TabsContent>
+            <TabsContent value="share">
+              <TabSection fields={SHARE_FIELDS} icon={<Share2 className="h-5 w-5 text-primary" />} title="Mensagem de Compartilhamento (WhatsApp)" />
+            </TabsContent>
           </div>
         </Tabs>
       </div>
