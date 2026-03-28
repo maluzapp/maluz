@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useProfileStore } from '@/hooks/useProfile';
@@ -54,6 +55,7 @@ function formatRelativeDate(dateStr: string) {
 
 export default function Index() {
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const profileId = useProfileStore((s) => s.activeProfileId);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [recentSessions, setRecentSessions] = useState<RecentSession[]>([]);
@@ -212,7 +214,7 @@ export default function Index() {
               {recentSessions.slice(0, 5).map((s) => {
                 const pct = Math.round((s.score / s.total) * 100);
                 return (
-                  <Card key={s.id} className="border-primary/5">
+                  <Card key={s.id} className="border-primary/5 cursor-pointer hover:border-primary/20 transition-colors" onClick={() => navigate(`/sessao/${s.id}`)}>
                     <CardContent className="p-3 flex items-center gap-3">
                       <div className={cn(
                         'w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold shrink-0',

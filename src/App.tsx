@@ -19,6 +19,7 @@ import Results from "./pages/Results";
 import Credits from "./pages/Credits";
 import Admin from "./pages/Admin";
 import Install from "./pages/Install";
+import SessionReview from "./pages/SessionReview";
 import NotFound from "./pages/NotFound";
 import type { ReactNode } from "react";
 
@@ -60,6 +61,7 @@ const App = () => (
             <Route path="/confirmacao" element={<RequireAuth><Confirmation /></RequireAuth>} />
             <Route path="/exercicios" element={<RequireAuth><Exercises /></RequireAuth>} />
             <Route path="/resultado" element={<RequireAuth><Results /></RequireAuth>} />
+            <Route path="/sessao/:id" element={<RequireAuth><SessionReview /></RequireAuth>} />
             <Route path="/creditos" element={<Credits />} />
             <Route path="/instalar" element={<Install />} />
             <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />

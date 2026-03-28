@@ -132,8 +132,9 @@ function SessionHistory() {
             return (
               <Card
                 key={s.id}
-                className="animate-fade-in overflow-hidden"
+                className="animate-fade-in overflow-hidden cursor-pointer hover:border-primary/30 transition-colors"
                 style={{ animationDelay: `${(idx + 3) * 60}ms` }}
+                onClick={() => navigate(`/sessao/${s.id}`)}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-3">
@@ -202,6 +203,8 @@ export default function Results() {
         score,
         total,
         xp_earned: xp,
+        exercises_data: JSON.parse(JSON.stringify(exercises)),
+        answers_data: JSON.parse(JSON.stringify(answers)),
       });
 
       const { data: profile } = await supabase

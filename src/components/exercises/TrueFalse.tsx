@@ -8,10 +8,15 @@ interface Props {
   exercise: TrueFalseExercise;
   index: number;
   onAnswer: (answer: ExerciseAnswer) => void;
+  readOnly?: boolean;
+  savedAnswer?: ExerciseAnswer;
 }
 
-export function TrueFalse({ exercise, index, onAnswer }: Props) {
-  const [selected, setSelected] = useState<boolean | null>(null);
+export function TrueFalse({ exercise, index, onAnswer, readOnly, savedAnswer }: Props) {
+  const [selected, setSelected] = useState<boolean | null>(() => {
+    if (readOnly && savedAnswer) return savedAnswer.userAnswer === 'Verdadeiro';
+    return null;
+  });
   const answered = selected !== null;
 
   const handleSelect = (value: boolean) => {
