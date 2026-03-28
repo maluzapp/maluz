@@ -223,7 +223,7 @@ export default function Profiles() {
     );
   }
 
-  const childProfiles = profiles.filter(p => p.profile_type === 'child');
+  
   const parentProfiles = profiles.filter(p => p.profile_type === 'parent');
   const hasParent = parentProfiles.length > 0;
 
