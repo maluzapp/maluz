@@ -272,34 +272,33 @@ export default function Results() {
       <div className="mx-auto max-w-lg">
         {hasActiveSession ? (
           <>
-            {/* Score card */}
-            <Card className="mb-6 overflow-hidden animate-scale-in">
-              <div className="bg-primary px-6 py-8 text-center text-primary-foreground">
-                <div className="mb-2 text-5xl">{getEmoji(pct)}</div>
-                <h1 className="font-display text-3xl font-bold">{pct}%</h1>
-                <p className="mt-1 text-primary-foreground/80">{getMessage(pct)}</p>
-                <div className="mt-4 flex justify-center gap-6 text-sm">
-                  <div className="flex items-center gap-1">
-                    <CheckCircle className="h-4 w-4" />
-                    <span>{score} certas</span>
+            {/* Score card - dark themed */}
+            <Card className="mb-6 overflow-hidden animate-scale-in border-primary/20 bg-card">
+              <div className="px-6 py-8 text-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
+                <div className="relative z-10">
+                  <div className="mb-2 text-5xl">{getEmoji(pct)}</div>
+                  <h1 className="font-display text-4xl font-bold text-foreground">{pct}%</h1>
+                  <p className="mt-1 text-muted-foreground">{getMessage(pct)}</p>
+                  <div className="mt-4 flex justify-center gap-6 text-sm">
+                    <div className="flex items-center gap-1.5 text-emerald-400">
+                      <CheckCircle className="h-4 w-4" />
+                      <span className="font-semibold">{score} certas</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-destructive">
+                      <XCircle className="h-4 w-4" />
+                      <span className="font-semibold">{total - score} erradas</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <XCircle className="h-4 w-4" />
-                    <span>{total - score} erradas</span>
-                  </div>
+                  {xpEarned > 0 && (
+                    <div className="mt-4 inline-flex items-center gap-1.5 bg-accent/15 text-accent px-4 py-1.5 rounded-full animate-bounce-in">
+                      <Star className="h-4 w-4" />
+                      <span className="font-display font-bold">+{xpEarned} XP</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
-
-            {/* XP earned */}
-            {xpEarned > 0 && (
-              <Card className="mb-6 animate-bounce-in">
-                <CardContent className="p-4 flex items-center justify-center gap-2 text-accent">
-                  <Star className="h-5 w-5" />
-                  <span className="font-display font-bold text-lg">+{xpEarned} XP</span>
-                </CardContent>
-              </Card>
-            )}
 
             {/* Review wrong answers */}
             {answers.some((a) => !a.isCorrect) && (
@@ -347,6 +346,15 @@ export default function Results() {
                 <ArrowLeft className="h-4 w-4" />
                 Novo estudo
               </Button>
+            </div>
+
+            {/* Past sessions */}
+            <div className="mt-8">
+              <h2 className="font-display text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+                <History className="h-5 w-5 text-primary" />
+                Sessões anteriores
+              </h2>
+              <SessionHistory />
             </div>
           </>
         ) : (

@@ -12,7 +12,7 @@ import { Plus, LogOut, Trash2, Pencil, Link2, Copy, UserPlus, Users, Baby, Shiel
 import { YEAR_OPTIONS, getYearLabel } from '@/constants/years';
 import { toast } from 'sonner';
 
-const AVATARS = ['🧑‍🎓', '👧', '👦', '🦸', '🧙', '🦊', '🐱', '🦄', '🚀', '⭐'];
+const AVATARS = ['🧑‍🎓', '👧', '👦', '🦸', '🧙', '🦊', '🐱', '🦄', '🚀', '⭐', '🐶', '🐼', '🦁', '🐸', '🦋', '🌟', '🎨', '🎮', '🏀', '🎸', '🧑‍🚀', '🧑‍💻', '👩‍🔬', '🧑‍🏫', '🦸‍♀️', '🧚', '🐉', '🌈', '🎯', '🏆'];
 
 interface Profile {
   id: string;
@@ -50,6 +50,7 @@ export default function Profiles() {
   const [generatedCode, setGeneratedCode] = useState('');
   const [linkingCode, setLinkingCode] = useState('');
   const [viewingChild, setViewingChild] = useState<Profile | null>(null);
+  const [activeTab, setActiveTab] = useState('meus');
 
   useEffect(() => {
     if (!loading && !user) navigate('/login');
@@ -369,7 +370,7 @@ export default function Profiles() {
           </Card>
         )}
 
-        <Tabs defaultValue="meus" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full grid grid-cols-2 h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl mb-4">
             <TabsTrigger value="meus" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2.5">
               <Baby className="h-3.5 w-3.5 mr-1" /> Meus Perfis
@@ -540,7 +541,7 @@ export default function Profiles() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Crie um perfil de "Pai/Mãe" para acompanhar o progresso dos seus filhos
                 </p>
-                <Button onClick={() => { setProfileType('parent'); setCreating(true); }} className="gap-2">
+                <Button onClick={() => { setProfileType('parent'); setCreating(true); setActiveTab('meus'); }} className="gap-2">
                   <Plus className="h-4 w-4" /> Criar perfil de responsável
                 </Button>
               </div>
