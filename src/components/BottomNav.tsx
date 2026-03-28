@@ -21,8 +21,9 @@ export function BottomNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [lampLit, setLampLit] = useState(false);
+  const profileId = useProfileStore((s) => s.activeProfileId);
 
-  if (HIDDEN_ROUTES.includes(pathname)) return null;
+  if (HIDDEN_ROUTES.includes(pathname) || !profileId) return null;
 
   const handleLampClick = () => {
     setLampLit(true);
