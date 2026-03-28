@@ -14,6 +14,7 @@ import Confirmation from "./pages/Confirmation";
 import Exercises from "./pages/Exercises";
 import Results from "./pages/Results";
 import Install from "./pages/Install";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import type { ReactNode } from "react";
 
