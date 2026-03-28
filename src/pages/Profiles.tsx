@@ -12,7 +12,7 @@ import { Plus, LogOut, Trash2, Pencil, Link2, Copy, UserPlus, Users, Baby, Shiel
 import { YEAR_OPTIONS, getYearLabel } from '@/constants/years';
 import { toast } from 'sonner';
 
-const AVATARS = ['🧑‍🎓', '👧', '👦', '🦸', '🧙', '🦊', '🐱', '🦄', '🚀', '⭐'];
+const AVATARS = ['🧑‍🎓', '👧', '👦', '🦸', '🧙', '🦊', '🐱', '🦄', '🚀', '⭐', '🐶', '🐼', '🦁', '🐸', '🦋', '🌟', '🎨', '🎮', '🏀', '🎸', '🧑‍🚀', '🧑‍💻', '👩‍🔬', '🧑‍🏫', '🦸‍♀️', '🧚', '🐉', '🌈', '🎯', '🏆'];
 
 interface Profile {
   id: string;
