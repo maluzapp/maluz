@@ -11,7 +11,7 @@ import { GamificationBar } from '@/components/GamificationBar';
 import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { YEAR_OPTIONS } from '@/constants/years';
-import lampadaIcon from '@/assets/lampada.png';
+import lampadaIcon from '@/assets/lampada-2.png';
 import type { SchoolYear, Subject } from '@/types/study';
 
 const SUBJECTS: Subject[] = ['Matemática', 'Português', 'Ciências', 'História', 'Geografia', 'Inglês', 'Artes', 'Educação Física'];
