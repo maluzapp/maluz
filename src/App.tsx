@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { useProfileStore } from "@/hooks/useProfile";
 import { BottomNav } from "@/components/BottomNav";
+import { ScrollToTop } from "@/components/ScrollToTop";
+import { DynamicPwaBranding } from "@/components/DynamicPwaBranding";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import Profiles from "./pages/Profiles";
@@ -46,6 +48,8 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
+          <DynamicPwaBranding />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/landing" element={<Landing />} />

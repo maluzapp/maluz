@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -51,34 +51,16 @@ export default function Profiles() {
   const [linkingCode, setLinkingCode] = useState('');
   const [viewingChild, setViewingChild] = useState<Profile | null>(null);
   const [activeTab, setActiveTab] = useState('meus');
+  const hasLoadedRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate('/login');
   }, [user, loading, navigate]);
 
-  const hasFetchedRef = useState({ done: false })[0];
-
-  useEffect(() => {
-    if (!user || loading) return;
-    if (hasFetchedRef.done) return;
-    hasFetchedRef.done = true;
-    fetchProfiles();
-    fetchLinkedChildren();
-  }, [user, loading]);
-
-  const fetchProfiles = async () => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('id, name, avatar_emoji, school_year, xp, level, streak_days, profile_type, total_exercises, total_correct')
-      .order('created_at');
-    const list = (data as Profile[]) || [];
-    setProfiles(list);
-    setLoadingProfiles(false);
-
-    // Auto-select first profile if none active, or clear if stale
+  const syncActiveProfile = (list: Profile[]) => {
     const current = useProfileStore.getState().activeProfileId;
-    if (current && list.length > 0 && !list.find(p => p.id === current)) {
-      // Active profile no longer exists — reset
+
+    if (current && list.length > 0 && !list.find((p) => p.id === current)) {
       setActiveProfile(list[0].id);
     } else if (!current && list.length > 0) {
       setActiveProfile(list[0].id);
@@ -87,36 +69,58 @@ export default function Profiles() {
     }
   };
 
-  const fetchLinkedChildren = async () => {
-    // Get parent profiles for current user
-    const { data: myProfiles } = await supabase
+  const fetchProfilesData = async () => {
+    const { data } = await supabase
       .from('profiles')
-      .select('id')
-      .eq('profile_type', 'parent');
+      .select('id, name, avatar_emoji, school_year, xp, level, streak_days, profile_type, total_exercises, total_correct')
+      .order('created_at');
 
-    if (!myProfiles || myProfiles.length === 0) return;
+    return (data as Profile[]) || [];
+  };
 
-    const parentIds = myProfiles.map(p => p.id);
+  const fetchLinkedChildrenData = async (profileList: Profile[]) => {
+    const parentIds = profileList.filter((profile) => profile.profile_type === 'parent').map((profile) => profile.id);
+
+    if (parentIds.length === 0) return [] as LinkedChild[];
+
     const { data: links } = await supabase
       .from('parent_child_links' as any)
       .select('id, child_profile_id')
       .in('parent_profile_id', parentIds);
 
-    if (!links || links.length === 0) { setLinkedChildren([]); return; }
+    if (!links || links.length === 0) return [] as LinkedChild[];
 
-    const childIds = (links as any[]).map((l: any) => l.child_profile_id);
+    const childIds = (links as any[]).map((link: any) => link.child_profile_id);
     const { data: children } = await supabase
       .from('profiles')
       .select('id, name, avatar_emoji, school_year, xp, level, streak_days, profile_type, total_exercises, total_correct')
       .in('id', childIds);
 
-    const result = (links as any[]).map((l: any) => ({
-      id: l.id,
-      child: (children as Profile[])?.find(c => c.id === l.child_profile_id),
-    })).filter(l => l.child) as LinkedChild[];
-
-    setLinkedChildren(result);
+    return (links as any[])
+      .map((link: any) => ({
+        id: link.id,
+        child: (children as Profile[])?.find((child) => child.id === link.child_profile_id),
+      }))
+      .filter((link) => link.child) as LinkedChild[];
   };
+
+  const loadPageData = async () => {
+    const profileList = await fetchProfilesData();
+    const childLinks = await fetchLinkedChildrenData(profileList);
+
+    setProfiles(profileList);
+    setLinkedChildren(childLinks);
+    syncActiveProfile(profileList);
+    setLoadingProfiles(false);
+  };
+
+  useEffect(() => {
+    if (!user || loading) return;
+    if (hasLoadedRef.current === user.id) return;
+
+    hasLoadedRef.current = user.id;
+    loadPageData();
+  }, [user, loading]);
 
   const createProfile = async () => {
     if (!newName.trim() || !user) return;
@@ -128,7 +132,7 @@ export default function Profiles() {
       profile_type: profileType,
     } as any);
     resetForm();
-    fetchProfiles();
+    await loadPageData();
   };
 
   const startEditing = (p: Profile) => {
@@ -148,7 +152,7 @@ export default function Profiles() {
       profile_type: profileType,
     } as any).eq('id', editing);
     resetForm();
-    fetchProfiles();
+    await loadPageData();
   };
 
   const resetForm = () => {
@@ -167,7 +171,7 @@ export default function Profiles() {
       setActiveProfile(null);
     }
     await supabase.from('profiles').delete().eq('id', id);
-    fetchProfiles();
+    await loadPageData();
   };
 
   const selectProfile = (id: string) => {
@@ -233,7 +237,7 @@ export default function Profiles() {
 
     setLinkingCode('');
     toast.success('Filho vinculado com sucesso!');
-    fetchLinkedChildren();
+    await loadPageData();
   };
 
   if (loading || loadingProfiles) {
@@ -311,8 +315,7 @@ export default function Profiles() {
   const ProfileCard = ({ p, idx }: { p: Profile; idx: number }) => (
     <Card
       key={p.id}
-      className="cursor-pointer hover:border-primary/50 transition-all animate-fade-in"
-      style={{ animationDelay: `${idx * 80}ms` }}
+      className="cursor-pointer hover:border-primary/50 transition-all duration-300"
     >
       <CardContent className="p-4 flex items-center gap-4">
         <button onClick={() => selectProfile(p.id)} className="flex-1 flex items-center gap-4 text-left">
