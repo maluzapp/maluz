@@ -14,7 +14,7 @@ import Generate from "./pages/Generate";
 import Confirmation from "./pages/Confirmation";
 import Exercises from "./pages/Exercises";
 import Results from "./pages/Results";
-import Install from "./pages/Install";
+import Credits from "./pages/Credits";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import type { ReactNode } from "react";
