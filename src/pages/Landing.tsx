@@ -26,14 +26,20 @@ const UX_STEPS = [
 ];
 
 export default function Landing() {
+  const { data: settings } = useBrandingByCategory();
+  const t = (key: string, fallback: string) => settings?.landing?.[key]?.value ?? settings?.general?.[key]?.value ?? fallback;
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-3 bg-background/93 backdrop-blur-xl border-b border-primary/15">
         <span className="font-display text-xl font-bold text-foreground">Ma<span className="text-primary italic">luz</span></span>
-        <Link to="/login" className="text-xs font-mono tracking-[0.12em] uppercase text-primary hover:text-primary/80 transition-colors">
-          Entrar
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link to="/admin" className="text-[0.6rem] font-mono tracking-[0.1em] uppercase text-foreground/30 hover:text-primary transition-colors">⚙</Link>
+          <Link to="/login" className="text-xs font-mono tracking-[0.12em] uppercase text-primary hover:text-primary/80 transition-colors">
+            Entrar
+          </Link>
+        </div>
       </nav>
 
       {/* Hero */}
