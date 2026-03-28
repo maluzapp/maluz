@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, Users, Trophy, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useProfileStore } from '@/hooks/useProfile';
 import lampadaIcon from '@/assets/lampada-2.png';
 
 const NAV_ITEMS_LEFT = [
@@ -20,8 +21,9 @@ export function BottomNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [lampLit, setLampLit] = useState(false);
+  const profileId = useProfileStore((s) => s.activeProfileId);
 
-  if (HIDDEN_ROUTES.includes(pathname)) return null;
+  if (HIDDEN_ROUTES.includes(pathname) || !profileId) return null;
 
   const handleLampClick = () => {
     setLampLit(true);

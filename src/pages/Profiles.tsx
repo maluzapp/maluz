@@ -67,8 +67,15 @@ export default function Profiles() {
       .from('profiles')
       .select('id, name, avatar_emoji, school_year, xp, level, streak_days, profile_type, total_exercises, total_correct')
       .order('created_at');
-    setProfiles((data as Profile[]) || []);
+    const list = (data as Profile[]) || [];
+    setProfiles(list);
     setLoadingProfiles(false);
+
+    // Auto-select first profile if none active
+    const current = useProfileStore.getState().activeProfileId;
+    if (!current && list.length > 0) {
+      setActiveProfile(list[0].id);
+    }
   };
 
   const fetchLinkedChildren = async () => {
