@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { ArrowLeft, Save, Palette, Type, Maximize, MessageCircle, FileText, Settings, Upload, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, Palette, Type, Maximize, MessageCircle, FileText, Settings, Upload, Trash2, Share2 } from 'lucide-react';
 import { useBrandingByCategory, useUpdateBranding, useIsAdmin } from '@/hooks/useBrandingSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -68,6 +68,12 @@ const VOICE_FIELDS: FieldConfig[] = [
   { key: 'phrase_2', label: 'Frase de acerto 2', type: 'text', category: 'voice' },
   { key: 'phrase_3', label: 'Frase de incentivo 1', type: 'text', category: 'voice' },
   { key: 'phrase_4', label: 'Frase de incentivo 2', type: 'text', category: 'voice' },
+];
+
+const SHARE_FIELDS: FieldConfig[] = [
+  { key: 'share_header', label: 'Cabeçalho do compartilhamento', type: 'text', category: 'share' },
+  { key: 'share_cta', label: 'CTA para amigos experimentarem', type: 'textarea', category: 'share' },
+  { key: 'share_app_url', label: 'Link do app no compartilhamento', type: 'text', category: 'share' },
 ];
 
 const LANDING_FIELDS: FieldConfig[] = [
@@ -437,6 +443,9 @@ export default function Admin() {
             <TabsTrigger value="landing" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
               <FileText className="h-3.5 w-3.5 mr-1" /> Landing
             </TabsTrigger>
+            <TabsTrigger value="share" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
+              <Share2 className="h-3.5 w-3.5 mr-1" /> Compartilhar
+            </TabsTrigger>
           </TabsList>
 
           <div className="mt-6">
@@ -457,6 +466,9 @@ export default function Admin() {
             </TabsContent>
             <TabsContent value="landing">
               <TabSection fields={LANDING_FIELDS} icon={<FileText className="h-5 w-5 text-primary" />} title="Textos da Landing Page" />
+            </TabsContent>
+            <TabsContent value="share">
+              <TabSection fields={SHARE_FIELDS} icon={<Share2 className="h-5 w-5 text-primary" />} title="Mensagem de Compartilhamento (WhatsApp)" />
             </TabsContent>
           </div>
         </Tabs>
