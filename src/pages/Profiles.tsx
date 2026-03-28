@@ -541,7 +541,7 @@ export default function Profiles() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Crie um perfil de "Pai/Mãe" para acompanhar o progresso dos seus filhos
                 </p>
-                <Button onClick={() => { setProfileType('parent'); setCreating(true); }} className="gap-2">
+                <Button onClick={() => { setProfileType('parent'); setCreating(true); setActiveTab('meus'); }} className="gap-2">
                   <Plus className="h-4 w-4" /> Criar perfil de responsável
                 </Button>
               </div>
