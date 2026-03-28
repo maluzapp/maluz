@@ -443,6 +443,9 @@ export default function Admin() {
             <TabsTrigger value="landing" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
               <FileText className="h-3.5 w-3.5 mr-1" /> Landing
             </TabsTrigger>
+            <TabsTrigger value="share" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
+              <Share2 className="h-3.5 w-3.5 mr-1" /> Compartilhar
+            </TabsTrigger>
           </TabsList>
 
           <div className="mt-6">
