@@ -260,9 +260,20 @@ export default function Results() {
     navigate('/confirmacao');
   };
 
-  const handleShareWhatsApp = () => {
+  const handleShareWhatsApp = async () => {
     if (!config) return;
-    const text = `📚 *StudyApp — Resultado do Estudo*\n\n📖 ${config.subject} — ${config.topic} (${config.year})\n🏆 Acertei *${score} de ${total}* (${pct}%)\n⭐ Ganhei ${xpEarned} XP!\n\n${getMessage(pct)}`;
+    // Fetch custom share settings from branding
+    const { data: shareSettings } = await supabase
+      .from('branding_settings')
+      .select('key, value')
+      .in('key', ['share_header', 'share_cta', 'share_app_url', 'app_name']);
+    const s = Object.fromEntries((shareSettings ?? []).map((i) => [i.key, i.value]));
+    const appName = s.app_name || 'Maluz';
+    const header = s.share_header || `💡 *${appName} — Resultado do Estudo*`;
+    const cta = s.share_cta || `🚀 Que tal tentar também? Baixe o ${appName} e descubra o seu resultado!`;
+    const appUrl = s.share_app_url || 'https://maluz.lovable.app';
+
+    const text = `${header}\n\n📖 ${config.subject} — ${config.topic} (${config.year})\n🏆 Acertei *${score} de ${total}* (${pct}%)\n⭐ Ganhei ${xpEarned} XP!\n\n${getMessage(pct)}\n\n${cta}\n👉 ${appUrl}`;
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
