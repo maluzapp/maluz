@@ -408,6 +408,117 @@ export default function Admin() {
     );
   };
 
+  const UsersSection = () => {
+    const [users, setUsers] = useState<any[]>([]);
+    const [loadingUsers, setLoadingUsers] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+      const fetchUsers = async () => {
+        setLoadingUsers(true);
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          const res = await supabase.functions.invoke('admin-users', {
+            headers: { Authorization: `Bearer ${session?.access_token}` },
+          });
+          if (res.data?.users) setUsers(res.data.users);
+        } catch (err) {
+          toast.error('Erro ao carregar usuários');
+        } finally {
+          setLoadingUsers(false);
+        }
+      };
+      fetchUsers();
+    }, []);
+
+    const filtered = users.filter(u =>
+      (u.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.profiles?.some((p: any) => p.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+
+    const formatDate = (d: string | null) => {
+      if (!d) return '—';
+      return new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 mb-2">
+          <Users className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-lg font-bold text-foreground">Usuários Cadastrados</h2>
+          <Badge variant="secondary" className="ml-auto font-mono text-xs">{users.length} total</Badge>
+        </div>
+
+        <Input
+          placeholder="Buscar por email ou nome..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          className="bg-card border-primary/20 text-foreground"
+        />
+
+        {loadingUsers ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-12 text-foreground/50 text-sm">Nenhum usuário encontrado</div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map(user => (
+              <div key={user.id} className="rounded-xl border border-primary/15 bg-card/50 p-4 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Mail className="h-3.5 w-3.5 text-primary/60 shrink-0" />
+                      <span className="text-sm font-medium text-foreground truncate">{user.email || 'Sem email'}</span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-1 text-xs text-foreground/50">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        Cadastro: {formatDate(user.created_at)}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <UserCheck className="h-3 w-3" />
+                        Último login: {formatDate(user.last_sign_in_at)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    {user.roles?.includes('admin') && (
+                      <Badge className="bg-primary/20 text-primary text-[10px] font-mono">
+                        <Shield className="h-2.5 w-2.5 mr-0.5" /> Admin
+                      </Badge>
+                    )}
+                    {user.email_confirmed_at ? (
+                      <Badge variant="secondary" className="text-[10px]">✓ Verificado</Badge>
+                    ) : (
+                      <Badge variant="destructive" className="text-[10px]">Pendente</Badge>
+                    )}
+                  </div>
+                </div>
+                {user.profiles?.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pt-1 border-t border-primary/10">
+                    {user.profiles.map((p: any) => (
+                      <div key={p.id} className="flex items-center gap-1.5 bg-background/50 rounded-lg px-2.5 py-1 text-xs">
+                        <span>{p.avatar_emoji}</span>
+                        <span className="text-foreground/80">{p.name}</span>
+                        <Badge variant="outline" className="text-[9px] px-1 py-0">
+                          {p.profile_type === 'parent' ? '👨‍👩‍👧 Responsável' : '📚 Estudante'}
+                        </Badge>
+                        {p.school_year && <span className="text-foreground/40">{p.school_year}</span>}
+                        <span className="text-primary/60 font-mono">Lv.{p.level} · {p.xp}xp</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
