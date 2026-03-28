@@ -61,7 +61,7 @@ export default function Landing() {
           <p className="text-xs tracking-widest uppercase text-foreground/42 flex items-center justify-center gap-2 flex-wrap">
             <span>Exercícios</span>
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_6px_hsl(42,91%,61%)]" />
-            <span>Inteligência Artificial</span>
+            <span>Personalização Inteligente</span>
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_6px_hsl(42,91%,61%)]" />
             <span>Gamificação</span>
           </p>
