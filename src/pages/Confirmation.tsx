@@ -110,7 +110,7 @@ export default function Confirmation() {
           Confirme o conteúdo 📋
         </h1>
         <p className="mb-6 text-muted-foreground">
-          Veja se a IA entendeu a matéria corretamente
+          Veja se a Maluz entendeu a matéria corretamente
         </p>
 
         {isLoading && !summary ? (

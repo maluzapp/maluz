@@ -120,7 +120,7 @@ export default function Index() {
             Acenda a <span className="text-primary italic">luz</span> do saber! 💡
           </h1>
           <p className="mt-2 text-muted-foreground font-body">
-            Vamos clarear as dúvidas? A IA gera exercícios sob medida ✨
+            Vamos clarear as dúvidas? A Maluz cria exercícios sob medida ✨
           </p>
         </div>
 

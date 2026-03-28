@@ -7,7 +7,7 @@ const FEATURES = [
   { icon: '📸', title: 'Entrada por Foto', desc: 'A criança fotografa a página do seu livro. O exercício é 100% alinhado ao que está sendo estudado naquele momento.' },
   { icon: '🧠', title: 'Personalização Profunda', desc: 'Conteúdo gerado sob demanda conforme ano, matéria, assunto e livro. Cada sessão é única e contextualizada.' },
   { icon: '🎯', title: 'Formatos Variados', desc: 'Múltipla escolha, lacunas, verdadeiro ou falso. Correção instantânea com feedback encorajador em cada resposta.' },
-  { icon: '🤖', title: 'IA Adaptativa', desc: 'A IA ajusta a dificuldade com base no desempenho, mantendo o desafio sempre na zona ideal de aprendizado.' },
+  { icon: '🤖', title: 'Aprendizado Adaptativo', desc: 'A Maluz ajusta a dificuldade com base no desempenho, mantendo o desafio sempre na zona ideal de aprendizado.' },
   { icon: '💛', title: 'Afeto na Tecnologia', desc: 'A Maluz tem uma história real. O nome carrega uma homenagem verdadeira que cria conexão emocional única.' },
   { icon: '📶', title: 'Funciona Offline', desc: 'Exercícios previamente gerados ficam disponíveis sem internet. O estudo nunca é interrompido.' },
 ];
@@ -49,7 +49,7 @@ export default function Landing() {
         <div className="text-center relative z-10 px-5 animate-fade-in">
           <img src={lampadaIcon} alt="Maluz símbolo" className="h-24 mx-auto mb-6 animate-float" />
           <p className="font-mono text-[0.6rem] tracking-[0.2em] uppercase text-primary/80 mb-4">
-            {t('hero_subtitle', 'Estudos personalizados por IA')}
+            {t('hero_subtitle', 'Estudos personalizados pela Maluz')}
           </p>
           <h1 className="font-display text-6xl md:text-8xl font-black leading-[0.9] mb-4 text-foreground">
             Ma<span className="text-primary italic">luz</span>
@@ -61,7 +61,7 @@ export default function Landing() {
           <p className="text-xs tracking-widest uppercase text-foreground/42 flex items-center justify-center gap-2 flex-wrap">
             <span>Exercícios</span>
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_6px_hsl(42,91%,61%)]" />
-            <span>Inteligência Artificial</span>
+            <span>Personalização Inteligente</span>
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_6px_hsl(42,91%,61%)]" />
             <span>Gamificação</span>
           </p>
