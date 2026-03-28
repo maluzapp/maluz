@@ -153,6 +153,11 @@ export default function Profiles() {
   };
 
   const deleteProfile = async (id: string) => {
+    // Clear active profile if it's the one being deleted
+    const current = useProfileStore.getState().activeProfileId;
+    if (current === id) {
+      setActiveProfile(null);
+    }
     await supabase.from('profiles').delete().eq('id', id);
     fetchProfiles();
   };
