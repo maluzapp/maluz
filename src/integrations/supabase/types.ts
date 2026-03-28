@@ -169,7 +169,9 @@ export type Database = {
       }
       study_sessions: {
         Row: {
+          answers_data: Json | null
           created_at: string
+          exercises_data: Json | null
           id: string
           profile_id: string
           score: number
@@ -180,7 +182,9 @@ export type Database = {
           year: string
         }
         Insert: {
+          answers_data?: Json | null
           created_at?: string
+          exercises_data?: Json | null
           id?: string
           profile_id: string
           score: number
@@ -191,7 +195,9 @@ export type Database = {
           year: string
         }
         Update: {
+          answers_data?: Json | null
           created_at?: string
+          exercises_data?: Json | null
           id?: string
           profile_id?: string
           score?: number
