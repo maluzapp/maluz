@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useProfileStore } from '@/hooks/useProfile';
+import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
 import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3 } from 'lucide-react';
@@ -52,6 +53,7 @@ function formatRelativeDate(dateStr: string) {
 }
 
 export default function Index() {
+  const { user, loading: authLoading } = useAuth();
   const profileId = useProfileStore((s) => s.activeProfileId);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [recentSessions, setRecentSessions] = useState<RecentSession[]>([]);
@@ -59,12 +61,14 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!profileId) return;
+    if (authLoading || !user || !profileId) return;
+    let cancelled = false;
     const fetchData = async () => {
       const [profileRes, sessionsRes] = await Promise.all([
         supabase.from('profiles').select('name, avatar_emoji, xp, level, streak_days, total_exercises, total_correct, school_year, last_study_date').eq('id', profileId).single(),
         supabase.from('study_sessions').select('id, subject, topic, score, total, xp_earned, created_at').eq('profile_id', profileId).order('created_at', { ascending: false }).limit(20),
       ]);
+      if (cancelled) return;
       if (profileRes.data) setProfile(profileRes.data as ProfileData);
       const sessions = (sessionsRes.data as RecentSession[]) || [];
       setRecentSessions(sessions);
@@ -81,7 +85,8 @@ export default function Index() {
       setLoading(false);
     };
     fetchData();
-  }, [profileId]);
+    return () => { cancelled = true; };
+  }, [profileId, user, authLoading]);
 
   if (loading || !profile) {
     return (
