@@ -536,7 +536,7 @@ export default function Admin() {
 
       <div className="max-w-2xl mx-auto px-4 py-6">
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="w-full grid grid-cols-3 md:grid-cols-6 h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl">
+          <TabsList className="w-full grid grid-cols-4 md:grid-cols-8 h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl">
             <TabsTrigger value="general" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
               <Settings className="h-3.5 w-3.5 mr-1" /> Geral
             </TabsTrigger>
