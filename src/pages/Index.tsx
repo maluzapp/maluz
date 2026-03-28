@@ -172,7 +172,7 @@ export default function Index() {
                         <span className="text-foreground font-medium truncate">{stat.subject}</span>
                         <span className={cn(
                           'text-xs font-mono font-bold',
-                          pct >= 70 ? 'text-green-400' : pct >= 50 ? 'text-primary' : 'text-destructive'
+                          pct >= 70 ? 'text-accent' : pct >= 50 ? 'text-primary' : 'text-destructive'
                         )}>{pct}%</span>
                       </div>
                       <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
