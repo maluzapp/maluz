@@ -152,9 +152,9 @@ export async function incrementDailyUsage(profileId: string) {
   }
 }
 
-export async function startCheckout(priceId: string) {
+export async function startCheckout(planSlug: string, billingPeriod: 'monthly' | 'yearly' = 'monthly') {
   const { data, error } = await supabase.functions.invoke('create-checkout', {
-    body: { price_id: priceId },
+    body: { plan_slug: planSlug, billing_period: billingPeriod },
   });
   if (error) throw error;
   if (data?.url) {
