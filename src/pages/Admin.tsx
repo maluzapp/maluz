@@ -83,6 +83,17 @@ const SHARE_FIELDS: FieldConfig[] = [
   { key: 'share_app_url', label: 'Link do app no compartilhamento', type: 'text', category: 'share' },
 ];
 
+const EMAIL_FIELDS: FieldConfig[] = [
+  { key: 'email_sender_name', label: 'Nome do remetente', type: 'text', category: 'email' },
+  { key: 'email_sender_address', label: 'Email remetente', type: 'text', category: 'email' },
+  { key: 'email_footer_text', label: 'Texto do rodapé', type: 'text', category: 'email' },
+  { key: 'email_primary_color', label: 'Cor principal (botões)', type: 'color', category: 'email' },
+  { key: 'email_text_color', label: 'Cor do texto', type: 'color', category: 'email' },
+  { key: 'email_welcome_subject', label: 'Assunto — Boas-vindas', type: 'text', category: 'email' },
+  { key: 'email_payment_subject', label: 'Assunto — Confirmação pagamento', type: 'text', category: 'email' },
+  { key: 'email_cancel_subject', label: 'Assunto — Cancelamento', type: 'text', category: 'email' },
+];
+
 const LANDING_FIELDS: FieldConfig[] = [
   { key: 'hero_title', label: 'Título Hero', type: 'text', category: 'landing' },
   { key: 'hero_subtitle', label: 'Subtítulo Hero', type: 'text', category: 'landing' },
@@ -105,6 +116,7 @@ const NAV_ITEMS = [
   { id: 'voice', label: 'Voz', icon: MessageCircle },
   { id: 'landing', label: 'Landing', icon: FileText },
   { id: 'share', label: 'Compartilhar', icon: Share2 },
+  { id: 'email', label: 'Emails', icon: Mail },
   { id: 'users', label: 'Usuários', icon: Users },
   { id: 'plans', label: 'Planos', icon: CreditCard },
 ];
@@ -823,6 +835,7 @@ export default function Admin() {
           {activeSection === 'voice' && <SectionPanel fields={VOICE_FIELDS} icon={<MessageCircle className="h-5 w-5 text-primary" />} title="Tom de Voz" />}
           {activeSection === 'landing' && <SectionPanel fields={LANDING_FIELDS} icon={<FileText className="h-5 w-5 text-primary" />} title="Textos da Landing Page" />}
           {activeSection === 'share' && <SectionPanel fields={SHARE_FIELDS} icon={<Share2 className="h-5 w-5 text-primary" />} title="Mensagem de Compartilhamento" />}
+          {activeSection === 'email' && <SectionPanel fields={EMAIL_FIELDS} icon={<Mail className="h-5 w-5 text-primary" />} title="Configuração de Emails" />}
           {activeSection === 'users' && <UsersSection />}
           {activeSection === 'plans' && <PlansSection />}
         </div>
