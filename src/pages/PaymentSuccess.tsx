@@ -46,8 +46,7 @@ export default function PaymentSuccess() {
     return () => clearTimeout(timer);
   }, [countdown, navigate]);
 
-  const priceInfo = stripeStatus?.price_id ? STRIPE_PRICES[stripeStatus.price_id] : null;
-  const planName = priceInfo?.slug === 'familia' ? 'Família' : 'Pro';
+  const planName = stripeStatus?.plan_slug === 'familia' ? 'Família' : 'Pro';
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
