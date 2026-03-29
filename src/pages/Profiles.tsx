@@ -5,10 +5,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfileStore } from '@/hooks/useProfile';
+import { useStripeSubscription, useUserSubscription, usePlans, startCheckout, openCustomerPortal, STRIPE_YEARLY_PRICES } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, LogOut, Trash2, Pencil, Link2, Copy, UserPlus, Users, Baby, ShieldCheck, Eye } from 'lucide-react';
+import { Plus, LogOut, Trash2, Pencil, Link2, Copy, UserPlus, Users, Baby, ShieldCheck, Eye, Crown, CreditCard, ArrowUpRight } from 'lucide-react';
 import { YEAR_OPTIONS, getYearLabel } from '@/constants/years';
 import { toast } from 'sonner';
 
@@ -36,6 +38,9 @@ export default function Profiles() {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const setActiveProfile = useProfileStore((s) => s.setActiveProfile);
+  const { data: stripeStatus } = useStripeSubscription();
+  const { data: dbSub } = useUserSubscription();
+  const { data: plans } = usePlans();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [linkedChildren, setLinkedChildren] = useState<LinkedChild[]>([]);
   const [creating, setCreating] = useState(false);
@@ -385,6 +390,90 @@ export default function Profiles() {
             </CardContent>
           </Card>
         )}
+
+        {/* Meu Plano card */}
+        {(() => {
+          const isPro = !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
+          const currentPlanSlug = isPro
+            ? (stripeStatus?.price_id
+              ? (stripeStatus.price_id.includes('familia') ? 'familia' : 'pro')
+              : dbSub?.plan?.slug ?? 'pro')
+            : 'free';
+          const planName = currentPlanSlug === 'familia' ? 'Família' : currentPlanSlug === 'pro' ? 'Pro' : 'Free';
+          const endDate = stripeStatus?.subscription_end
+            ? new Date(stripeStatus.subscription_end).toLocaleDateString('pt-BR')
+            : dbSub?.expires_at
+              ? new Date(dbSub.expires_at).toLocaleDateString('pt-BR')
+              : null;
+
+          return (
+            <Card className={`mb-4 border-primary/20 ${isPro ? 'bg-primary/5' : ''}`}>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Crown className={`h-5 w-5 ${isPro ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <h3 className="font-display font-bold text-foreground">Meu Plano</h3>
+                  </div>
+                  <Badge className={isPro
+                    ? 'bg-primary text-primary-foreground border-0'
+                    : 'bg-muted text-muted-foreground border-0'
+                  }>
+                    {planName}
+                  </Badge>
+                </div>
+
+                {isPro && endDate && (
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Válido até {endDate}
+                  </p>
+                )}
+
+                {!isPro && (
+                  <p className="text-xs text-muted-foreground mb-3">
+                    3 sessões por dia · 1 perfil · Correções básicas
+                  </p>
+                )}
+
+                <div className="flex gap-2">
+                  {isPro ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5 flex-1"
+                      onClick={async () => {
+                        try { await openCustomerPortal(); }
+                        catch { toast.error('Erro ao abrir portal'); }
+                      }}
+                    >
+                      <CreditCard className="h-3.5 w-3.5" /> Gerenciar assinatura
+                    </Button>
+                  ) : (
+                    <>
+                      <Button
+                        size="sm"
+                        className="gap-1.5 flex-1"
+                        onClick={() => {
+                          const proPlan = plans?.find(p => p.slug === 'pro');
+                          if (proPlan?.stripe_price_id) startCheckout(proPlan.stripe_price_id);
+                        }}
+                      >
+                        <ArrowUpRight className="h-3.5 w-3.5" /> Upgrade Pro
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => navigate('/#planos')}
+                      >
+                        Ver planos
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })()}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full grid grid-cols-2 h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl mb-4">

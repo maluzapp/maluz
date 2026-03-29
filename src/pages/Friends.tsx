@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UserPlus, Search, Copy, Users, Trophy, Star, Flame, Check, X } from 'lucide-react';
+import { UserPlus, Search, Copy, Users, Trophy, Star, Flame, Check, X, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -60,12 +60,15 @@ export default function Friends() {
   const [activeTab, setActiveTab] = useState('feed');
   const [friends, setFriends] = useState<Friendship[]>([]);
   const [pendingRequests, setPendingRequests] = useState<Friendship[]>([]);
+  const [sentRequests, setSentRequests] = useState<Friendship[]>([]);
   const [activities, setActivities] = useState<FriendActivity[]>([]);
   const [myCode, setMyCode] = useState('');
   const [searchCode, setSearchCode] = useState('');
   const [searchName, setSearchName] = useState('');
   const [searchResults, setSearchResults] = useState<FriendProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  // Track IDs already connected (friends + pending sent/received)
+  const [connectedIds, setConnectedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!profileId || !user) return;
@@ -97,12 +100,20 @@ export default function Friends() {
       .eq('target_profile_id', profileId)
       .eq('status', 'pending');
 
+    // Get requests I sent (pending)
+    const { data: sent } = await supabase
+      .from('friendships' as any)
+      .select('*')
+      .eq('requester_profile_id', profileId)
+      .eq('status', 'pending');
+
     // Get friend profile IDs
     const friendIds = (friendships as any[] || []).map((f: any) =>
       f.requester_profile_id === profileId ? f.target_profile_id : f.requester_profile_id
     );
     const pendingIds = (pending as any[] || []).map((p: any) => p.requester_profile_id);
-    const allIds = [...new Set([...friendIds, ...pendingIds])];
+    const sentIds = (sent as any[] || []).map((s: any) => s.target_profile_id);
+    const allIds = [...new Set([...friendIds, ...pendingIds, ...sentIds])];
 
     let profileMap: Record<string, FriendProfile> = {};
     if (allIds.length > 0) {
@@ -124,8 +135,14 @@ export default function Friends() {
       ...p, friend: profileMap[p.requester_profile_id]
     })).filter((p: any) => p.friend);
 
+    const mappedSent = (sent as any[] || []).map((s: any) => ({
+      ...s, friend: profileMap[s.target_profile_id]
+    })).filter((s: any) => s.friend);
+
     setFriends(mappedFriends);
     setPendingRequests(mappedPending);
+    setSentRequests(mappedSent);
+    setConnectedIds(new Set([...friendIds, ...pendingIds, ...sentIds]));
 
     // Get friends' recent sessions
     if (friendIds.length > 0) {
@@ -195,9 +212,11 @@ export default function Friends() {
       .ilike('name', `%${searchName.trim()}%`)
       .neq('id', profileId)
       .eq('profile_type', 'child')
-      .limit(10);
+      .limit(20);
 
-    setSearchResults((data || []) as FriendProfile[]);
+    // Filter out already connected profiles
+    const filtered = (data || []).filter((p: any) => !connectedIds.has(p.id));
+    setSearchResults(filtered as FriendProfile[]);
   };
 
   const sendRequest = async (targetId: string) => {
@@ -394,12 +413,17 @@ export default function Friends() {
 
           {/* Add friends tab */}
           <TabsContent value="adicionar" className="mt-4 space-y-4">
+            <p className="text-xs text-muted-foreground">
+              Ao enviar um convite, o amigo precisa aceitar antes de vocês serem conectados.
+            </p>
+
             {/* By code */}
             <Card className="border-primary/15">
               <CardContent className="p-4 space-y-3">
                 <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-                  <Copy className="h-3.5 w-3.5 text-primary" /> Adicionar por código
+                  <Copy className="h-3.5 w-3.5 text-primary" /> Enviar convite por código
                 </h3>
+                <p className="text-[10px] text-muted-foreground">Peça o código de 6 dígitos do seu amigo</p>
                 <div className="flex gap-2">
                   <Input
                     placeholder="Código do amigo"
@@ -434,15 +458,16 @@ export default function Friends() {
 
                 {searchResults.length > 0 && (
                   <div className="space-y-2 mt-2">
+                    <p className="text-[10px] text-muted-foreground">{searchResults.length} resultado(s) encontrado(s)</p>
                     {searchResults.map((p) => (
-                      <div key={p.id} className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
+                      <div key={p.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-primary/5">
                         <span className="text-2xl">{p.avatar_emoji}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-foreground">{p.name}</p>
-                          <p className="text-[10px] text-muted-foreground">Nv.{p.level} · {p.xp} XP</p>
+                          <p className="text-[10px] text-muted-foreground">Nv.{p.level} · {p.xp} XP · {p.friend_code}</p>
                         </div>
-                        <Button size="sm" variant="outline" onClick={() => sendRequest(p.id)} className="gap-1">
-                          <UserPlus className="h-3.5 w-3.5" /> Adicionar
+                        <Button size="sm" variant="outline" onClick={() => sendRequest(p.id)} className="gap-1 text-xs">
+                          <UserPlus className="h-3.5 w-3.5" /> Enviar convite
                         </Button>
                       </div>
                     ))}
@@ -450,6 +475,33 @@ export default function Friends() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Sent requests */}
+            {sentRequests.length > 0 && (
+              <div>
+                <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-1.5">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  Convites enviados ({sentRequests.length})
+                </h3>
+                <div className="space-y-2">
+                  {sentRequests.map((req) => (
+                    <Card key={req.id} className="border-muted">
+                      <CardContent className="p-3 flex items-center gap-3">
+                        <span className="text-2xl">{req.friend.avatar_emoji}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-foreground">{req.friend.name}</p>
+                          <p className="text-[10px] text-muted-foreground">Aguardando aceitação...</p>
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                          onClick={() => removeFriend(req.id)}>
+                          <X className="h-3.5 w-3.5" />
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>
