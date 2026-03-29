@@ -12,7 +12,7 @@ const NAV_ITEMS_LEFT = [
 
 const NAV_ITEMS_RIGHT = [
   { path: '/resultado', icon: Trophy, label: 'Resultado' },
-  { path: '/creditos', icon: Info, label: 'Créditos' },
+  { path: '/amigos', icon: Heart, label: 'Amigos' },
 ];
 
 const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/'];
