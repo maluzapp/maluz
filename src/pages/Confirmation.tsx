@@ -134,7 +134,7 @@ export default function Confirmation() {
   return (
     <div className="min-h-screen bg-background px-4 py-6 md:py-12">
       <div className="mx-auto max-w-lg">
-        <Button variant="ghost" className="mb-4 gap-2" onClick={() => navigate('/')}>
+        <Button variant="ghost" className="mb-4 gap-2" onClick={() => navigate('/inicio')}>
           <ArrowLeft className="h-4 w-4" /> Voltar
         </Button>
 

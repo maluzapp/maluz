@@ -175,7 +175,7 @@ export default function Admin() {
         <div className="text-6xl">🔒</div>
         <h1 className="font-display text-2xl font-bold text-primary">Acesso Restrito</h1>
         <p className="text-sm text-foreground/60 text-center">Você precisa de permissão de administrador para acessar este painel.</p>
-        <Button variant="outline" onClick={() => navigate('/')}>Voltar ao início</Button>
+        <Button variant="outline" onClick={() => navigate('/inicio')}>Voltar ao início</Button>
       </div>
     );
   }

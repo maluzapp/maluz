@@ -17,7 +17,7 @@ export default function Exercises() {
 
   useEffect(() => {
     if (!config || exercises.length === 0) {
-      navigate('/');
+      navigate('/inicio');
     }
   }, []);
 

@@ -176,7 +176,7 @@ export default function Profiles() {
 
   const selectProfile = (id: string) => {
     setActiveProfile(id);
-    navigate('/');
+    navigate('/inicio');
   };
 
   const handleSignOut = async () => {

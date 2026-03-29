@@ -257,7 +257,7 @@ export default function Results() {
 
   const handleNewSession = () => {
     reset();
-    navigate('/');
+    navigate('/inicio');
   };
 
   const handleRetry = () => {
