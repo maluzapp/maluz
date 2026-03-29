@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Users, Trophy, Info } from 'lucide-react';
+import { Home, Users, Trophy, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProfileStore } from '@/hooks/useProfile';
 import lampadaIcon from '@/assets/lampada-2.png';
@@ -12,7 +12,7 @@ const NAV_ITEMS_LEFT = [
 
 const NAV_ITEMS_RIGHT = [
   { path: '/resultado', icon: Trophy, label: 'Resultado' },
-  { path: '/creditos', icon: Info, label: 'Créditos' },
+  { path: '/amigos', icon: Heart, label: 'Amigos' },
 ];
 
 const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/'];

@@ -17,6 +17,7 @@ import Confirmation from "./pages/Confirmation";
 import Exercises from "./pages/Exercises";
 import Results from "./pages/Results";
 import Credits from "./pages/Credits";
+import Friends from "./pages/Friends";
 import Admin from "./pages/Admin";
 import Install from "./pages/Install";
 import SessionReview from "./pages/SessionReview";
@@ -65,6 +66,7 @@ const App = () => (
             <Route path="/resultado" element={<RequireAuth><Results /></RequireAuth>} />
             <Route path="/sessao/:id" element={<RequireAuth><SessionReview /></RequireAuth>} />
             <Route path="/creditos" element={<Credits />} />
+            <Route path="/amigos" element={<RequireAuth><Friends /></RequireAuth>} />
             <Route path="/instalar" element={<Install />} />
             <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
             <Route path="/reset-password" element={<ResetPassword />} />
