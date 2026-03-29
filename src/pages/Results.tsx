@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, XCircle, CheckCircle, Share2, Star, History, BookOpen, Trophy, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -179,7 +179,7 @@ function SessionHistory() {
 
 export default function Results() {
   const navigate = useNavigate();
-  const { exercises, answers, config, reset } = useStudyStore();
+  const { exercises, answers, config, reset, sessionId } = useStudyStore();
   const profileId = useProfileStore((s) => s.activeProfileId);
   const [xpEarned, setXpEarned] = useState(0);
   const [saved, setSaved] = useState(false);
@@ -190,16 +190,22 @@ export default function Results() {
   const total = exercises.length;
   const pct = total > 0 ? Math.round((score / total) * 100) : 0;
 
-  // Save results once - use ref to prevent React strict mode double-save
-  const savingRef = React.useRef(false);
+  // Save results once per generated study session, even across remounts/navigation
   useEffect(() => {
-    if (saved || savingRef.current || !config || !profileId || total === 0) return;
-    savingRef.current = true;
+    if (!config || !profileId || total === 0 || !sessionId) return;
+
+    const savedSessionId = sessionStorage.getItem('lastSavedStudySessionId');
+    if (savedSessionId === sessionId) {
+      setSaved(true);
+      setXpEarned(calcXP(score, total));
+      return;
+    }
+
     const xp = calcXP(score, total);
     setXpEarned(xp);
 
     const saveResults = async () => {
-      await supabase.from('study_sessions').insert({
+      const { error: insertError } = await supabase.from('study_sessions').insert({
         profile_id: profileId,
         subject: config.subject,
         topic: config.topic,
@@ -211,7 +217,10 @@ export default function Results() {
         answers_data: JSON.parse(JSON.stringify(answers)),
       });
 
-      // Track daily usage for subscription limits
+      if (insertError) return;
+
+      sessionStorage.setItem('lastSavedStudySessionId', sessionId);
+
       await incrementDailyUsage(profileId);
 
       const { data: profile } = await supabase
@@ -259,7 +268,7 @@ export default function Results() {
     };
 
     saveResults();
-  }, [config, profileId, score, total, saved]);
+  }, [answers, config, exercises, profileId, score, sessionId, total]);
 
   const handleNewSession = () => {
     reset();

@@ -8,6 +8,7 @@ interface StudyState {
   answers: ExerciseAnswer[];
   currentIndex: number;
   isLoading: boolean;
+  sessionId: string | null;
 
   setConfig: (config: StudyConfig) => void;
   setSummary: (summary: ContentSummary) => void;
@@ -19,6 +20,8 @@ interface StudyState {
   getResult: () => SessionResult | null;
 }
 
+const createSessionId = () => crypto.randomUUID();
+
 export const useStudyStore = create<StudyState>((set, get) => ({
   config: null,
   summary: null,
@@ -26,14 +29,15 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   answers: [],
   currentIndex: 0,
   isLoading: false,
+  sessionId: null,
 
-  setConfig: (config) => set({ config, summary: null, exercises: [], answers: [], currentIndex: 0 }),
+  setConfig: (config) => set({ config, summary: null, exercises: [], answers: [], currentIndex: 0, sessionId: createSessionId() }),
   setSummary: (summary) => set({ summary }),
-  setExercises: (exercises) => set({ exercises, answers: [], currentIndex: 0 }),
+  setExercises: (exercises) => set((state) => ({ exercises, answers: [], currentIndex: 0, sessionId: state.sessionId ?? createSessionId() })),
   addAnswer: (answer) => set((s) => ({ answers: [...s.answers, answer] })),
   nextExercise: () => set((s) => ({ currentIndex: s.currentIndex + 1 })),
   setLoading: (isLoading) => set({ isLoading }),
-  reset: () => set({ config: null, summary: null, exercises: [], answers: [], currentIndex: 0, isLoading: false }),
+  reset: () => set({ config: null, summary: null, exercises: [], answers: [], currentIndex: 0, isLoading: false, sessionId: null }),
   getResult: () => {
     const { exercises, answers, config } = get();
     if (!config || exercises.length === 0) return null;
