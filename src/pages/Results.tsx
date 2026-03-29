@@ -189,17 +189,35 @@ export default function Results() {
   const score = answers.filter((a) => a.isCorrect).length;
   const total = exercises.length;
   const pct = total > 0 ? Math.round((score / total) * 100) : 0;
+  const sessionFingerprint = profileId && config && total > 0
+    ? JSON.stringify({
+        profileId,
+        subject: config.subject,
+        topic: config.topic,
+        year: config.year,
+        score,
+        total,
+        answers,
+        exercises,
+      })
+    : null;
 
-  // Save results once - use ref to prevent React strict mode double-save
-  const savingRef = React.useRef(false);
+  // Save results once per unique completed session, even across remounts/navigation
   useEffect(() => {
-    if (saved || savingRef.current || !config || !profileId || total === 0) return;
-    savingRef.current = true;
+    if (!config || !profileId || total === 0 || !sessionFingerprint) return;
+
+    const savedFingerprint = sessionStorage.getItem('lastSavedStudySessionFingerprint');
+    if (savedFingerprint === sessionFingerprint) {
+      setSaved(true);
+      setXpEarned(calcXP(score, total));
+      return;
+    }
+
     const xp = calcXP(score, total);
     setXpEarned(xp);
 
     const saveResults = async () => {
-      await supabase.from('study_sessions').insert({
+      const { error: insertError } = await supabase.from('study_sessions').insert({
         profile_id: profileId,
         subject: config.subject,
         topic: config.topic,
@@ -210,6 +228,10 @@ export default function Results() {
         exercises_data: JSON.parse(JSON.stringify(exercises)),
         answers_data: JSON.parse(JSON.stringify(answers)),
       });
+
+      if (insertError) return;
+
+      sessionStorage.setItem('lastSavedStudySessionFingerprint', sessionFingerprint);
 
       // Track daily usage for subscription limits
       await incrementDailyUsage(profileId);
@@ -259,7 +281,7 @@ export default function Results() {
     };
 
     saveResults();
-  }, [config, profileId, score, total, saved]);
+  }, [answers, config, exercises, profileId, score, sessionFingerprint, total]);
 
   const handleNewSession = () => {
     reset();
