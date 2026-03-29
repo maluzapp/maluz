@@ -112,7 +112,8 @@ export default function Friends() {
       f.requester_profile_id === profileId ? f.target_profile_id : f.requester_profile_id
     );
     const pendingIds = (pending as any[] || []).map((p: any) => p.requester_profile_id);
-    const allIds = [...new Set([...friendIds, ...pendingIds])];
+    const sentIds = (sent as any[] || []).map((s: any) => s.target_profile_id);
+    const allIds = [...new Set([...friendIds, ...pendingIds, ...sentIds])];
 
     let profileMap: Record<string, FriendProfile> = {};
     if (allIds.length > 0) {
