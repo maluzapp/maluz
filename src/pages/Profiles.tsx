@@ -688,6 +688,10 @@ export default function Profiles() {
               </div>
             )}
           </TabsContent>
+
+          <TabsContent value="amigos">
+            <FriendsTab />
+          </TabsContent>
         </Tabs>
       </div>
 
