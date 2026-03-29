@@ -8,6 +8,9 @@ import { MultipleChoice } from '@/components/exercises/MultipleChoice';
 import { TrueFalse } from '@/components/exercises/TrueFalse';
 import { FillBlank } from '@/components/exercises/FillBlank';
 import { Matching } from '@/components/exercises/Matching';
+import { Ordering } from '@/components/exercises/Ordering';
+import { CompleteSentence } from '@/components/exercises/CompleteSentence';
+import { ColumnClassification } from '@/components/exercises/ColumnClassification';
 import type { Exercise, ExerciseAnswer } from '@/types/study';
 
 export default function Exercises() {
@@ -21,7 +24,6 @@ export default function Exercises() {
     }
   }, []);
 
-  // Reset answered state when index changes
   useEffect(() => {
     setAnswered(false);
   }, [currentIndex]);
@@ -61,9 +63,16 @@ export default function Exercises() {
         return <FillBlank key={key} exercise={ex} index={currentIndex} onAnswer={handleAnswer} />;
       case 'matching':
         return <Matching key={key} exercise={ex} index={currentIndex} onAnswer={handleAnswer} />;
+      case 'ordering':
+        return <Ordering key={key} exercise={ex} index={currentIndex} onAnswer={handleAnswer} />;
+      case 'complete_sentence':
+        return <CompleteSentence key={key} exercise={ex} index={currentIndex} onAnswer={handleAnswer} />;
+      case 'column_classification':
+        return <ColumnClassification key={key} exercise={ex} index={currentIndex} onAnswer={handleAnswer} />;
+      default:
+        return <MultipleChoice key={key} exercise={ex as any} index={currentIndex} onAnswer={handleAnswer} />;
     }
   };
-
   return (
     <div className="min-h-screen bg-background px-4 py-6 pb-24 md:py-12">
       <div className="mx-auto max-w-lg">
