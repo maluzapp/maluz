@@ -13,13 +13,41 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const prompt = `Você é um professor do ${year}º ano do Ensino Fundamental II.
+    // Map year code to proper label and school level
+    function getYearInfo(y: string): { label: string; level: string; ageRange: string } {
+      const map: Record<string, { label: string; level: string; ageRange: string }> = {
+        '2': { label: '2º ano', level: 'Ensino Fundamental I', ageRange: '7-8 anos' },
+        '3': { label: '3º ano', level: 'Ensino Fundamental I', ageRange: '8-9 anos' },
+        '4': { label: '4º ano', level: 'Ensino Fundamental I', ageRange: '9-10 anos' },
+        '5': { label: '5º ano', level: 'Ensino Fundamental I', ageRange: '10-11 anos' },
+        '6': { label: '6º ano', level: 'Ensino Fundamental II', ageRange: '11-12 anos' },
+        '7': { label: '7º ano', level: 'Ensino Fundamental II', ageRange: '12-13 anos' },
+        '8': { label: '8º ano', level: 'Ensino Fundamental II', ageRange: '13-14 anos' },
+        '9': { label: '9º ano', level: 'Ensino Fundamental II', ageRange: '14-15 anos' },
+        '1M': { label: '1º ano', level: 'Ensino Médio', ageRange: '15-16 anos' },
+        '2M': { label: '2º ano', level: 'Ensino Médio', ageRange: '16-17 anos' },
+        '3M': { label: '3º ano', level: 'Ensino Médio', ageRange: '17-18 anos' },
+      };
+      return map[y] || { label: `${y}º ano`, level: 'Ensino Fundamental II', ageRange: '10-15 anos' };
+    }
+
+    const yearInfo = getYearInfo(year);
+
+    const prompt = `Você é um professor do ${yearInfo.label} do ${yearInfo.level}, especialista em criar conteúdo para alunos de ${yearInfo.ageRange}.
 Matéria: ${subject}
 Assunto: ${topic}
 Resumo: ${summary}
 Pontos-chave: ${keyPoints?.join(', ') || topic}
 
 Gere EXATAMENTE 8 exercícios variados sobre este conteúdo. Use os seguintes tipos (pelo menos 2 de múltipla escolha, 2 verdadeiro/falso, 2 preencher lacuna, 2 associação):
+
+IMPORTANTE - ADEQUAÇÃO AO NÍVEL ESCOLAR:
+- O aluno está no ${yearInfo.label} do ${yearInfo.level} (faixa etária: ${yearInfo.ageRange})
+- A linguagem DEVE ser simples e adequada para essa idade
+- A complexidade das questões DEVE corresponder ao nível escolar
+- Para Fundamental I (2º ao 5º ano): use frases curtas, vocabulário básico, conceitos introdutórios
+- Para Fundamental II (6º ao 9º ano): use linguagem intermediária, conceitos mais elaborados
+- Para Ensino Médio: use linguagem formal, conceitos avançados
 
 Formato JSON EXATO (retorne APENAS o JSON, sem markdown):
 {
@@ -56,9 +84,9 @@ Formato JSON EXATO (retorne APENAS o JSON, sem markdown):
 }
 
 REGRAS:
-- Exercícios devem ser adequados para alunos do ${year}º ano
+- Exercícios devem ser adequados para alunos do ${yearInfo.label} do ${yearInfo.level} (${yearInfo.ageRange})
 - As questões devem cobrir diferentes aspectos do assunto
-- Explicações devem ser didáticas e claras
+- Explicações devem ser didáticas e claras, adequadas à faixa etária
 - Para fill_blank, use EXATAMENTE "___" (3 underscores) para a lacuna
 - Para matching, use exatamente 3 ou 4 pares
 - correctIndex começa em 0`;

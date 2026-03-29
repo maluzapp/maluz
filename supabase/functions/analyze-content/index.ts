@@ -13,20 +13,38 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    // Map year code to proper label and school level
+    const yearMap: Record<string, { label: string; level: string }> = {
+      '2': { label: '2º ano', level: 'Ensino Fundamental I' },
+      '3': { label: '3º ano', level: 'Ensino Fundamental I' },
+      '4': { label: '4º ano', level: 'Ensino Fundamental I' },
+      '5': { label: '5º ano', level: 'Ensino Fundamental I' },
+      '6': { label: '6º ano', level: 'Ensino Fundamental II' },
+      '7': { label: '7º ano', level: 'Ensino Fundamental II' },
+      '8': { label: '8º ano', level: 'Ensino Fundamental II' },
+      '9': { label: '9º ano', level: 'Ensino Fundamental II' },
+      '1M': { label: '1º ano', level: 'Ensino Médio' },
+      '2M': { label: '2º ano', level: 'Ensino Médio' },
+      '3M': { label: '3º ano', level: 'Ensino Médio' },
+    };
+    const yearInfo = yearMap[year] || { label: `${year}º ano`, level: 'Ensino Fundamental II' };
+
     // Build content parts for the AI
     const userContentParts: any[] = [
       {
         type: "text",
         text: `Analise o seguinte conteúdo escolar e retorne um resumo estruturado.
 
-Ano: ${year}º ano do Ensino Fundamental II
+Ano: ${yearInfo.label} do ${yearInfo.level}
 Matéria: ${subject}
 Assunto: ${topic}
+
+O conteúdo deve ser adequado para alunos do ${yearInfo.label} do ${yearInfo.level}.
 
 Retorne EXATAMENTE neste formato JSON (e nada mais):
 {
   "title": "Título claro do conteúdo",
-  "summary": "Resumo de 2-3 frases sobre o conteúdo",
+  "summary": "Resumo de 2-3 frases sobre o conteúdo, com linguagem adequada ao nível escolar",
   "keyPoints": ["ponto chave 1", "ponto chave 2", "ponto chave 3", "ponto chave 4"]
 }`,
       },
@@ -63,7 +81,7 @@ Retorne EXATAMENTE neste formato JSON (e nada mais):
         messages: [
           {
             role: "system",
-            content: "Você é um professor experiente do Ensino Fundamental II brasileiro. Analise conteúdos escolares e retorne resumos estruturados em JSON. Responda APENAS com JSON válido, sem markdown.",
+            content: `Você é um professor experiente do ${yearInfo.level} brasileiro. Analise conteúdos escolares adequados para o ${yearInfo.label} e retorne resumos estruturados em JSON. Use linguagem apropriada para a faixa etária. Responda APENAS com JSON válido, sem markdown.`,
           },
           {
             role: "user",
