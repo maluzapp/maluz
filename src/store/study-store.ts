@@ -27,7 +27,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   currentIndex: 0,
   isLoading: false,
 
-  setConfig: (config) => set({ config }),
+  setConfig: (config) => set({ config, summary: null, exercises: [], answers: [], currentIndex: 0 }),
   setSummary: (summary) => set({ summary }),
   setExercises: (exercises) => set({ exercises, answers: [], currentIndex: 0 }),
   addAnswer: (answer) => set((s) => ({ answers: [...s.answers, answer] })),
