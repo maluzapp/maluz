@@ -268,6 +268,11 @@ export default function Landing() {
 
       <hr className="border-primary/15" />
 
+      {/* Pricing */}
+      <PricingSection />
+
+      <hr className="border-primary/15" />
+
       {/* Mockup Preview */}
       <section className="py-16 md:py-20 px-5">
         <div className="max-w-4xl mx-auto text-center">
