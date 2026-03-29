@@ -62,6 +62,8 @@ export default function Profiles() {
   const [viewingChild, setViewingChild] = useState<Profile | null>(null);
   const [activeTab, setActiveTab] = useState('meus');
   const hasLoadedRef = useRef<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleteConfirmName, setDeleteConfirmName] = useState('');
 
   useEffect(() => {
     if (!loading && !user) navigate('/login');
