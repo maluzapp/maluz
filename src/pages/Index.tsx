@@ -122,8 +122,18 @@ export default function Index() {
             <span className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full font-mono">
               Nv.{profile.level}
             </span>
+            {isPro && (
+              <Badge className="absolute -top-1 -left-2 bg-primary text-primary-foreground text-[9px] px-1.5 py-0 border-0 shadow-lg shadow-primary/30">
+                PRO ⭐
+              </Badge>
+            )}
           </div>
-          <h1 className="font-display text-2xl font-bold text-foreground">Olá, {profile.name}! 👋</h1>
+          <div className="flex items-center justify-center gap-2">
+            <h1 className="font-display text-2xl font-bold text-foreground">Olá, {profile.name}! 👋</h1>
+            <button onClick={() => navigate('/creditos')} className="text-muted-foreground hover:text-foreground transition-colors">
+              <Settings className="h-4 w-4" />
+            </button>
+          </div>
           {profile.school_year && (
             <p className="text-sm text-primary font-medium mt-0.5">{getYearLabel(profile.school_year)}</p>
           )}
