@@ -220,6 +220,7 @@ export default function Admin() {
   const [localValues, setLocalValues] = useState<Record<string, string>>({});
   const [logoTimestamps, setLogoTimestamps] = useState<Record<string, number>>({});
   const [activeSection, setActiveSection] = useState('general');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (allSettings) {
