@@ -207,7 +207,7 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
                     onClick={() => handleLeftClick(i)}
                     disabled={answered}
                     className={cn(
-                      'w-full rounded-lg border-2 px-3 py-2.5 text-left text-sm font-medium transition-all duration-300 relative z-20',
+                    'w-full rounded-xl border-2 px-3 py-3.5 text-left text-base font-medium transition-all duration-300 relative z-20',
                       selectedLeft === i && 'border-primary bg-primary/10 ring-2 ring-primary/30 shimmer-glow',
                       !answered && isMatched && colorClass && `${colorClass.border} ${colorClass.bg}`,
                       !answered && !isMatched && selectedLeft !== i && 'border-border hover:border-primary/50',
