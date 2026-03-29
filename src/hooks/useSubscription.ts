@@ -32,19 +32,7 @@ export interface UserSubscription {
   plan?: SubscriptionPlan;
 }
 
-// Stripe price → plan slug mapping
-export const STRIPE_PRICES: Record<string, { slug: string; period: 'monthly' | 'yearly' }> = {
-  'price_1TGJVgEWUivwufDD8qFByYML': { slug: 'pro', period: 'monthly' },
-  'price_1TGJWvEWUivwufDD6lWAQJIk': { slug: 'pro', period: 'yearly' },
-  'price_1TGJX3EWUivwufDDIy281CCo': { slug: 'familia', period: 'monthly' },
-  'price_1TGJX4EWUivwufDDp2uoTWVo': { slug: 'familia', period: 'yearly' },
-};
-
-// Yearly price IDs per plan slug
-export const STRIPE_YEARLY_PRICES: Record<string, string> = {
-  pro: 'price_1TGJWvEWUivwufDD6lWAQJIk',
-  familia: 'price_1TGJX4EWUivwufDDp2uoTWVo',
-};
+// No more hardcoded Stripe price IDs — prices are resolved dynamically by the edge function
 
 export function usePlans() {
   return useQuery({
