@@ -4,17 +4,38 @@ import { useStripeSubscription, STRIPE_PRICES } from '@/hooks/useSubscription';
 import { useAuth } from '@/hooks/useAuth';
 import { CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: stripeStatus, refetch } = useStripeSubscription();
   const [countdown, setCountdown] = useState(5);
+  const [emailSent, setEmailSent] = useState(false);
 
   useEffect(() => {
-    // Refetch immediately to get updated status
     refetch();
   }, [refetch]);
+
+  // Send payment confirmation email
+  useEffect(() => {
+    if (!user?.email || emailSent || !stripeStatus?.subscribed) return;
+    const priceInfo = stripeStatus?.price_id ? STRIPE_PRICES[stripeStatus.price_id] : null;
+    const planName = priceInfo?.slug === 'familia' ? 'Família' : 'Pro';
+
+    supabase.functions.invoke('send-email', {
+      body: {
+        template: 'payment-success',
+        to: user.email,
+        variables: {
+          name: user.user_metadata?.full_name || '',
+          plan_name: planName,
+          app_url: window.location.origin,
+        },
+      },
+    }).then(() => setEmailSent(true))
+      .catch(console.error);
+  }, [user, stripeStatus, emailSent]);
 
   useEffect(() => {
     if (countdown <= 0) {
