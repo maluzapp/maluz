@@ -190,9 +190,11 @@ export default function Results() {
   const total = exercises.length;
   const pct = total > 0 ? Math.round((score / total) * 100) : 0;
 
-  // Save results once
+  // Save results once - use ref to prevent React strict mode double-save
+  const savingRef = React.useRef(false);
   useEffect(() => {
-    if (saved || !config || !profileId || total === 0) return;
+    if (saved || savingRef.current || !config || !profileId || total === 0) return;
+    savingRef.current = true;
     const xp = calcXP(score, total);
     setXpEarned(xp);
 
