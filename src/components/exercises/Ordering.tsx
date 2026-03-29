@@ -43,7 +43,7 @@ export function Ordering({ exercise, index, onAnswer }: Props) {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="font-display text-lg font-bold text-foreground mb-1">Ordene corretamente</h2>
+      <h2 className="font-display text-xl font-bold text-foreground mb-1">Ordene corretamente</h2>
       <p className="text-sm text-muted-foreground mb-4">{exercise.question}</p>
 
       <div className="space-y-2 mb-4">
@@ -53,33 +53,33 @@ export function Ordering({ exercise, index, onAnswer }: Props) {
           return (
             <div
               key={itemIdx}
-              className={`flex items-center gap-2 rounded-lg border p-3 transition-all ${
+              className={`flex items-center gap-3 rounded-xl border-2 p-4 transition-all ${
                 isRight ? 'border-success bg-success/10' :
                 isWrong ? 'border-destructive bg-destructive/10' :
                 'border-border bg-card'
               }`}
             >
-              <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="flex-1 text-sm font-body text-foreground">{exercise.items[itemIdx]}</span>
+              <GripVertical className="h-5 w-5 text-muted-foreground shrink-0" />
+              <span className="flex-1 text-base font-body text-foreground">{exercise.items[itemIdx]}</span>
               {!submitted && (
-                <div className="flex flex-col gap-0.5">
+                <div className="flex flex-col gap-1">
                   <button
                     onClick={() => moveItem(pos, -1)}
                     disabled={pos === 0}
-                    className="p-0.5 rounded hover:bg-muted disabled:opacity-30"
+                    className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-30 active:scale-90 transition-all"
                   >
-                    <ArrowUp className="h-3.5 w-3.5 text-muted-foreground" />
+                    <ArrowUp className="h-5 w-5 text-muted-foreground" />
                   </button>
                   <button
                     onClick={() => moveItem(pos, 1)}
                     disabled={pos === order.length - 1}
-                    className="p-0.5 rounded hover:bg-muted disabled:opacity-30"
+                    className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-30 active:scale-90 transition-all"
                   >
-                    <ArrowDown className="h-3.5 w-3.5 text-muted-foreground" />
+                    <ArrowDown className="h-5 w-5 text-muted-foreground" />
                   </button>
                 </div>
               )}
-              {submitted && (isRight ? <Check className="h-4 w-4 text-success" /> : <X className="h-4 w-4 text-destructive" />)}
+              {submitted && (isRight ? <Check className="h-5 w-5 text-success" /> : <X className="h-5 w-5 text-destructive" />)}
             </div>
           );
         })}

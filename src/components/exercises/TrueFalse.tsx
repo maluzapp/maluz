@@ -34,7 +34,7 @@ export function TrueFalse({ exercise, index, onAnswer, readOnly, savedAnswer }: 
         <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary animate-fade-in">
           Verdadeiro ou Falso
         </div>
-        <h2 className="mb-6 text-lg font-bold text-foreground animate-fade-in" style={{ animationDelay: '100ms' }}>
+        <h2 className="mb-6 text-xl font-bold text-foreground animate-fade-in" style={{ animationDelay: '100ms' }}>
           {exercise.statement}
         </h2>
         <div className="grid grid-cols-2 gap-3">
@@ -49,7 +49,7 @@ export function TrueFalse({ exercise, index, onAnswer, readOnly, savedAnswer }: 
                 onClick={() => handleSelect(val)}
                 disabled={answered}
                 className={cn(
-                  'text-base font-bold h-16 rounded-xl transition-all duration-300 animate-fade-in hover:scale-[1.03] active:scale-[0.97]',
+                  'text-lg font-bold h-[72px] rounded-xl transition-all duration-300 animate-fade-in hover:scale-[1.03] active:scale-[0.97]',
                   answered && isCorrectAnswer && 'animate-bounce-in border-success bg-success/10 text-success shadow-md shadow-success/20',
                   answered && isSelected && !isCorrectAnswer && 'animate-shake border-destructive bg-destructive/10 text-destructive',
                   answered && !isSelected && !isCorrectAnswer && 'opacity-40 scale-95'

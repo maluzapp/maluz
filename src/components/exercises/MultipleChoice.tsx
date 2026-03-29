@@ -35,7 +35,7 @@ export function MultipleChoice({ exercise, index, onAnswer, readOnly, savedAnswe
         <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary animate-fade-in">
           Múltipla escolha
         </div>
-        <h2 className="mb-5 text-lg font-bold text-foreground animate-fade-in" style={{ animationDelay: '100ms' }}>
+        <h2 className="mb-5 text-xl font-bold text-foreground animate-fade-in" style={{ animationDelay: '100ms' }}>
           {exercise.question}
         </h2>
         <div className="space-y-2.5">
@@ -48,7 +48,7 @@ export function MultipleChoice({ exercise, index, onAnswer, readOnly, savedAnswe
                 onClick={() => handleSelect(i)}
                 disabled={answered}
                 className={cn(
-                  'w-full rounded-xl border-2 px-4 py-3.5 text-left text-sm font-medium transition-all duration-300 animate-fade-in',
+                  'w-full rounded-xl border-2 px-4 py-4 text-left text-base font-medium transition-all duration-300 animate-fade-in',
                   !answered && 'border-border hover:border-primary hover:bg-primary/5 hover:scale-[1.02] active:scale-[0.98]',
                   answered && isCorrect && 'animate-bounce-in border-success bg-success/10 text-success shadow-md shadow-success/20',
                   answered && isSelected && !isCorrect && 'animate-shake border-destructive bg-destructive/10 text-destructive',
@@ -56,7 +56,7 @@ export function MultipleChoice({ exercise, index, onAnswer, readOnly, savedAnswe
                 )}
                 style={{ animationDelay: `${(i + 2) * 80}ms` }}
               >
-                <span className="mr-3 inline-flex h-7 w-7 items-center justify-center rounded-full bg-muted text-xs font-bold transition-colors">
+                <span className="mr-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-bold transition-colors">
                   {String.fromCharCode(65 + i)}
                 </span>
                 {opt}

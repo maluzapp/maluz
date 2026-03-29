@@ -164,7 +164,7 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
         <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">
           Associação
         </div>
-        <h2 className="mb-2 text-lg font-bold text-foreground">
+        <h2 className="mb-2 text-xl font-bold text-foreground">
           Conecte os conceitos relacionados
         </h2>
         <p className="mb-4 text-xs text-muted-foreground">
@@ -207,7 +207,7 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
                     onClick={() => handleLeftClick(i)}
                     disabled={answered}
                     className={cn(
-                      'w-full rounded-lg border-2 px-3 py-2.5 text-left text-sm font-medium transition-all duration-300 relative z-20',
+                    'w-full rounded-xl border-2 px-3 py-3.5 text-left text-base font-medium transition-all duration-300 relative z-20',
                       selectedLeft === i && 'border-primary bg-primary/10 ring-2 ring-primary/30 shimmer-glow',
                       !answered && isMatched && colorClass && `${colorClass.border} ${colorClass.bg}`,
                       !answered && !isMatched && selectedLeft !== i && 'border-border hover:border-primary/50',
@@ -240,7 +240,7 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
                     onClick={() => handleRightClick(i)}
                     disabled={answered}
                     className={cn(
-                      'w-full rounded-lg border-2 px-3 py-2.5 text-left text-sm font-medium transition-all duration-300 relative z-20',
+                      'w-full rounded-xl border-2 px-3 py-3.5 text-left text-base font-medium transition-all duration-300 relative z-20',
                       selectedRight === i && 'border-accent bg-accent/10 ring-2 ring-accent/30 shimmer-glow',
                       !answered && isUsed && colorClass && `${colorClass.border} ${colorClass.bg}`,
                       !answered && !isUsed && selectedRight !== i && 'border-border hover:border-accent/50',

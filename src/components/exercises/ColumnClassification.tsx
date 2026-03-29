@@ -48,13 +48,13 @@ export function ColumnClassification({ exercise, index, onAnswer }: Props) {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="font-display text-lg font-bold text-foreground mb-1">Classifique os itens</h2>
+      <h2 className="font-display text-xl font-bold text-foreground mb-1">Classifique os itens</h2>
       <p className="text-sm text-muted-foreground mb-3">{exercise.question}</p>
 
       {/* Column headers */}
       <div className="grid gap-2 mb-3" style={{ gridTemplateColumns: `repeat(${exercise.columns.length}, 1fr)` }}>
         {exercise.columns.map((col, ci) => (
-          <div key={ci} className="text-center text-xs font-bold font-display text-primary bg-primary/10 rounded-lg py-2">
+          <div key={ci} className="text-center text-sm font-bold font-display text-primary bg-primary/10 rounded-xl py-2.5">
             {col}
           </div>
         ))}
@@ -71,15 +71,15 @@ export function ColumnClassification({ exercise, index, onAnswer }: Props) {
           return (
             <div
               key={itemIdx}
-              className={`rounded-lg border p-3 transition-all ${
+              className={`rounded-xl border-2 p-4 transition-all ${
                 rightAnswer ? 'border-success bg-success/10' :
                 wrongAnswer ? 'border-destructive bg-destructive/10' :
                 'border-border bg-card'
               }`}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-sm font-body text-foreground flex-1">{item.text}</span>
-                {submitted && (rightAnswer ? <Check className="h-4 w-4 text-success shrink-0" /> : wrongAnswer ? <X className="h-4 w-4 text-destructive shrink-0" /> : null)}
+                <span className="text-base font-body text-foreground flex-1">{item.text}</span>
+                {submitted && (rightAnswer ? <Check className="h-5 w-5 text-success shrink-0" /> : wrongAnswer ? <X className="h-5 w-5 text-destructive shrink-0" /> : null)}
               </div>
               <div className="grid gap-1.5 mt-2" style={{ gridTemplateColumns: `repeat(${exercise.columns.length}, 1fr)` }}>
                 {exercise.columns.map((col, ci) => {
@@ -90,7 +90,7 @@ export function ColumnClassification({ exercise, index, onAnswer }: Props) {
                       key={ci}
                       onClick={() => handleAssign(itemIdx, ci)}
                       disabled={submitted}
-                      className={`text-[10px] py-1 px-2 rounded-md border transition-all ${
+                      className={`text-xs py-1.5 px-3 rounded-lg border-2 transition-all ${
                         showCorrect ? 'border-success bg-success/20 text-success font-bold' :
                         isActive && !submitted ? 'border-primary bg-primary/20 text-primary font-bold' :
                         isActive && submitted ? 'border-destructive bg-destructive/20 text-destructive' :
