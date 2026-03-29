@@ -212,9 +212,11 @@ export default function Friends() {
       .ilike('name', `%${searchName.trim()}%`)
       .neq('id', profileId)
       .eq('profile_type', 'child')
-      .limit(10);
+      .limit(20);
 
-    setSearchResults((data || []) as FriendProfile[]);
+    // Filter out already connected profiles
+    const filtered = (data || []).filter((p: any) => !connectedIds.has(p.id));
+    setSearchResults(filtered as FriendProfile[]);
   };
 
   const sendRequest = async (targetId: string) => {
