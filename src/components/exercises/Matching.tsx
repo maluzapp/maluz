@@ -1,8 +1,9 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Undo2 } from 'lucide-react';
+import { fireCorrectConfetti } from './Confetti';
 import type { MatchingExercise, ExerciseAnswer } from '@/types/study';
 
 interface Props {
