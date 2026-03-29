@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { usePlans, useStripeSubscription, startCheckout, STRIPE_PRICES, STRIPE_YEARLY_PRICES } from '@/hooks/useSubscription';
+import { usePlans, useStripeSubscription, startCheckout } from '@/hooks/useSubscription';
 import { useAuth } from '@/hooks/useAuth';
 import { Check, Star, Crown, Sparkles, Zap, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const PLAN_ICONS: Record<string, React.ReactNode> = {
   free: <Zap className="h-6 w-6" />,
@@ -33,9 +34,9 @@ export default function PricingSection() {
 
   if (isLoading || !plans?.length) return null;
 
-  // Determine current plan from Stripe
-  const currentPlanSlug = stripeStatus?.subscribed && stripeStatus.price_id
-    ? STRIPE_PRICES[stripeStatus.price_id]?.slug
+  // Determine current plan from Stripe (now uses plan_slug from metadata)
+  const currentPlanSlug = stripeStatus?.subscribed
+    ? stripeStatus.plan_slug ?? 'pro'
     : 'free';
 
   const handleSubscribe = async (plan: typeof plans[0]) => {
@@ -44,18 +45,16 @@ export default function PricingSection() {
       return;
     }
 
-    const priceId = billingPeriod === 'yearly'
-      ? STRIPE_YEARLY_PRICES[plan.slug]
-      : plan.stripe_price_id;
-
-    if (!priceId) {
-      toast.error('Preço não configurado para este plano');
-      return;
-    }
-
     setLoadingPlan(plan.id);
     try {
-      await startCheckout(priceId);
+      // Use plan_slug + billing_period — the edge function resolves the correct Stripe price
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { plan_slug: plan.slug, billing_period: billingPeriod },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
     } catch (err: any) {
       toast.error(err.message || 'Erro ao iniciar checkout');
     } finally {
