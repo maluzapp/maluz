@@ -1,4 +1,4 @@
-export type SchoolYear = '6' | '7' | '8' | '9' | '1M' | '2M' | '3M';
+export type SchoolYear = '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '1M' | '2M' | '3M';
 
 export type Subject = 
   | 'Matemática'
