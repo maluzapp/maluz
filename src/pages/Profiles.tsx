@@ -264,7 +264,7 @@ export default function Profiles() {
       : 0;
 
     return (
-      <div className="min-h-screen bg-background px-4 py-6 pb-36">
+      <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36">
         <div className="mx-auto max-w-md">
           <Button variant="ghost" className="mb-4 gap-2" onClick={() => setViewingChild(null)}>
             ← Voltar
