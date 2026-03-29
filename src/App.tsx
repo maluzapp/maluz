@@ -48,6 +48,11 @@ function RequireAuth({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+function AppUpdateChecker() {
+  useAppUpdateToast();
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -58,6 +63,7 @@ const App = () => (
           <ScrollToTop />
           <DynamicPwaBranding />
           <UpdateModal />
+          <AppUpdateChecker />
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
