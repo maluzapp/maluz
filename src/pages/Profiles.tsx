@@ -322,9 +322,6 @@ export default function Profiles() {
     );
   }
 
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [deleteConfirmName, setDeleteConfirmName] = useState('');
-
   const isPro = !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
 
   const ProfileCard = ({ p, idx }: { p: Profile; idx: number }) => (
