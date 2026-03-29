@@ -69,6 +69,7 @@ export default function Profiles() {
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
   const [partnerCode, setPartnerCode] = useState('');
   const [linkingPartner, setLinkingPartner] = useState(false);
+  const [linkedSpouse, setLinkedSpouse] = useState<{ name: string; avatar_emoji: string; friend_code: string } | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate('/login');
@@ -121,12 +122,40 @@ export default function Profiles() {
       .filter((link) => link.child) as LinkedChild[];
   };
 
+  const fetchSpouseData = async (profileList: Profile[], childLinks: LinkedChild[]) => {
+    const parentIds = profileList.filter(p => p.profile_type === 'parent').map(p => p.id);
+    if (parentIds.length === 0 || childLinks.length === 0) return null;
+
+    const childIds = childLinks.map(l => l.child.id);
+    // Find other parents linked to the same children
+    const { data: otherLinks } = await supabase
+      .from('parent_child_links' as any)
+      .select('parent_profile_id')
+      .in('child_profile_id', childIds);
+
+    if (!otherLinks) return null;
+
+    const otherParentIds = [...new Set((otherLinks as any[])
+      .map((l: any) => l.parent_profile_id)
+      .filter((id: string) => !parentIds.includes(id)))];
+
+    if (otherParentIds.length === 0) return null;
+
+    const { data: spouseData } = await supabase
+      .rpc('get_profiles_by_ids', { _ids: otherParentIds });
+
+    const spouse = (spouseData as any)?.[0];
+    return spouse ? { name: spouse.name, avatar_emoji: spouse.avatar_emoji, friend_code: spouse.friend_code || '' } : null;
+  };
+
   const loadPageData = async () => {
     const profileList = await fetchProfilesData();
     const childLinks = await fetchLinkedChildrenData(profileList);
+    const spouse = await fetchSpouseData(profileList, childLinks);
 
     setProfiles(profileList);
     setLinkedChildren(childLinks);
+    setLinkedSpouse(spouse);
     syncActiveProfile(profileList);
     setLoadingProfiles(false);
   };
@@ -711,16 +740,34 @@ export default function Profiles() {
                   </div>
                 )}
 
-                {/* Spouse info if linked */}
+                {/* Spouse display */}
+                {linkedSpouse && (
+                  <div>
+                    <h3 className="font-display font-bold text-foreground mb-3 flex items-center gap-2">
+                      <Heart className="h-4 w-4 text-primary" />
+                      Cônjuge
+                    </h3>
+                    <Card className="border-primary/10">
+                      <CardContent className="p-4 flex items-center gap-4">
+                        <span className="text-3xl">{linkedSpouse.avatar_emoji}</span>
+                        <div className="flex-1">
+                          <p className="font-display font-bold text-foreground">{linkedSpouse.name}</p>
+                          <p className="text-xs text-muted-foreground">Responsável vinculado(a)</p>
+                        </div>
+                        <Check className="h-4 w-4 text-primary" />
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+
+                {/* Current parent info */}
                 {parentProfiles[0]?.friend_code && (
                   <Card className="border-primary/10">
                     <CardContent className="p-4 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Users className="h-5 w-5 text-primary" />
-                      </div>
+                      <span className="text-3xl">{parentProfiles[0].avatar_emoji}</span>
                       <div className="flex-1">
-                        <p className="font-display font-bold text-sm text-foreground">Responsável</p>
-                        <p className="text-xs text-muted-foreground">{parentProfiles[0].name}</p>
+                        <p className="font-display font-bold text-sm text-foreground">{parentProfiles[0].name}</p>
+                        <p className="text-xs text-muted-foreground">Você</p>
                       </div>
                       <span className="font-mono text-xs text-primary tracking-wider">{parentProfiles[0].friend_code}</span>
                     </CardContent>
