@@ -634,6 +634,48 @@ export default function Profiles() {
                   </CardContent>
                 </Card>
 
+                {/* Link partner/spouse section */}
+                <Card className="border-primary/20">
+                  <CardContent className="p-4 space-y-3">
+                    <h3 className="font-display font-bold text-foreground flex items-center gap-2">
+                      <Users className="h-4 w-4 text-primary" />
+                      Vincular cônjuge
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Compartilhe seu código com o outro responsável, ou digite o código dele(a) para compartilhar os filhos vinculados
+                    </p>
+
+                    {/* Show own parent friend code */}
+                    {parentProfiles[0]?.friend_code && (
+                      <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
+                        <span className="text-xs text-muted-foreground">Seu código:</span>
+                        <span className="font-mono text-sm font-bold text-primary tracking-widest flex-1">{parentProfiles[0].friend_code}</span>
+                        <Button variant="outline" size="sm" className="h-7 px-2" onClick={() => {
+                          navigator.clipboard.writeText(parentProfiles[0].friend_code || '');
+                          toast.success('Código copiado!');
+                        }}>
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Código do cônjuge"
+                        value={partnerCode}
+                        onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
+                        className="font-mono tracking-widest"
+                      />
+                      <Button
+                        onClick={linkPartner}
+                        disabled={!partnerCode.trim() || linkingPartner}
+                      >
+                        {linkingPartner ? '...' : 'Vincular'}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Linked children */}
                 {linkedChildren.length > 0 ? (
                   <div>
