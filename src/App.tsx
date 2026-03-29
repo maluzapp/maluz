@@ -9,6 +9,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { DynamicPwaBranding } from "@/components/DynamicPwaBranding";
 import { UpdateModal } from "@/components/UpdateModal";
+import { useAppUpdateToast } from "@/hooks/useAppUpdateToast";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import Profiles from "./pages/Profiles";
@@ -47,6 +48,11 @@ function RequireAuth({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+function AppUpdateChecker() {
+  useAppUpdateToast();
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -57,6 +63,7 @@ const App = () => (
           <ScrollToTop />
           <DynamicPwaBranding />
           <UpdateModal />
+          <AppUpdateChecker />
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
