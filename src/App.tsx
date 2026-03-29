@@ -9,6 +9,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { DynamicPwaBranding } from "@/components/DynamicPwaBranding";
 import { UpdateModal } from "@/components/UpdateModal";
+import { useAppUpdateToast } from "@/hooks/useAppUpdateToast";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import Profiles from "./pages/Profiles";
