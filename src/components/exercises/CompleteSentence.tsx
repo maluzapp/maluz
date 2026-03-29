@@ -26,7 +26,7 @@ export function CompleteSentence({ exercise, index, onAnswer }: Props) {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="font-display text-lg font-bold text-foreground mb-1">Complete a frase</h2>
+      <h2 className="font-display text-xl font-bold text-foreground mb-1">Complete a frase</h2>
 
       <div className="rounded-xl bg-card border border-border p-4 mb-4">
         <p className="text-foreground text-base leading-relaxed font-body">
