@@ -69,6 +69,7 @@ export default function Profiles() {
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
   const [partnerCode, setPartnerCode] = useState('');
   const [linkingPartner, setLinkingPartner] = useState(false);
+  const [linkedSpouse, setLinkedSpouse] = useState<{ name: string; avatar_emoji: string; friend_code: string } | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate('/login');
