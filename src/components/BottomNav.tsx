@@ -18,6 +18,7 @@ const NAV_ITEMS_RIGHT = [
 ];
 
 const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/'];
+const HIDDEN_PREFIXES = ['/desafio/'];
 
 export function BottomNav() {
   const navigate = useNavigate();
