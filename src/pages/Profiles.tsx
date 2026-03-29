@@ -322,6 +322,11 @@ export default function Profiles() {
     );
   }
 
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleteConfirmName, setDeleteConfirmName] = useState('');
+
+  const isPro = !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
+
   const ProfileCard = ({ p, idx }: { p: Profile; idx: number }) => (
     <Card
       key={p.id}
@@ -329,12 +334,20 @@ export default function Profiles() {
     >
       <CardContent className="p-4 flex items-center gap-4">
         <button onClick={() => selectProfile(p.id)} className="flex-1 flex items-center gap-4 text-left">
-          <span className="text-4xl">{p.avatar_emoji}</span>
+          <div className="relative">
+            <span className="text-4xl">{p.avatar_emoji}</span>
+            {isPro && (
+              <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[8px] font-bold px-1 py-0.5 rounded-full leading-none">PRO</span>
+            )}
+          </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <p className="font-display font-bold text-foreground">{p.name}</p>
               {p.profile_type === 'parent' && (
                 <span className="bg-primary/15 text-primary text-[10px] px-1.5 py-0.5 rounded-full font-mono">Pai/Mãe</span>
+              )}
+              {isPro && (
+                <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-1.5 py-0 h-4">⭐ PRO</Badge>
               )}
             </div>
             {p.school_year && (
@@ -360,7 +373,7 @@ export default function Profiles() {
             <Pencil className="h-3.5 w-3.5" />
           </Button>
           <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive h-8 w-8"
-            onClick={(e) => { e.stopPropagation(); deleteProfile(p.id); }}>
+            onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(p.id); setDeleteConfirmName(p.name); }}>
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
