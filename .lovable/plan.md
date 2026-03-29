@@ -1,76 +1,66 @@
 
 
-# Integração Completa Stripe — Maluz
+# Configuração de Emails com Domínio Próprio — Maluz
 
 ## Resumo
 
-Criar 4 produtos no Stripe (Pro mensal, Pro anual, Família mensal, Família anual), 3 edge functions (create-checkout, check-stripe-subscription, customer-portal), atualizar o frontend (PricingSection, useSubscription, página de sucesso) e adicionar a coluna `stripe_price_id` na tabela `subscription_plans`.
+Configurar o sistema de emails do Maluz para usar o domínio `maluz.app` como remetente (hello@maluz.app), incluindo emails de autenticação (confirmação de conta, reset de senha) e emails transacionais (confirmação de pagamento). Adicionar capacidade de customizar templates de email via backend (admin).
+
+## Estado Atual
+
+- **Nenhum sistema de email customizado** configurado — o projeto usa emails padrão do sistema de autenticação
+- **Nenhum email transacional** implementado (a página de sucesso de pagamento é apenas visual, sem envio de email)
+- **Stripe está integrado** com checkout e portal de faturamento funcionando
 
 ## Etapas
 
-### 1. Criar Produtos e Preços no Stripe
-- **Maluz Pro Mensal**: R$ 14,90/mês (1490 centavos, BRL, recurring month)
-- **Maluz Pro Anual**: R$ 99,90/ano (9990 centavos, BRL, recurring year)
-- **Maluz Família Mensal**: R$ 24,90/mês (2490 centavos, BRL, recurring month)
-- **Maluz Família Anual**: R$ 199,90/ano (19990 centavos, BRL, recurring year)
+### 1. Configurar domínio de email (maluz.app)
+- Configurar o subdomínio de envio (ex: `notify.maluz.app`) via diálogo de setup de email
+- O remetente será exibido como `hello@maluz.app` no cabeçalho dos emails
+- Requer configuração de DNS (registros NS) no registrar do domínio — propagação pode levar até 72h
 
-### 2. Migração: adicionar `stripe_price_id` à tabela `subscription_plans`
-```sql
-ALTER TABLE subscription_plans ADD COLUMN stripe_price_id text;
-```
-Depois, atualizar os registros existentes com os price IDs criados no Stripe.
+### 2. Configurar infraestrutura de email
+- Criar filas de processamento, tabelas de log e jobs automáticos para envio confiável com retry
+- Isso garante que emails não se percam mesmo em caso de falhas temporárias
 
-### 3. Edge Function: `create-checkout`
-- Recebe `price_id` e `billing_period` do frontend
-- Autentica o usuário via token JWT
-- Busca/cria customer no Stripe pelo email
-- Cria checkout session `mode: "subscription"` com success/cancel URLs
-- Retorna URL do checkout
+### 3. Criar templates de email de autenticação
+- **Confirmação de cadastro** — email enviado ao criar conta
+- **Reset de senha** — email de recuperação
+- **Magic link** — login por link
+- **Mudança de email** — confirmação de alteração
+- Todos com visual da marca Maluz (cores navy/dourado, fonte Playfair Display)
+- Background branco no corpo do email para compatibilidade
 
-### 4. Edge Function: `check-stripe-subscription`
-- Autentica o usuário, busca customer no Stripe pelo email
-- Verifica se há subscription ativa
-- Retorna: `subscribed`, `product_id`, `subscription_end`, `price_id`
-- Usado no frontend para validar status real da assinatura
+### 4. Criar templates de emails transacionais
+- **Confirmação de pagamento** — enviado após checkout Stripe bem-sucedido
+- **Boas-vindas Pro/Família** — enviado ao ativar assinatura
+- Templates com estilo consistente da marca
 
-### 5. Edge Function: `customer-portal`
-- Autentica o usuário, busca customer no Stripe
-- Cria sessão do Billing Portal
-- Retorna URL para gerenciar assinatura (cancelar, trocar cartão, etc.)
+### 5. Integrar envio de email ao fluxo de pagamento
+- Na página `PaymentSuccess`, disparar email de confirmação de pagamento para o usuário
+- Passar dados dinâmicos (nome do plano, período) para o template
 
-### 6. Frontend: Atualizar `PricingSection.tsx`
-- Botão "Assinar" chama `create-checkout` com o `stripe_price_id` do plano
-- Toggle mensal/anual para escolher período
-- Usuários logados vão direto ao checkout; não logados vão para /login primeiro
-- Destaque visual no plano atual do usuário
+### 6. Criar página de descadastro (unsubscribe)
+- Página no app para processar pedidos de descadastro de emails transacionais
+- Link automático incluído no rodapé dos emails
 
-### 7. Frontend: Atualizar `useSubscription.ts`
-- Adicionar hook `useStripeSubscription()` que chama `check-stripe-subscription`
-- Invocar na mudança de auth state e periodicamente (a cada 60s)
-- Manter compatibilidade com o sistema atual (admin_manual + futuro stores)
+### 7. Sistema de customização de templates via admin
+- Adicionar seção no painel admin (`/admin`) para editar textos dos emails
+- Usar tabela `branding_settings` existente (categoria `email`) para armazenar customizações:
+  - Título, corpo e texto do botão de cada template
+  - Nome do remetente
+- Os edge functions consultam essas configurações ao montar os emails
 
-### 8. Página de sucesso pós-checkout
-- Rota `/pagamento-sucesso` com mensagem de confirmação
-- Chama `check-stripe-subscription` para atualizar estado
-- Redireciona para `/perfis` após alguns segundos
+## Arquivos Impactados
 
-### 9. Botão "Gerenciar Assinatura"
-- Na página de perfis ou configurações, botão que abre o Customer Portal do Stripe
-- Visível apenas para assinantes ativos
+- **Novos**: Templates de email (6 auth + 2 transacionais), edge functions de email, página de unsubscribe
+- **Editados**: `PaymentSuccess.tsx` (adicionar envio de email), `Admin.tsx` (seção de gestão de emails), `App.tsx` (rota unsubscribe)
+- **Migrações**: Inserir configurações de email na tabela `branding_settings`
 
-### Arquivos Criados/Modificados
-- `supabase/functions/create-checkout/index.ts` — novo
-- `supabase/functions/check-stripe-subscription/index.ts` — novo
-- `supabase/functions/customer-portal/index.ts` — novo
-- `src/hooks/useSubscription.ts` — adicionar hook Stripe
-- `src/components/PricingSection.tsx` — botões de checkout + toggle período
-- `src/pages/PaymentSuccess.tsx` — novo
-- `src/App.tsx` — nova rota
-- Migração SQL — adicionar coluna stripe_price_id
-
-### Detalhes Técnicos
-- Stripe API version: `2025-08-27.basil`
-- STRIPE_SECRET_KEY já está configurado nos secrets
-- Sem webhooks — verificação por polling via `check-stripe-subscription`
-- O plano Free não tem checkout (é o padrão)
+## Detalhes Técnicos
+- Remetente: `hello@maluz.app` (via subdomínio verificado `notify.maluz.app`)
+- Cores dos emails: primary `hsl(42, 91%, 61%)` (dourado), foreground `hsl(213, 50%, 11%)` (navy), fundo branco `#ffffff`
+- React Email v0.0.22 para templates
+- Fila pgmq com retry automático e dead-letter queue
+- Customizações salvas em `branding_settings` com categoria `email`
 
