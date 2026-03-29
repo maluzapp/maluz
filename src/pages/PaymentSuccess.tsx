@@ -20,8 +20,8 @@ export default function PaymentSuccess() {
   // Send payment confirmation email
   useEffect(() => {
     if (!user?.email || emailSent || !stripeStatus?.subscribed) return;
-    const priceInfo = stripeStatus?.price_id ? STRIPE_PRICES[stripeStatus.price_id] : null;
-    const planName = priceInfo?.slug === 'familia' ? 'Família' : 'Pro';
+    const planSlug = stripeStatus?.plan_slug;
+    const planName = planSlug === 'familia' ? 'Família' : 'Pro';
 
     supabase.functions.invoke('send-email', {
       body: {
