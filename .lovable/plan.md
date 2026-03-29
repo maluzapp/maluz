@@ -1,66 +1,40 @@
 
 
-# Configuração de Emails com Domínio Próprio — Maluz
+# Contornar o problema do setup de email nativo
 
-## Resumo
+## Situação
 
-Configurar o sistema de emails do Maluz para usar o domínio `maluz.app` como remetente (hello@maluz.app), incluindo emails de autenticação (confirmação de conta, reset de senha) e emails transacionais (confirmação de pagamento). Adicionar capacidade de customizar templates de email via backend (admin).
+O domínio `maluz.app` está configurado como custom domain do projeto, mas o modal de setup de email falhou 4 vezes seguidas — erro "Couldn't connect maluz.app". Não há nenhum domínio de email configurado no workspace.
 
-## Estado Atual
+## Problema
 
-- **Nenhum sistema de email customizado** configurado — o projeto usa emails padrão do sistema de autenticação
-- **Nenhum email transacional** implementado (a página de sucesso de pagamento é apenas visual, sem envio de email)
-- **Stripe está integrado** com checkout e portal de faturamento funcionando
+O único caminho nativo para configurar o domínio de email é via o modal `<lov-open-email-setup>`. Não existe ferramenta de CLI ou API alternativa para registrar o domínio manualmente — todas as ferramentas (scaffold, infra) dependem de um domínio já registrado.
 
-## Etapas
+## Opções reais
 
-### 1. Configurar domínio de email (maluz.app)
-- Configurar o subdomínio de envio (ex: `notify.maluz.app`) via diálogo de setup de email
-- O remetente será exibido como `hello@maluz.app` no cabeçalho dos emails
-- Requer configuração de DNS (registros NS) no registrar do domínio — propagação pode levar até 72h
+### Opção A — Tentar o modal novamente com diagnóstico
+O erro pode ser intermitente (DNS propagation do custom domain, ou problema temporário do lado do Lovable). Podemos:
+1. Verificar se o custom domain `maluz.app` está ativo e resolvendo corretamente
+2. Tentar o setup em horário diferente (pode ser instabilidade temporária)
+3. Se persistir, reportar ao suporte do Lovable como bug
 
-### 2. Configurar infraestrutura de email
-- Criar filas de processamento, tabelas de log e jobs automáticos para envio confiável com retry
-- Isso garante que emails não se percam mesmo em caso de falhas temporárias
+### Opção B — Usar Resend como provedor de email
+Contornar completamente o sistema nativo e usar Resend:
+1. Criar conta no Resend e verificar o domínio `maluz.app` (ou subdomínio `mail.maluz.app`)
+2. Adicionar `RESEND_API_KEY` como secret
+3. Criar edge function `send-email` que usa a API do Resend
+4. Templates de email customizáveis via `branding_settings` (categoria `email`)
+5. Integrar envio no fluxo de pagamento e auth
 
-### 3. Criar templates de email de autenticação
-- **Confirmação de cadastro** — email enviado ao criar conta
-- **Reset de senha** — email de recuperação
-- **Magic link** — login por link
-- **Mudança de email** — confirmação de alteração
-- Todos com visual da marca Maluz (cores navy/dourado, fonte Playfair Display)
-- Background branco no corpo do email para compatibilidade
+### Opção C — Aguardar e usar emails padrão por enquanto
+Os emails de autenticação (confirmação, reset de senha) já funcionam com o template padrão do Lovable — sem branding customizado. Podemos:
+1. Continuar usando os emails padrão para auth
+2. Focar em outras features enquanto o problema do modal é resolvido
+3. Voltar para o setup nativo quando estiver funcionando
 
-### 4. Criar templates de emails transacionais
-- **Confirmação de pagamento** — enviado após checkout Stripe bem-sucedido
-- **Boas-vindas Pro/Família** — enviado ao ativar assinatura
-- Templates com estilo consistente da marca
+## Recomendação
 
-### 5. Integrar envio de email ao fluxo de pagamento
-- Na página `PaymentSuccess`, disparar email de confirmação de pagamento para o usuário
-- Passar dados dinâmicos (nome do plano, período) para o template
+**Opção B (Resend)** é a mais confiável e independente. O setup é simples (1 API key), o free tier tem 3.000 emails/mês, e não depende do modal do Lovable. Podemos usar `mail.maluz.app` como subdomínio para evitar conflitos futuros se o email nativo voltar a funcionar.
 
-### 6. Criar página de descadastro (unsubscribe)
-- Página no app para processar pedidos de descadastro de emails transacionais
-- Link automático incluído no rodapé dos emails
-
-### 7. Sistema de customização de templates via admin
-- Adicionar seção no painel admin (`/admin`) para editar textos dos emails
-- Usar tabela `branding_settings` existente (categoria `email`) para armazenar customizações:
-  - Título, corpo e texto do botão de cada template
-  - Nome do remetente
-- Os edge functions consultam essas configurações ao montar os emails
-
-## Arquivos Impactados
-
-- **Novos**: Templates de email (6 auth + 2 transacionais), edge functions de email, página de unsubscribe
-- **Editados**: `PaymentSuccess.tsx` (adicionar envio de email), `Admin.tsx` (seção de gestão de emails), `App.tsx` (rota unsubscribe)
-- **Migrações**: Inserir configurações de email na tabela `branding_settings`
-
-## Detalhes Técnicos
-- Remetente: `hello@maluz.app` (via subdomínio verificado `notify.maluz.app`)
-- Cores dos emails: primary `hsl(42, 91%, 61%)` (dourado), foreground `hsl(213, 50%, 11%)` (navy), fundo branco `#ffffff`
-- React Email v0.0.22 para templates
-- Fila pgmq com retry automático e dead-letter queue
-- Customizações salvas em `branding_settings` com categoria `email`
+Se preferir não criar conta em outro serviço, a **Opção A** vale uma última tentativa — o erro pode ser temporário.
 
