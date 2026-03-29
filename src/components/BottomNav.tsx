@@ -15,7 +15,7 @@ const NAV_ITEMS_RIGHT = [
   { path: '/creditos', icon: Info, label: 'Créditos' },
 ];
 
-const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/landing'];
+const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/'];
 
 export function BottomNav() {
   const navigate = useNavigate();
