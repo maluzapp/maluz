@@ -48,7 +48,7 @@ export function MultipleChoice({ exercise, index, onAnswer, readOnly, savedAnswe
                 onClick={() => handleSelect(i)}
                 disabled={answered}
                 className={cn(
-                  'w-full rounded-xl border-2 px-4 py-3.5 text-left text-sm font-medium transition-all duration-300 animate-fade-in',
+                  'w-full rounded-xl border-2 px-4 py-4 text-left text-base font-medium transition-all duration-300 animate-fade-in',
                   !answered && 'border-border hover:border-primary hover:bg-primary/5 hover:scale-[1.02] active:scale-[0.98]',
                   answered && isCorrect && 'animate-bounce-in border-success bg-success/10 text-success shadow-md shadow-success/20',
                   answered && isSelected && !isCorrect && 'animate-shake border-destructive bg-destructive/10 text-destructive',
