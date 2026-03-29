@@ -88,7 +88,7 @@ export default function Profiles() {
   const fetchProfilesData = async () => {
     const { data } = await supabase
       .from('profiles')
-      .select('id, name, avatar_emoji, school_year, xp, level, streak_days, profile_type, total_exercises, total_correct')
+      .select('id, name, avatar_emoji, school_year, xp, level, streak_days, profile_type, total_exercises, total_correct, friend_code')
       .order('created_at');
 
     return (data as Profile[]) || [];
