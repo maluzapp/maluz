@@ -509,12 +509,15 @@ export default function Profiles() {
         })()}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-2 h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl mb-4">
+          <TabsList className="w-full grid grid-cols-3 h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl mb-4">
             <TabsTrigger value="meus" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2.5">
-              <Baby className="h-3.5 w-3.5 mr-1" /> Meus Perfis
+              <Baby className="h-3.5 w-3.5 mr-1" /> Perfis
             </TabsTrigger>
             <TabsTrigger value="familia" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2.5">
               <Users className="h-3.5 w-3.5 mr-1" /> Família
+            </TabsTrigger>
+            <TabsTrigger value="amigos" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2.5">
+              <Heart className="h-3.5 w-3.5 mr-1" /> Amigos
             </TabsTrigger>
           </TabsList>
 
