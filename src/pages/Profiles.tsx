@@ -11,6 +11,11 @@ import { useProfileStore } from '@/hooks/useProfile';
 import { useStripeSubscription, useUserSubscription, usePlans, startCheckout, openCustomerPortal } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, LogOut, Trash2, Pencil, Link2, Copy, UserPlus, Users, Baby, ShieldCheck, Eye, Crown, CreditCard, ArrowUpRight } from 'lucide-react';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { YEAR_OPTIONS, getYearLabel } from '@/constants/years';
 import { toast } from 'sonner';
 
