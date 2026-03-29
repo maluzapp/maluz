@@ -124,6 +124,7 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
     });
     const isCorrect = correct === exercise.pairs.length;
     setAnswered(true);
+    if (isCorrect) fireCorrectConfetti();
     onAnswer({
       exerciseIndex: index,
       isCorrect,
