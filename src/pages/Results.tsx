@@ -287,8 +287,14 @@ export default function Results() {
       <div className="mx-auto max-w-lg">
         {hasActiveSession ? (
           <>
+            {/* Perfect score confetti */}
+            {pct === 100 && <PerfectScoreConfetti />}
+
             {/* Score card - dark themed */}
-            <Card className="mb-6 overflow-hidden animate-scale-in border-primary/20 bg-card">
+            <Card className={cn(
+              "mb-6 overflow-hidden animate-scale-in border-primary/20 bg-card",
+              pct === 100 && "ring-2 ring-primary shimmer-glow"
+            )}>
               <div className="px-6 py-8 text-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
                 <div className="relative z-10">
