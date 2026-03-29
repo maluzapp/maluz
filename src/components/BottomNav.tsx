@@ -28,7 +28,7 @@ export function BottomNav() {
   const pendingFriends = usePendingFriendRequests();
   const pendingChallenges = usePendingChallenges();
 
-  if (HIDDEN_ROUTES.includes(pathname) || !profileId) return null;
+  if (HIDDEN_ROUTES.includes(pathname) || HIDDEN_PREFIXES.some(p => pathname.startsWith(p)) || !profileId) return null;
 
   const handleLampClick = () => {
     setLampLit(true);
