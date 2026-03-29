@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useBrandingByCategory } from '@/hooks/useBrandingSettings';
 import logoMaluz from '@/assets/logo_maluz.png';
 import lampadaIcon from '@/assets/lampada-2.png';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 const FEATURES = [
   { icon: '📸', title: 'Entrada por Foto', desc: 'A criança fotografa a página do seu livro. O exercício é 100% alinhado ao que está sendo estudado naquele momento.' },
@@ -24,6 +25,44 @@ const UX_STEPS = [
   { title: 'Gratificação Constante', desc: '"Brilhou!" com partículas douradas após cada acerto. Cada conquista é um momento, não apenas uma estatística.' },
   { title: 'Controle para os Pais', desc: 'Progresso, matérias, tempo de estudo e desempenho por assunto. Transparência total, sem esforço.' },
 ];
+
+/* Store badge SVGs */
+function GooglePlayBadge({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 135 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="135" height="40" rx="5" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeOpacity="0.3" strokeWidth="0.8"/>
+      <text x="67.5" y="16" textAnchor="middle" fill="currentColor" fillOpacity="0.6" fontSize="7" fontFamily="system-ui">DISPONÍVEL NO</text>
+      <text x="67.5" y="28" textAnchor="middle" fill="currentColor" fontSize="11" fontWeight="bold" fontFamily="system-ui">Google Play</text>
+    </svg>
+  );
+}
+
+function AppStoreBadge({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 135 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="135" height="40" rx="5" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeOpacity="0.3" strokeWidth="0.8"/>
+      <text x="67.5" y="16" textAnchor="middle" fill="currentColor" fillOpacity="0.6" fontSize="7" fontFamily="system-ui">BAIXE NA</text>
+      <text x="67.5" y="28" textAnchor="middle" fill="currentColor" fontSize="11" fontWeight="bold" fontFamily="system-ui">App Store</text>
+    </svg>
+  );
+}
+
+/* Small store icons for hero */
+function SmallGooglePlayIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 20.5V3.5C3 2.91 3.34 2.39 3.84 2.15L13.69 12L3.84 21.85C3.34 21.61 3 21.09 3 20.5ZM16.81 15.12L6.05 21.34L14.54 12.85L16.81 15.12ZM20.16 10.81C20.5 11.08 20.75 11.5 20.75 12C20.75 12.5 20.5 12.92 20.16 13.19L17.89 14.5L15.39 12L17.89 9.5L20.16 10.81ZM6.05 2.66L16.81 8.88L14.54 11.15L6.05 2.66Z" fill="currentColor"/>
+    </svg>
+  );
+}
+
+function SmallAppleIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.56 2.93 11.3 4.7 7.72C5.57 5.94 7.36 4.86 9.28 4.84C10.56 4.81 11.78 5.72 12.57 5.72C13.36 5.72 14.85 4.62 16.4 4.8C17.06 4.83 18.89 5.09 20.05 6.82C19.95 6.89 17.76 8.16 17.79 10.81C17.82 14.03 20.59 15.09 20.63 15.11C20.59 15.21 20.14 16.72 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" fill="currentColor"/>
+    </svg>
+  );
+}
 
 export default function Landing() {
   const { data: settings } = useBrandingByCategory();
@@ -68,6 +107,26 @@ export default function Landing() {
           <Link to="/login" className="inline-block mt-8 px-8 py-3 rounded-full bg-primary text-primary-foreground font-display font-bold text-sm tracking-wide hover:opacity-90 transition-all hover:scale-105">
             {t('cta_button', 'Começar agora ✨')}
           </Link>
+
+          {/* Small store icons in hero */}
+          <div className="flex items-center justify-center gap-3 mt-5">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-primary/20 bg-primary/[0.06] text-foreground/40 hover:text-primary hover:border-primary/40 transition-all cursor-default">
+                  <SmallGooglePlayIcon className="h-4 w-4" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent><p className="text-xs">Em breve no Google Play</p></TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-primary/20 bg-primary/[0.06] text-foreground/40 hover:text-primary hover:border-primary/40 transition-all cursor-default">
+                  <SmallAppleIcon className="h-4 w-4" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent><p className="text-xs">Em breve na App Store</p></TooltipContent>
+            </Tooltip>
+          </div>
         </div>
         {/* Scroll indicator */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-primary/55 animate-scroll-bounce">
@@ -275,6 +334,35 @@ export default function Landing() {
                 <div className="rounded-lg border border-primary/20 px-3 py-2 text-xs text-foreground/36">D) 34</div>
                 <p className="text-center font-display text-lg italic text-primary">Brilhou! 🌟</p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr className="border-primary/15" />
+
+      {/* App Stores */}
+      <section className="py-16 md:py-20 px-5">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="font-mono text-[0.64rem] tracking-[0.22em] uppercase text-primary/70 mb-3">Disponibilidade</p>
+          <h2 className="font-display text-3xl md:text-5xl font-bold mb-4 text-foreground">
+            Em breve nas <em className="text-primary">melhores lojas</em>
+          </h2>
+          <p className="text-sm text-foreground/60 mb-8 max-w-md mx-auto">
+            {t('stores_description', 'A Maluz está sendo preparada com carinho para chegar ao Google Play e à App Store. Enquanto isso, acesse pelo navegador!')}
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="relative group cursor-default">
+              <GooglePlayBadge className="w-[160px] h-[48px] text-foreground opacity-50 group-hover:opacity-80 transition-opacity" />
+              <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[9px] font-bold px-2 py-0.5 rounded-full font-mono uppercase tracking-wider">
+                Em breve
+              </span>
+            </div>
+            <div className="relative group cursor-default">
+              <AppStoreBadge className="w-[160px] h-[48px] text-foreground opacity-50 group-hover:opacity-80 transition-opacity" />
+              <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[9px] font-bold px-2 py-0.5 rounded-full font-mono uppercase tracking-wider">
+                Em breve
+              </span>
             </div>
           </div>
         </div>

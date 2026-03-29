@@ -69,7 +69,7 @@ export default function Login() {
             Instalar
           </Link>
           <span className="text-foreground/20">·</span>
-          <Link to="/landing" className="text-sm text-foreground/50 hover:text-primary transition-colors">
+          <Link to="/" className="text-sm text-foreground/50 hover:text-primary transition-colors">
             Conheça o Maluz
           </Link>
         </div>

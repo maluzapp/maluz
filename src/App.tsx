@@ -53,10 +53,10 @@ const App = () => (
           <ScrollToTop />
           <DynamicPwaBranding />
           <Routes>
+            <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/landing" element={<Landing />} />
             <Route path="/perfis" element={<Profiles />} />
-            <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />
+            <Route path="/inicio" element={<RequireAuth><Index /></RequireAuth>} />
             <Route path="/gerar" element={<RequireAuth><Generate /></RequireAuth>} />
             <Route path="/confirmacao" element={<RequireAuth><Confirmation /></RequireAuth>} />
             <Route path="/exercicios" element={<RequireAuth><Exercises /></RequireAuth>} />
