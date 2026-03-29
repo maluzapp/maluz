@@ -103,10 +103,16 @@ export default function PricingSection() {
                   ? 'bg-primary-foreground/20 text-primary-foreground'
                   : 'bg-accent/20 text-accent'
               }`}>
-                -44%
+                Economia
               </span>
             </button>
           </div>
+
+          <p className="text-xs text-foreground/50 mt-3">
+            {billingPeriod === 'monthly'
+              ? 'Cobrança mensal • cancele quando quiser'
+              : 'Cobrança anual única • economize até 44%'}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 items-start">
