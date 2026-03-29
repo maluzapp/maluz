@@ -60,12 +60,15 @@ export default function Friends() {
   const [activeTab, setActiveTab] = useState('feed');
   const [friends, setFriends] = useState<Friendship[]>([]);
   const [pendingRequests, setPendingRequests] = useState<Friendship[]>([]);
+  const [sentRequests, setSentRequests] = useState<Friendship[]>([]);
   const [activities, setActivities] = useState<FriendActivity[]>([]);
   const [myCode, setMyCode] = useState('');
   const [searchCode, setSearchCode] = useState('');
   const [searchName, setSearchName] = useState('');
   const [searchResults, setSearchResults] = useState<FriendProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  // Track IDs already connected (friends + pending sent/received)
+  const [connectedIds, setConnectedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!profileId || !user) return;
