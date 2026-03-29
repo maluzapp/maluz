@@ -444,14 +444,20 @@ export default function Profiles() {
                         try {
                           const result = await openCustomerPortal();
                           if (!result?.url) {
-                            toast.error('Você ainda não tem uma assinatura ativa no Stripe. Assine um plano primeiro.');
+                            toast('Você ainda não tem assinatura ativa.', {
+                              description: 'Assine um plano para gerenciar sua conta.',
+                              action: { label: 'Ver planos', onClick: () => navigate('/') },
+                            });
                           }
                         } catch (err: any) {
-                          const msg = err?.message || '';
-                          if (msg.includes('No Stripe customer')) {
-                            toast.error('Você ainda não tem uma assinatura. Assine um plano primeiro.');
+                          const msg = typeof err?.message === 'string' ? err.message : String(err);
+                          if (msg.includes('No Stripe customer') || msg.includes('customer')) {
+                            toast('Você ainda não tem assinatura ativa.', {
+                              description: 'Assine um plano para gerenciar sua conta.',
+                              action: { label: 'Ver planos', onClick: () => navigate('/') },
+                            });
                           } else {
-                            toast.error('Erro ao abrir portal de assinatura');
+                            toast.error('Erro ao abrir portal. Tente novamente.');
                           }
                         }
                       }}
