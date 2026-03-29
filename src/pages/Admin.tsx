@@ -83,6 +83,17 @@ const SHARE_FIELDS: FieldConfig[] = [
   { key: 'share_app_url', label: 'Link do app no compartilhamento', type: 'text', category: 'share' },
 ];
 
+const EMAIL_FIELDS: FieldConfig[] = [
+  { key: 'email_sender_name', label: 'Nome do remetente', type: 'text', category: 'email' },
+  { key: 'email_sender_address', label: 'Email remetente', type: 'text', category: 'email' },
+  { key: 'email_footer_text', label: 'Texto do rodapé', type: 'text', category: 'email' },
+  { key: 'email_primary_color', label: 'Cor principal (botões)', type: 'color', category: 'email' },
+  { key: 'email_text_color', label: 'Cor do texto', type: 'color', category: 'email' },
+  { key: 'email_welcome_subject', label: 'Assunto — Boas-vindas', type: 'text', category: 'email' },
+  { key: 'email_payment_subject', label: 'Assunto — Confirmação pagamento', type: 'text', category: 'email' },
+  { key: 'email_cancel_subject', label: 'Assunto — Cancelamento', type: 'text', category: 'email' },
+];
+
 const LANDING_FIELDS: FieldConfig[] = [
   { key: 'hero_title', label: 'Título Hero', type: 'text', category: 'landing' },
   { key: 'hero_subtitle', label: 'Subtítulo Hero', type: 'text', category: 'landing' },
