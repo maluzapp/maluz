@@ -209,6 +209,9 @@ export default function Results() {
         answers_data: JSON.parse(JSON.stringify(answers)),
       });
 
+      // Track daily usage for subscription limits
+      await incrementDailyUsage(profileId);
+
       const { data: profile } = await supabase
         .from('profiles')
         .select('xp, level, streak_days, last_study_date, total_exercises, total_correct')
