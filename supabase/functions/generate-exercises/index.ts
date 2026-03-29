@@ -33,13 +33,29 @@ serve(async (req) => {
 
     const yearInfo = getYearInfo(year);
 
+    // Pick a random distribution of exercise types for variety
+    const allTypes = [
+      'multiple_choice', 'true_false', 'fill_blank', 'matching',
+      'ordering', 'complete_sentence', 'column_classification'
+    ];
+    // Shuffle and pick types so each session feels unique
+    const shuffled = [...allTypes].sort(() => Math.random() - 0.5);
+    const typeDist = [
+      shuffled[0], shuffled[1], shuffled[2], shuffled[3],
+      shuffled[4], shuffled[5], shuffled[6],
+      shuffled[Math.floor(Math.random() * allTypes.length)],
+      shuffled[Math.floor(Math.random() * allTypes.length)],
+      shuffled[Math.floor(Math.random() * allTypes.length)],
+    ].sort(() => Math.random() - 0.5);
+
     const prompt = `Você é um professor do ${yearInfo.label} do ${yearInfo.level}, especialista em criar conteúdo para alunos de ${yearInfo.ageRange}.
 Matéria: ${subject}
 Assunto: ${topic}
 Resumo: ${summary}
 Pontos-chave: ${keyPoints?.join(', ') || topic}
 
-Gere EXATAMENTE 8 exercícios variados sobre este conteúdo. Use os seguintes tipos (pelo menos 2 de múltipla escolha, 2 verdadeiro/falso, 2 preencher lacuna, 2 associação):
+Gere EXATAMENTE 10 exercícios variados sobre este conteúdo, usando EXATAMENTE estes tipos nesta ordem:
+${typeDist.map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
 IMPORTANTE - ADEQUAÇÃO AO NÍVEL ESCOLAR:
 - O aluno está no ${yearInfo.label} do ${yearInfo.level} (faixa etária: ${yearInfo.ageRange})
@@ -48,6 +64,12 @@ IMPORTANTE - ADEQUAÇÃO AO NÍVEL ESCOLAR:
 - Para Fundamental I (2º ao 5º ano): use frases curtas, vocabulário básico, conceitos introdutórios
 - Para Fundamental II (6º ao 9º ano): use linguagem intermediária, conceitos mais elaborados
 - Para Ensino Médio: use linguagem formal, conceitos avançados
+
+IMPORTANTE - VARIEDADE:
+- NUNCA repita a mesma pergunta ou conceito em exercícios diferentes
+- Cada exercício deve abordar um ASPECTO DIFERENTE do conteúdo
+- Varie o estilo: perguntas diretas, situações-problema, exemplos práticos, curiosidades
+- Use contextos diferentes (exemplos do cotidiano, históricos, científicos)
 
 Formato JSON EXATO (retorne APENAS o JSON, sem markdown):
 {
@@ -79,17 +101,46 @@ Formato JSON EXATO (retorne APENAS o JSON, sem markdown):
         {"left": "Conceito 3", "right": "Definição 3"}
       ],
       "explanation": "Explicação breve"
+    },
+    {
+      "type": "ordering",
+      "question": "Coloque na ordem correta:",
+      "items": ["Item A", "Item B", "Item C", "Item D"],
+      "correctOrder": [0, 1, 2, 3],
+      "explanation": "Explicação breve. correctOrder contém os índices do array items na ordem certa."
+    },
+    {
+      "type": "complete_sentence",
+      "sentence": "O ___ é a capital do Brasil.",
+      "options": ["Rio de Janeiro", "Brasília", "São Paulo", "Salvador"],
+      "correctIndex": 1,
+      "explanation": "Explicação breve"
+    },
+    {
+      "type": "column_classification",
+      "question": "Classifique os itens nas categorias corretas:",
+      "columns": ["Categoria A", "Categoria B"],
+      "items": [
+        {"text": "Item 1", "column": 0},
+        {"text": "Item 2", "column": 1},
+        {"text": "Item 3", "column": 0},
+        {"text": "Item 4", "column": 1}
+      ],
+      "explanation": "Explicação breve. column é o índice (0, 1...) da coluna correta."
     }
   ]
 }
 
 REGRAS:
 - Exercícios devem ser adequados para alunos do ${yearInfo.label} do ${yearInfo.level} (${yearInfo.ageRange})
-- As questões devem cobrir diferentes aspectos do assunto
+- As questões devem cobrir diferentes aspectos do assunto — NUNCA REPITA CONCEITOS
 - Explicações devem ser didáticas e claras, adequadas à faixa etária
-- Para fill_blank, use EXATAMENTE "___" (3 underscores) para a lacuna
+- Para fill_blank e complete_sentence, use EXATAMENTE "___" (3 underscores) para a lacuna
 - Para matching, use exatamente 3 ou 4 pares
-- correctIndex começa em 0`;
+- Para ordering, use 4 ou 5 items, correctOrder são os índices de items na ordem certa
+- Para column_classification, use 2 colunas e 4-6 items
+- correctIndex começa em 0
+- Siga EXATAMENTE a ordem de tipos pedida acima`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
