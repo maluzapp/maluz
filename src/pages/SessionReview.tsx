@@ -77,7 +77,7 @@ export default function SessionReview() {
     const appName = s.app_name || 'Maluz';
     const header = s.share_header || `💡 *${appName} — Resultado do Estudo*`;
     const cta = s.share_cta || `🚀 Que tal tentar também? Baixe o ${appName}!`;
-    const appUrl = s.share_app_url || 'https://maluz.lovable.app';
+    const appUrl = s.share_app_url || 'https://maluz.app';
 
     const text = `${header}\n\n📖 ${session.subject} — ${session.topic}\n🏆 Acertei *${session.score} de ${session.total}* (${pct}%)\n⭐ +${session.xp_earned} XP\n\n${cta}\n👉 ${appUrl}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
