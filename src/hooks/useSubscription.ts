@@ -176,18 +176,19 @@ export async function startCheckout(priceId: string) {
 
 export async function openCustomerPortal() {
   const { data, error } = await supabase.functions.invoke('customer-portal');
+  
+  // The edge function returns { error: "..." } with status 500 for no-customer cases
+  // supabase.functions.invoke may put the response body in `data` even on errors
+  const body = data || (error as any)?.context?.body;
+  
+  if (body?.error) {
+    throw new Error(body.error);
+  }
   if (error) {
-    // Check if the error contains the actual response with an error message
-    if (typeof error === 'object' && 'message' in error) {
-      throw new Error(error.message);
-    }
-    throw error;
+    throw new Error(typeof error === 'object' && 'message' in error ? error.message : String(error));
   }
-  if (data?.error) {
-    throw new Error(data.error);
+  if (body?.url) {
+    window.location.href = body.url;
   }
-  if (data?.url) {
-    window.location.href = data.url;
-  }
-  return data;
+  return body;
 }
