@@ -66,6 +66,8 @@ export default function Profiles() {
   const hasLoadedRef = useRef<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
+  const [partnerCode, setPartnerCode] = useState('');
+  const [linkingPartner, setLinkingPartner] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate('/login');
