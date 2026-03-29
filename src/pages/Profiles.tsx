@@ -411,7 +411,7 @@ export default function Profiles() {
 
         {/* Meu Plano card */}
         {(() => {
-          const isPro = !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
+          const isPro = subDataLoaded && !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
           const hasStripePortal = !!stripeStatus?.subscribed;
           const currentPlanSlug = isPro
             ? (stripeStatus?.price_id
