@@ -20,6 +20,7 @@ import Credits from "./pages/Credits";
 import Admin from "./pages/Admin";
 import Install from "./pages/Install";
 import SessionReview from "./pages/SessionReview";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import type { ReactNode } from "react";
 
