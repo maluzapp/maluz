@@ -109,7 +109,13 @@ export default function Generate() {
           <GamificationBar />
         </div>
 
-        <div className="mb-8 text-center animate-fade-in">
+        {!canStart && (
+          <div className="mb-6">
+            <UpgradePrompt />
+          </div>
+        )}
+
+        <div className={`mb-8 text-center animate-fade-in ${!canStart ? 'opacity-50 pointer-events-none' : ''}`}>
           <img src={lampadaIcon} alt="Maluz" className="h-16 mx-auto mb-3" />
           <h1 className="font-display text-3xl font-bold text-foreground">
             Acenda a <span className="text-primary italic">luz</span> do saber! 💡
