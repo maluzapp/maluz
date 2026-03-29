@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useStripeSubscription, useUserSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
-import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings } from 'lucide-react';
+import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProfileData {
@@ -130,6 +130,9 @@ export default function Index() {
           </div>
           <div className="flex items-center justify-center gap-2">
             <h1 className="font-display text-2xl font-bold text-foreground">Olá, {profile.name}! 👋</h1>
+            <button onClick={() => navigate('/amigos')} className="text-muted-foreground hover:text-foreground transition-colors">
+              <Heart className="h-4 w-4" />
+            </button>
             <button onClick={() => navigate('/creditos')} className="text-muted-foreground hover:text-foreground transition-colors">
               <Settings className="h-4 w-4" />
             </button>

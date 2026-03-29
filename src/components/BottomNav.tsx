@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Users, Trophy, Heart } from 'lucide-react';
+import { Home, Users, Trophy, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProfileStore } from '@/hooks/useProfile';
 import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests';
+import { usePendingChallenges } from '@/hooks/usePendingChallenges';
 import lampadaIcon from '@/assets/lampada-2.png';
 
 const NAV_ITEMS_LEFT = [
@@ -13,19 +14,21 @@ const NAV_ITEMS_LEFT = [
 
 const NAV_ITEMS_RIGHT = [
   { path: '/resultado', icon: Trophy, label: 'Resultado' },
-  { path: '/amigos', icon: Heart, label: 'Amigos' },
+  { path: '/desafios', icon: Swords, label: 'Desafios' },
 ];
 
 const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/'];
+const HIDDEN_PREFIXES = ['/desafio/'];
 
 export function BottomNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [lampLit, setLampLit] = useState(false);
   const profileId = useProfileStore((s) => s.activeProfileId);
-  const pendingCount = usePendingFriendRequests();
+  const pendingFriends = usePendingFriendRequests();
+  const pendingChallenges = usePendingChallenges();
 
-  if (HIDDEN_ROUTES.includes(pathname) || !profileId) return null;
+  if (HIDDEN_ROUTES.includes(pathname) || HIDDEN_PREFIXES.some(p => pathname.startsWith(p)) || !profileId) return null;
 
   const handleLampClick = () => {
     setLampLit(true);
@@ -39,7 +42,8 @@ export function BottomNav() {
 
   const renderItem = ({ path, icon: Icon, label }: { path: string; icon: typeof Home; label: string }) => {
     const active = pathname === path;
-    const showBadge = path === '/amigos' && pendingCount > 0;
+    const badgeCount = path === '/desafios' ? pendingChallenges + pendingFriends : 0;
+    const showBadge = badgeCount > 0;
     return (
       <button
         key={path}
@@ -53,7 +57,7 @@ export function BottomNav() {
           <Icon className={cn('h-5 w-5 transition-transform', active && 'scale-110')} />
           {showBadge && (
             <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold animate-pulse">
-              {pendingCount > 9 ? '9+' : pendingCount}
+              {badgeCount > 9 ? '9+' : badgeCount}
             </span>
           )}
         </div>
