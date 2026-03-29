@@ -33,6 +33,7 @@ interface Profile {
   profile_type: string;
   total_exercises: number;
   total_correct: number;
+  friend_code: string | null;
 }
 
 interface LinkedChild {
@@ -65,6 +66,8 @@ export default function Profiles() {
   const hasLoadedRef = useRef<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
+  const [partnerCode, setPartnerCode] = useState('');
+  const [linkingPartner, setLinkingPartner] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate('/login');
@@ -85,7 +88,7 @@ export default function Profiles() {
   const fetchProfilesData = async () => {
     const { data } = await supabase
       .from('profiles')
-      .select('id, name, avatar_emoji, school_year, xp, level, streak_days, profile_type, total_exercises, total_correct')
+      .select('id, name, avatar_emoji, school_year, xp, level, streak_days, profile_type, total_exercises, total_correct, friend_code')
       .order('created_at');
 
     return (data as Profile[]) || [];
@@ -106,7 +109,7 @@ export default function Profiles() {
     const childIds = (links as any[]).map((link: any) => link.child_profile_id);
     const { data: children } = await supabase
       .from('profiles')
-      .select('id, name, avatar_emoji, school_year, xp, level, streak_days, profile_type, total_exercises, total_correct')
+      .select('id, name, avatar_emoji, school_year, xp, level, streak_days, profile_type, total_exercises, total_correct, friend_code')
       .in('id', childIds);
 
     return (links as any[])
@@ -251,6 +254,73 @@ export default function Profiles() {
     setLinkingCode('');
     toast.success('Filho vinculado com sucesso!');
     await loadPageData();
+  };
+  // Link partner/spouse - share children between parents
+  const linkPartner = async () => {
+    if (!partnerCode.trim() || linkingPartner) return;
+    setLinkingPartner(true);
+    try {
+      const myParent = parentProfiles[0];
+      if (!myParent) {
+        toast.error('Crie um perfil de responsável primeiro');
+        return;
+      }
+
+      // Find partner's parent profile by friend_code
+      const { data: partnerData } = await supabase
+        .rpc('find_profile_by_friend_code', { _code: partnerCode.trim() });
+
+      const partner = (partnerData as any)?.[0];
+      if (!partner) {
+        toast.error('Código não encontrado');
+        return;
+      }
+
+      // Get partner's linked children
+      const { data: partnerLinks } = await supabase
+        .from('parent_child_links' as any)
+        .select('child_profile_id')
+        .eq('parent_profile_id', partner.id);
+
+      // Get my linked children
+      const { data: myLinks } = await supabase
+        .from('parent_child_links' as any)
+        .select('child_profile_id')
+        .eq('parent_profile_id', myParent.id);
+
+      const myChildIds = new Set((myLinks as any[] || []).map((l: any) => l.child_profile_id));
+      const partnerChildIds = new Set((partnerLinks as any[] || []).map((l: any) => l.child_profile_id));
+
+      // Link partner's children to me
+      const toAddToMe = (partnerLinks as any[] || [])
+        .filter((l: any) => !myChildIds.has(l.child_profile_id))
+        .map((l: any) => ({ parent_profile_id: myParent.id, child_profile_id: l.child_profile_id }));
+
+      // Link my children to partner
+      const toAddToPartner = (myLinks as any[] || [])
+        .filter((l: any) => !partnerChildIds.has(l.child_profile_id))
+        .map((l: any) => ({ parent_profile_id: partner.id, child_profile_id: l.child_profile_id }));
+
+      if (toAddToMe.length > 0) {
+        await supabase.from('parent_child_links' as any).insert(toAddToMe);
+      }
+      if (toAddToPartner.length > 0) {
+        await supabase.from('parent_child_links' as any).insert(toAddToPartner);
+      }
+
+      if (toAddToMe.length === 0 && toAddToPartner.length === 0) {
+        toast.info('Vocês já compartilham os mesmos filhos!');
+      } else {
+        toast.success('Cônjuge vinculado! Filhos compartilhados com sucesso.');
+      }
+
+      setPartnerCode('');
+      await loadPageData();
+    } catch (err) {
+      toast.error('Erro ao vincular cônjuge');
+    } finally {
+      setLinkingPartner(false);
+    }
   };
 
   if (loading || loadingProfiles) {
@@ -629,6 +699,48 @@ export default function Profiles() {
                         disabled={!linkingCode.trim()}
                       >
                         Vincular
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Link partner/spouse section */}
+                <Card className="border-primary/20">
+                  <CardContent className="p-4 space-y-3">
+                    <h3 className="font-display font-bold text-foreground flex items-center gap-2">
+                      <Users className="h-4 w-4 text-primary" />
+                      Vincular cônjuge
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Compartilhe seu código com o outro responsável, ou digite o código dele(a) para compartilhar os filhos vinculados
+                    </p>
+
+                    {/* Show own parent friend code */}
+                    {parentProfiles[0]?.friend_code && (
+                      <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
+                        <span className="text-xs text-muted-foreground">Seu código:</span>
+                        <span className="font-mono text-sm font-bold text-primary tracking-widest flex-1">{parentProfiles[0].friend_code}</span>
+                        <Button variant="outline" size="sm" className="h-7 px-2" onClick={() => {
+                          navigator.clipboard.writeText(parentProfiles[0].friend_code || '');
+                          toast.success('Código copiado!');
+                        }}>
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Código do cônjuge"
+                        value={partnerCode}
+                        onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
+                        className="font-mono tracking-widest"
+                      />
+                      <Button
+                        onClick={linkPartner}
+                        disabled={!partnerCode.trim() || linkingPartner}
+                      >
+                        {linkingPartner ? '...' : 'Vincular'}
                       </Button>
                     </div>
                   </CardContent>
