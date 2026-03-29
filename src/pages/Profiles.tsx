@@ -33,6 +33,7 @@ interface Profile {
   profile_type: string;
   total_exercises: number;
   total_correct: number;
+  friend_code: string | null;
 }
 
 interface LinkedChild {
