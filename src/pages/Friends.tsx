@@ -118,9 +118,7 @@ export default function Friends() {
     let profileMap: Record<string, FriendProfile> = {};
     if (allIds.length > 0) {
       const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, name, avatar_emoji, xp, level, streak_days, friend_code')
-        .in('id', allIds);
+        .rpc('get_profiles_by_ids', { _ids: allIds });
       for (const p of (profiles || [])) {
         profileMap[p.id] = p as FriendProfile;
       }

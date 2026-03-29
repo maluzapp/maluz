@@ -431,6 +431,18 @@ export type Database = {
           xp: number
         }[]
       }
+      get_profiles_by_ids: {
+        Args: { _ids: string[] }
+        Returns: {
+          avatar_emoji: string
+          friend_code: string
+          id: string
+          level: number
+          name: string
+          streak_days: number
+          xp: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
