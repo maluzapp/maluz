@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { FriendsTab } from '@/components/FriendsTab';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
