@@ -63,6 +63,9 @@ export default function Index() {
   const [recentSessions, setRecentSessions] = useState<RecentSession[]>([]);
   const [subjectStats, setSubjectStats] = useState<SubjectStat[]>([]);
   const [loading, setLoading] = useState(true);
+  const { data: stripeStatus } = useStripeSubscription();
+  const { data: dbSub } = useUserSubscription();
+  const isPro = !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
 
   useEffect(() => {
     if (authLoading || !user || !profileId) return;
