@@ -740,16 +740,34 @@ export default function Profiles() {
                   </div>
                 )}
 
-                {/* Spouse info if linked */}
+                {/* Spouse display */}
+                {linkedSpouse && (
+                  <div>
+                    <h3 className="font-display font-bold text-foreground mb-3 flex items-center gap-2">
+                      <Heart className="h-4 w-4 text-primary" />
+                      Cônjuge
+                    </h3>
+                    <Card className="border-primary/10">
+                      <CardContent className="p-4 flex items-center gap-4">
+                        <span className="text-3xl">{linkedSpouse.avatar_emoji}</span>
+                        <div className="flex-1">
+                          <p className="font-display font-bold text-foreground">{linkedSpouse.name}</p>
+                          <p className="text-xs text-muted-foreground">Responsável vinculado(a)</p>
+                        </div>
+                        <Check className="h-4 w-4 text-primary" />
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+
+                {/* Current parent info */}
                 {parentProfiles[0]?.friend_code && (
                   <Card className="border-primary/10">
                     <CardContent className="p-4 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Users className="h-5 w-5 text-primary" />
-                      </div>
+                      <span className="text-3xl">{parentProfiles[0].avatar_emoji}</span>
                       <div className="flex-1">
-                        <p className="font-display font-bold text-sm text-foreground">Responsável</p>
-                        <p className="text-xs text-muted-foreground">{parentProfiles[0].name}</p>
+                        <p className="font-display font-bold text-sm text-foreground">{parentProfiles[0].name}</p>
+                        <p className="text-xs text-muted-foreground">Você</p>
                       </div>
                       <span className="font-mono text-xs text-primary tracking-wider">{parentProfiles[0].friend_code}</span>
                     </CardContent>
