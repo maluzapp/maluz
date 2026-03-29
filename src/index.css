@@ -102,3 +102,24 @@
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* Shimmer glow effect */
+@keyframes shimmer-glow {
+  0%, 100% { box-shadow: 0 0 8px hsla(42, 91%, 61%, 0.3); }
+  50% { box-shadow: 0 0 20px hsla(42, 91%, 61%, 0.6), 0 0 40px hsla(42, 91%, 61%, 0.2); }
+}
+
+.shimmer-glow {
+  animation: shimmer-glow 1.5s ease-in-out infinite;
+}
+
+/* Sparkle pulse for correct feedback */
+@keyframes sparkle-in {
+  0% { opacity: 0; transform: scale(0.8); filter: brightness(1); }
+  50% { opacity: 1; transform: scale(1.05); filter: brightness(1.3); }
+  100% { opacity: 1; transform: scale(1); filter: brightness(1); }
+}
+
+.animate-sparkle-in {
+  animation: sparkle-in 0.5s ease-out;
+}
