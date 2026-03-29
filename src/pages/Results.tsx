@@ -179,7 +179,7 @@ function SessionHistory() {
 
 export default function Results() {
   const navigate = useNavigate();
-  const { exercises, answers, config, reset } = useStudyStore();
+  const { exercises, answers, config, reset, sessionId } = useStudyStore();
   const profileId = useProfileStore((s) => s.activeProfileId);
   const [xpEarned, setXpEarned] = useState(0);
   const [saved, setSaved] = useState(false);
@@ -189,25 +189,13 @@ export default function Results() {
   const score = answers.filter((a) => a.isCorrect).length;
   const total = exercises.length;
   const pct = total > 0 ? Math.round((score / total) * 100) : 0;
-  const sessionFingerprint = profileId && config && total > 0
-    ? JSON.stringify({
-        profileId,
-        subject: config.subject,
-        topic: config.topic,
-        year: config.year,
-        score,
-        total,
-        answers,
-        exercises,
-      })
-    : null;
 
-  // Save results once per unique completed session, even across remounts/navigation
+  // Save results once per generated study session, even across remounts/navigation
   useEffect(() => {
-    if (!config || !profileId || total === 0 || !sessionFingerprint) return;
+    if (!config || !profileId || total === 0 || !sessionId) return;
 
-    const savedFingerprint = sessionStorage.getItem('lastSavedStudySessionFingerprint');
-    if (savedFingerprint === sessionFingerprint) {
+    const savedSessionId = sessionStorage.getItem('lastSavedStudySessionId');
+    if (savedSessionId === sessionId) {
       setSaved(true);
       setXpEarned(calcXP(score, total));
       return;
@@ -231,9 +219,8 @@ export default function Results() {
 
       if (insertError) return;
 
-      sessionStorage.setItem('lastSavedStudySessionFingerprint', sessionFingerprint);
+      sessionStorage.setItem('lastSavedStudySessionId', sessionId);
 
-      // Track daily usage for subscription limits
       await incrementDailyUsage(profileId);
 
       const { data: profile } = await supabase
@@ -281,7 +268,7 @@ export default function Results() {
     };
 
     saveResults();
-  }, [answers, config, exercises, profileId, score, sessionFingerprint, total]);
+  }, [answers, config, exercises, profileId, score, sessionId, total]);
 
   const handleNewSession = () => {
     reset();
