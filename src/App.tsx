@@ -25,6 +25,8 @@ import Install from "./pages/Install";
 import SessionReview from "./pages/SessionReview";
 import ResetPassword from "./pages/ResetPassword";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import Challenges from "./pages/Challenges";
+import ChallengeExercise from "./pages/ChallengeExercise";
 import NotFound from "./pages/NotFound";
 import type { ReactNode } from "react";
 
