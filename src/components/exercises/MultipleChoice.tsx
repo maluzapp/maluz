@@ -35,7 +35,7 @@ export function MultipleChoice({ exercise, index, onAnswer, readOnly, savedAnswe
         <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary animate-fade-in">
           Múltipla escolha
         </div>
-        <h2 className="mb-5 text-lg font-bold text-foreground animate-fade-in" style={{ animationDelay: '100ms' }}>
+        <h2 className="mb-5 text-xl font-bold text-foreground animate-fade-in" style={{ animationDelay: '100ms' }}>
           {exercise.question}
         </h2>
         <div className="space-y-2.5">
