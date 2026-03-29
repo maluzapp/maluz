@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, Users, Trophy, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProfileStore } from '@/hooks/useProfile';
+import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests';
 import lampadaIcon from '@/assets/lampada-2.png';
 
 const NAV_ITEMS_LEFT = [
@@ -22,6 +23,7 @@ export function BottomNav() {
   const { pathname } = useLocation();
   const [lampLit, setLampLit] = useState(false);
   const profileId = useProfileStore((s) => s.activeProfileId);
+  const pendingCount = usePendingFriendRequests();
 
   if (HIDDEN_ROUTES.includes(pathname) || !profileId) return null;
 
@@ -37,6 +39,7 @@ export function BottomNav() {
 
   const renderItem = ({ path, icon: Icon, label }: { path: string; icon: typeof Home; label: string }) => {
     const active = pathname === path;
+    const showBadge = path === '/amigos' && pendingCount > 0;
     return (
       <button
         key={path}
@@ -46,7 +49,14 @@ export function BottomNav() {
           active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
         )}
       >
-        <Icon className={cn('h-5 w-5 transition-transform', active && 'scale-110')} />
+        <div className="relative">
+          <Icon className={cn('h-5 w-5 transition-transform', active && 'scale-110')} />
+          {showBadge && (
+            <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold animate-pulse">
+              {pendingCount > 9 ? '9+' : pendingCount}
+            </span>
+          )}
+        </div>
         <span>{label}</span>
         {active && <span className="absolute top-0 h-0.5 w-8 rounded-b-full bg-primary" />}
       </button>
