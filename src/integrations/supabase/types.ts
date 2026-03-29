@@ -38,6 +38,72 @@ export type Database = {
         }
         Relationships: []
       }
+      challenges: {
+        Row: {
+          answers_data: Json | null
+          child_profile_id: string
+          completed_at: string | null
+          created_at: string
+          exercises_data: Json | null
+          id: string
+          message: string | null
+          parent_profile_id: string
+          score: number | null
+          status: string
+          subject: string
+          topic: string
+          total: number | null
+          year: string
+        }
+        Insert: {
+          answers_data?: Json | null
+          child_profile_id: string
+          completed_at?: string | null
+          created_at?: string
+          exercises_data?: Json | null
+          id?: string
+          message?: string | null
+          parent_profile_id: string
+          score?: number | null
+          status?: string
+          subject: string
+          topic: string
+          total?: number | null
+          year: string
+        }
+        Update: {
+          answers_data?: Json | null
+          child_profile_id?: string
+          completed_at?: string | null
+          created_at?: string
+          exercises_data?: Json | null
+          id?: string
+          message?: string | null
+          parent_profile_id?: string
+          score?: number | null
+          status?: string
+          subject?: string
+          topic?: string
+          total?: number | null
+          year?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_child"
+            columns: ["child_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_parent"
+            columns: ["parent_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_usage: {
         Row: {
           created_at: string
