@@ -43,8 +43,8 @@ export default function Profiles() {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const setActiveProfile = useProfileStore((s) => s.setActiveProfile);
-  const { data: stripeStatus } = useStripeSubscription();
-  const { data: dbSub } = useUserSubscription();
+  const { data: stripeStatus, isLoading: stripeLoading } = useStripeSubscription();
+  const { data: dbSub, isLoading: dbSubLoading } = useUserSubscription();
   const { data: plans } = usePlans();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [linkedChildren, setLinkedChildren] = useState<LinkedChild[]>([]);
@@ -324,7 +324,8 @@ export default function Profiles() {
     );
   }
 
-  const isPro = !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
+  const subDataLoaded = !stripeLoading && !dbSubLoading;
+  const isPro = subDataLoaded && !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
 
   const ProfileCard = ({ p, idx }: { p: Profile; idx: number }) => (
     <Card
@@ -410,7 +411,7 @@ export default function Profiles() {
 
         {/* Meu Plano card */}
         {(() => {
-          const isPro = !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
+          const isPro = subDataLoaded && !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
           const hasStripePortal = !!stripeStatus?.subscribed;
           const currentPlanSlug = isPro
             ? (stripeStatus?.price_id
