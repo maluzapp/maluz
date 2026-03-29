@@ -346,7 +346,7 @@ export default function Profiles() {
                 <span className="bg-primary/15 text-primary text-[10px] px-1.5 py-0.5 rounded-full font-mono">Pai/Mãe</span>
               )}
               {isPro && (
-                <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-1.5 py-0 h-4">⭐ PRO</Badge>
+                <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-1.5 py-0 h-4"><Crown className="h-3 w-3 mr-0.5" /> PRO</Badge>
               )}
             </div>
             {p.school_year && (
