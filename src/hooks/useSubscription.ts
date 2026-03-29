@@ -32,19 +32,7 @@ export interface UserSubscription {
   plan?: SubscriptionPlan;
 }
 
-// Stripe price → plan slug mapping
-export const STRIPE_PRICES: Record<string, { slug: string; period: 'monthly' | 'yearly' }> = {
-  'price_1TGJVgEWUivwufDD8qFByYML': { slug: 'pro', period: 'monthly' },
-  'price_1TGJWvEWUivwufDD6lWAQJIk': { slug: 'pro', period: 'yearly' },
-  'price_1TGJX3EWUivwufDDIy281CCo': { slug: 'familia', period: 'monthly' },
-  'price_1TGJX4EWUivwufDDp2uoTWVo': { slug: 'familia', period: 'yearly' },
-};
-
-// Yearly price IDs per plan slug
-export const STRIPE_YEARLY_PRICES: Record<string, string> = {
-  pro: 'price_1TGJWvEWUivwufDD6lWAQJIk',
-  familia: 'price_1TGJX4EWUivwufDDp2uoTWVo',
-};
+// No more hardcoded Stripe price IDs — prices are resolved dynamically by the edge function
 
 export function usePlans() {
   return useQuery({
@@ -83,6 +71,8 @@ export interface StripeSubscriptionStatus {
   subscribed: boolean;
   price_id?: string;
   product_id?: string;
+  plan_slug?: string;
+  billing_period?: string;
   subscription_end?: string;
 }
 
@@ -126,8 +116,7 @@ export function useCanStartSession() {
 
   // If Stripe says subscribed → unlimited
   if (stripeStatus?.subscribed) {
-    const priceInfo = stripeStatus.price_id ? STRIPE_PRICES[stripeStatus.price_id] : null;
-    return { canStart: true, sessionsUsed: usage?.sessions_count ?? 0, limit: -1, planSlug: priceInfo?.slug ?? 'pro' };
+    return { canStart: true, sessionsUsed: usage?.sessions_count ?? 0, limit: -1, planSlug: stripeStatus.plan_slug ?? 'pro' };
   }
 
   // If DB subscription is active with unlimited
@@ -163,9 +152,9 @@ export async function incrementDailyUsage(profileId: string) {
   }
 }
 
-export async function startCheckout(priceId: string) {
+export async function startCheckout(planSlug: string, billingPeriod: 'monthly' | 'yearly' = 'monthly') {
   const { data, error } = await supabase.functions.invoke('create-checkout', {
-    body: { price_id: priceId },
+    body: { plan_slug: planSlug, billing_period: billingPeriod },
   });
   if (error) throw error;
   if (data?.url) {

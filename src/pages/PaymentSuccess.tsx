@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useStripeSubscription, STRIPE_PRICES } from '@/hooks/useSubscription';
+import { useStripeSubscription } from '@/hooks/useSubscription';
 import { useAuth } from '@/hooks/useAuth';
 import { CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -20,8 +20,8 @@ export default function PaymentSuccess() {
   // Send payment confirmation email
   useEffect(() => {
     if (!user?.email || emailSent || !stripeStatus?.subscribed) return;
-    const priceInfo = stripeStatus?.price_id ? STRIPE_PRICES[stripeStatus.price_id] : null;
-    const planName = priceInfo?.slug === 'familia' ? 'Família' : 'Pro';
+    const planSlug = stripeStatus?.plan_slug;
+    const planName = planSlug === 'familia' ? 'Família' : 'Pro';
 
     supabase.functions.invoke('send-email', {
       body: {
@@ -46,8 +46,7 @@ export default function PaymentSuccess() {
     return () => clearTimeout(timer);
   }, [countdown, navigate]);
 
-  const priceInfo = stripeStatus?.price_id ? STRIPE_PRICES[stripeStatus.price_id] : null;
-  const planName = priceInfo?.slug === 'familia' ? 'Família' : 'Pro';
+  const planName = stripeStatus?.plan_slug === 'familia' ? 'Família' : 'Pro';
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
