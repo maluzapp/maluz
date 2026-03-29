@@ -686,6 +686,30 @@ export default function Profiles() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => { if (!open) setDeleteConfirmId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apagar perfil</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja apagar o perfil <strong>{deleteConfirmName}</strong>? Todos os dados, histórico de sessões e progresso serão perdidos permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (deleteConfirmId) deleteProfile(deleteConfirmId);
+                setDeleteConfirmId(null);
+              }}
+            >
+              Apagar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
