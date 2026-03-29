@@ -71,7 +71,7 @@ export function ColumnClassification({ exercise, index, onAnswer }: Props) {
           return (
             <div
               key={itemIdx}
-              className={`rounded-lg border p-3 transition-all ${
+              className={`rounded-xl border-2 p-4 transition-all ${
                 rightAnswer ? 'border-success bg-success/10' :
                 wrongAnswer ? 'border-destructive bg-destructive/10' :
                 'border-border bg-card'
