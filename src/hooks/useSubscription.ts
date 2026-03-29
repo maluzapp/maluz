@@ -116,8 +116,7 @@ export function useCanStartSession() {
 
   // If Stripe says subscribed → unlimited
   if (stripeStatus?.subscribed) {
-    const priceInfo = stripeStatus.price_id ? STRIPE_PRICES[stripeStatus.price_id] : null;
-    return { canStart: true, sessionsUsed: usage?.sessions_count ?? 0, limit: -1, planSlug: priceInfo?.slug ?? 'pro' };
+    return { canStart: true, sessionsUsed: usage?.sessions_count ?? 0, limit: -1, planSlug: stripeStatus.plan_slug ?? 'pro' };
   }
 
   // If DB subscription is active with unlimited
