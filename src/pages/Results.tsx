@@ -8,6 +8,7 @@ import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
 import { cn } from '@/lib/utils';
+import { PerfectScoreConfetti, firePerfectScoreConfetti } from '@/components/exercises/Confetti';
 
 function getEmoji(pct: number) {
   if (pct >= 90) return '🏆';
