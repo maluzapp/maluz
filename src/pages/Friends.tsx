@@ -100,6 +100,13 @@ export default function Friends() {
       .eq('target_profile_id', profileId)
       .eq('status', 'pending');
 
+    // Get requests I sent (pending)
+    const { data: sent } = await supabase
+      .from('friendships' as any)
+      .select('*')
+      .eq('requester_profile_id', profileId)
+      .eq('status', 'pending');
+
     // Get friend profile IDs
     const friendIds = (friendships as any[] || []).map((f: any) =>
       f.requester_profile_id === profileId ? f.target_profile_id : f.requester_profile_id
