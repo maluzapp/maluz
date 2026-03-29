@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import { fireCorrectConfetti } from './Confetti';
 import type { FillBlankExercise, ExerciseAnswer } from '@/types/study';
 
 interface Props {
@@ -41,6 +42,7 @@ export function FillBlank({ exercise, index, onAnswer, readOnly, savedAnswer }: 
       setIsCorrect(correct);
       setFeedback(fb);
       setAnswered(true);
+      if (correct) fireCorrectConfetti();
       onAnswer({ exerciseIndex: index, isCorrect: correct, userAnswer: value.trim() });
     } catch {
       // Fallback to exact match

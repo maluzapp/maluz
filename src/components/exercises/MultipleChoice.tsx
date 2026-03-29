@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { fireCorrectConfetti } from './Confetti';
 import type { MultipleChoiceExercise, ExerciseAnswer } from '@/types/study';
 
 interface Props {
@@ -24,6 +25,7 @@ export function MultipleChoice({ exercise, index, onAnswer, readOnly, savedAnswe
     if (answered) return;
     setSelected(optIndex);
     const isCorrect = optIndex === exercise.correctIndex;
+    if (isCorrect) fireCorrectConfetti();
     onAnswer({ exerciseIndex: index, isCorrect, userAnswer: exercise.options[optIndex] });
   };
 
