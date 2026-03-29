@@ -42,6 +42,7 @@ export function FillBlank({ exercise, index, onAnswer, readOnly, savedAnswer }: 
       setIsCorrect(correct);
       setFeedback(fb);
       setAnswered(true);
+      if (correct) fireCorrectConfetti();
       onAnswer({ exerciseIndex: index, isCorrect: correct, userAnswer: value.trim() });
     } catch {
       // Fallback to exact match

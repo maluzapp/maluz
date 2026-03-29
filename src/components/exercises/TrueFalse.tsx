@@ -24,6 +24,7 @@ export function TrueFalse({ exercise, index, onAnswer, readOnly, savedAnswer }: 
     if (answered) return;
     setSelected(value);
     const isCorrect = value === exercise.correct;
+    if (isCorrect) fireCorrectConfetti();
     onAnswer({ exerciseIndex: index, isCorrect, userAnswer: value ? 'Verdadeiro' : 'Falso' });
   };
 

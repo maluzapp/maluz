@@ -25,6 +25,7 @@ export function MultipleChoice({ exercise, index, onAnswer, readOnly, savedAnswe
     if (answered) return;
     setSelected(optIndex);
     const isCorrect = optIndex === exercise.correctIndex;
+    if (isCorrect) fireCorrectConfetti();
     onAnswer({ exerciseIndex: index, isCorrect, userAnswer: exercise.options[optIndex] });
   };
 
