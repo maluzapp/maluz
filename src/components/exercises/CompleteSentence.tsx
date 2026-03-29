@@ -59,7 +59,7 @@ export function CompleteSentence({ exercise, index, onAnswer }: Props) {
               key={i}
               onClick={() => handleSelect(i)}
               disabled={submitted}
-              className={`rounded-lg border p-3 text-sm font-body text-foreground text-left transition-all ${cls}`}
+              className={`rounded-xl border-2 p-4 text-base font-body text-foreground text-left transition-all ${cls}`}
             >
               {opt}
               {submitted && isCorrectOpt && <Check className="inline h-4 w-4 text-success ml-1" />}

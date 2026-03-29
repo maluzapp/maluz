@@ -53,7 +53,7 @@ export function Ordering({ exercise, index, onAnswer }: Props) {
           return (
             <div
               key={itemIdx}
-              className={`flex items-center gap-2 rounded-lg border p-3 transition-all ${
+              className={`flex items-center gap-3 rounded-xl border-2 p-4 transition-all ${
                 isRight ? 'border-success bg-success/10' :
                 isWrong ? 'border-destructive bg-destructive/10' :
                 'border-border bg-card'

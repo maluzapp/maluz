@@ -90,7 +90,7 @@ export function ColumnClassification({ exercise, index, onAnswer }: Props) {
                       key={ci}
                       onClick={() => handleAssign(itemIdx, ci)}
                       disabled={submitted}
-                      className={`text-[10px] py-1 px-2 rounded-md border transition-all ${
+                      className={`text-xs py-1.5 px-3 rounded-lg border-2 transition-all ${
                         showCorrect ? 'border-success bg-success/20 text-success font-bold' :
                         isActive && !submitted ? 'border-primary bg-primary/20 text-primary font-bold' :
                         isActive && submitted ? 'border-destructive bg-destructive/20 text-destructive' :

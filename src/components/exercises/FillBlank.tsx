@@ -63,7 +63,7 @@ export function FillBlank({ exercise, index, onAnswer, readOnly, savedAnswer }: 
         <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary animate-fade-in">
           Preencher lacuna
         </div>
-        <div className="mb-5 text-lg font-bold text-foreground animate-fade-in" style={{ animationDelay: '100ms' }}>
+        <div className="mb-5 text-xl font-bold text-foreground animate-fade-in" style={{ animationDelay: '100ms' }}>
           {parts[0]}
           <span className={cn(
             'mx-1 inline-block min-w-[100px] border-b-3 px-1 text-center transition-all duration-500',

@@ -56,7 +56,7 @@ export function MultipleChoice({ exercise, index, onAnswer, readOnly, savedAnswe
                 )}
                 style={{ animationDelay: `${(i + 2) * 80}ms` }}
               >
-                <span className="mr-3 inline-flex h-7 w-7 items-center justify-center rounded-full bg-muted text-xs font-bold transition-colors">
+                <span className="mr-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-bold transition-colors">
                   {String.fromCharCode(65 + i)}
                 </span>
                 {opt}

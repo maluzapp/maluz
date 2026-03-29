@@ -49,7 +49,7 @@ export function TrueFalse({ exercise, index, onAnswer, readOnly, savedAnswer }: 
                 onClick={() => handleSelect(val)}
                 disabled={answered}
                 className={cn(
-                  'text-base font-bold h-16 rounded-xl transition-all duration-300 animate-fade-in hover:scale-[1.03] active:scale-[0.97]',
+                  'text-lg font-bold h-[72px] rounded-xl transition-all duration-300 animate-fade-in hover:scale-[1.03] active:scale-[0.97]',
                   answered && isCorrectAnswer && 'animate-bounce-in border-success bg-success/10 text-success shadow-md shadow-success/20',
                   answered && isSelected && !isCorrectAnswer && 'animate-shake border-destructive bg-destructive/10 text-destructive',
                   answered && !isSelected && !isCorrectAnswer && 'opacity-40 scale-95'
