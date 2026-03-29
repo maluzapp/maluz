@@ -66,6 +66,7 @@ const App = () => (
             <Route path="/creditos" element={<Credits />} />
             <Route path="/instalar" element={<Install />} />
             <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomNav />
