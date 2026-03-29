@@ -34,6 +34,7 @@ export default function Generate() {
   const { setConfig, setLoading } = useStudyStore();
   const [year, setYear] = useState<SchoolYear | ''>('');
   const activeProfileId = useProfileStore((s) => s.activeProfileId);
+  const { canStart } = useCanStartSession();
 
   useEffect(() => {
     if (!activeProfileId) return;
