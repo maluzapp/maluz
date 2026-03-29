@@ -54,7 +54,7 @@ export function ColumnClassification({ exercise, index, onAnswer }: Props) {
       {/* Column headers */}
       <div className="grid gap-2 mb-3" style={{ gridTemplateColumns: `repeat(${exercise.columns.length}, 1fr)` }}>
         {exercise.columns.map((col, ci) => (
-          <div key={ci} className="text-center text-xs font-bold font-display text-primary bg-primary/10 rounded-lg py-2">
+          <div key={ci} className="text-center text-sm font-bold font-display text-primary bg-primary/10 rounded-xl py-2.5">
             {col}
           </div>
         ))}
