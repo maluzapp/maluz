@@ -6,7 +6,7 @@ import { useProfileStore } from '@/hooks/useProfile';
 import lampadaIcon from '@/assets/lampada-2.png';
 
 const NAV_ITEMS_LEFT = [
-  { path: '/', icon: Home, label: 'Início' },
+  { path: '/inicio', icon: Home, label: 'Início' },
   { path: '/perfis', icon: Users, label: 'Perfis' },
 ];
 
