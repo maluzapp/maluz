@@ -56,6 +56,7 @@ const App = () => (
         <BrowserRouter>
           <ScrollToTop />
           <DynamicPwaBranding />
+          <UpdateModal />
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
