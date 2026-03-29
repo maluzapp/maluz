@@ -62,7 +62,7 @@ export default function Install() {
               <div className="text-4xl mb-3">✅</div>
               <p className="font-display font-bold text-foreground">App já instalado!</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Procure o ícone do StudyApp na tela inicial.
+                Procure o ícone do Maluz na tela inicial.
               </p>
             </CardContent>
           </Card>
