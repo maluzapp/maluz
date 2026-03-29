@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   ArrowLeft, Save, Palette, Type, Maximize, MessageCircle, FileText, Settings, Upload, Trash2,
   Share2, Users, Mail, Calendar, Shield, UserCheck, CreditCard, Crown, Star, Filter, X, Plus,
-  ChevronRight, Zap, LayoutDashboard
+  ChevronRight, Zap, LayoutDashboard, Menu
 } from 'lucide-react';
 import { useBrandingByCategory, useUpdateBranding, useIsAdmin } from '@/hooks/useBrandingSettings';
 import { supabase } from '@/integrations/supabase/client';
