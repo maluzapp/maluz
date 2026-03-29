@@ -43,8 +43,8 @@ export default function Profiles() {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const setActiveProfile = useProfileStore((s) => s.setActiveProfile);
-  const { data: stripeStatus } = useStripeSubscription();
-  const { data: dbSub } = useUserSubscription();
+  const { data: stripeStatus, isLoading: stripeLoading } = useStripeSubscription();
+  const { data: dbSub, isLoading: dbSubLoading } = useUserSubscription();
   const { data: plans } = usePlans();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [linkedChildren, setLinkedChildren] = useState<LinkedChild[]>([]);
