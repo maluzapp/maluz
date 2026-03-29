@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useStudyStore } from '@/store/study-store';
 import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
+import { incrementDailyUsage } from '@/hooks/useSubscription';
 import { getYearLabel } from '@/constants/years';
 import { cn } from '@/lib/utils';
 import { PerfectScoreConfetti, firePerfectScoreConfetti } from '@/components/exercises/Confetti';
