@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   ArrowLeft, Save, Palette, Type, Maximize, MessageCircle, FileText, Settings, Upload, Trash2,
   Share2, Users, Mail, Calendar, Shield, UserCheck, CreditCard, Crown, Star, Filter, X, Plus,
-  ChevronRight, Zap, LayoutDashboard
+  ChevronRight, Zap, LayoutDashboard, Menu
 } from 'lucide-react';
 import { useBrandingByCategory, useUpdateBranding, useIsAdmin } from '@/hooks/useBrandingSettings';
 import { supabase } from '@/integrations/supabase/client';
@@ -220,6 +220,7 @@ export default function Admin() {
   const [localValues, setLocalValues] = useState<Record<string, string>>({});
   const [logoTimestamps, setLogoTimestamps] = useState<Record<string, number>>({});
   const [activeSection, setActiveSection] = useState('general');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (allSettings) {
@@ -679,7 +680,37 @@ export default function Admin() {
         store_product_id_apple: vals.store_product_id_apple || null,
         is_active: vals.is_active,
       }).eq('id', planId);
-      if (error) { toast.error('Erro ao salvar: ' + error.message); } else { toast.success('Plano atualizado!'); }
+      if (error) { toast.error('Erro ao salvar: ' + error.message); return; }
+
+      // Sync to Stripe if it's a paid plan
+      const priceMonthly = parseFloat(vals.price_monthly) || 0;
+      if (priceMonthly > 0) {
+        try {
+          const { data: stripeResult, error: stripeError } = await supabase.functions.invoke('sync-plan-to-stripe', {
+            body: {
+              plan_slug: vals.slug,
+              name: vals.name,
+              price_monthly: priceMonthly,
+              price_yearly: vals.price_yearly ? parseFloat(vals.price_yearly) : null,
+            },
+          });
+          if (stripeError) {
+            toast.error('Plano salvo, mas erro ao sincronizar com Stripe: ' + stripeError.message);
+          } else if (stripeResult?.monthly_price_id) {
+            // Update stripe_price_id in DB
+            await supabase.from('subscription_plans').update({
+              stripe_price_id: stripeResult.monthly_price_id,
+            }).eq('id', planId);
+            toast.success('Plano atualizado e sincronizado com Stripe!');
+          } else {
+            toast.success('Plano atualizado e sincronizado com Stripe!');
+          }
+        } catch (err: any) {
+          toast.error('Plano salvo, mas erro Stripe: ' + (err.message || 'desconhecido'));
+        }
+      } else {
+        toast.success('Plano atualizado!');
+      }
     };
 
     const setVal = (planId: string, key: string, value: any) => {
@@ -786,9 +817,29 @@ export default function Admin() {
   // RENDER — Sidebar + Content
   // ═══════════════════════════════════════════════════════════
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div className="min-h-screen bg-background text-foreground flex relative">
+      {/* Mobile header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center gap-3 px-4 py-3 bg-background/95 backdrop-blur-xl border-b border-primary/15">
+        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-1.5 rounded-lg hover:bg-primary/10">
+          <Menu className="h-5 w-5 text-primary" />
+        </button>
+        <div className="flex items-center gap-2">
+          <LayoutDashboard className="h-4 w-4 text-primary" />
+          <h1 className="font-display text-sm font-bold text-foreground">Painel Admin</h1>
+        </div>
+      </div>
+
+      {/* Sidebar overlay on mobile */}
+      {sidebarOpen && (
+        <div className="md:hidden fixed inset-0 z-40 bg-black/50" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-56 xl:w-64 shrink-0 border-r border-primary/15 bg-card/30 flex flex-col sticky top-0 h-screen">
+      <aside className={cn(
+        'w-56 xl:w-64 shrink-0 border-r border-primary/15 bg-card/30 flex flex-col h-screen',
+        'fixed md:sticky top-0 z-40 transition-transform duration-200',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+      )}>
         <div className="p-4 border-b border-primary/15">
           <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity mb-3">
             <ArrowLeft className="h-4 w-4" />
@@ -808,7 +859,7 @@ export default function Admin() {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveSection(item.id)}
+                onClick={() => { setActiveSection(item.id); setSidebarOpen(false); }}
                 className={cn(
                   'w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition-all',
                   isActive
@@ -826,8 +877,8 @@ export default function Admin() {
       </aside>
 
       {/* Content area */}
-      <main className="flex-1 min-h-screen overflow-y-auto">
-        <div className="p-6 lg:p-8 xl:p-10 max-w-6xl">
+      <main className="flex-1 min-h-screen overflow-y-auto pt-14 md:pt-0">
+        <div className="p-4 md:p-6 lg:p-8 xl:p-10 max-w-6xl">
           {activeSection === 'general' && <SectionPanel fields={GENERAL_FIELDS} icon={<Settings className="h-5 w-5 text-primary" />} title="Configurações Gerais" />}
           {activeSection === 'colors' && <SectionPanel fields={COLOR_FIELDS} icon={<Palette className="h-5 w-5 text-primary" />} title="Paleta de Cores" />}
           {activeSection === 'typography' && <SectionPanel fields={TYPO_FIELDS} icon={<Type className="h-5 w-5 text-primary" />} title="Tipografia" />}
