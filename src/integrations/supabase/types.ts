@@ -38,6 +38,38 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_usage: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string
+          sessions_count: number
+          usage_date: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id: string
+          sessions_count?: number
+          usage_date?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string
+          sessions_count?: number
+          usage_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_usage_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invite_codes: {
         Row: {
           code: string
@@ -217,6 +249,57 @@ export type Database = {
           },
         ]
       }
+      subscription_plans: {
+        Row: {
+          created_at: string
+          daily_session_limit: number
+          features: Json
+          id: string
+          is_active: boolean
+          max_profiles: number
+          name: string
+          price_monthly: number
+          price_weekly: number | null
+          price_yearly: number | null
+          slug: string
+          sort_order: number
+          store_product_id_apple: string | null
+          store_product_id_google: string | null
+        }
+        Insert: {
+          created_at?: string
+          daily_session_limit?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          max_profiles?: number
+          name: string
+          price_monthly?: number
+          price_weekly?: number | null
+          price_yearly?: number | null
+          slug: string
+          sort_order?: number
+          store_product_id_apple?: string | null
+          store_product_id_google?: string | null
+        }
+        Update: {
+          created_at?: string
+          daily_session_limit?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          max_profiles?: number
+          name?: string
+          price_monthly?: number
+          price_weekly?: number | null
+          price_yearly?: number | null
+          slug?: string
+          sort_order?: number
+          store_product_id_apple?: string | null
+          store_product_id_google?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -234,6 +317,56 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          billing_period: string
+          cancelled_at: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          plan_id: string
+          started_at: string
+          status: string
+          store_provider: string | null
+          store_transaction_id: string | null
+          user_id: string
+        }
+        Insert: {
+          billing_period?: string
+          cancelled_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_id: string
+          started_at?: string
+          status?: string
+          store_provider?: string | null
+          store_transaction_id?: string | null
+          user_id: string
+        }
+        Update: {
+          billing_period?: string
+          cancelled_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_id?: string
+          started_at?: string
+          status?: string
+          store_provider?: string | null
+          store_transaction_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
