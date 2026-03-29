@@ -419,6 +419,18 @@ export type Database = {
     }
     Functions: {
       can_view_profile: { Args: { _profile_id: string }; Returns: boolean }
+      find_profile_by_friend_code: {
+        Args: { _code: string }
+        Returns: {
+          avatar_emoji: string
+          friend_code: string
+          id: string
+          level: number
+          name: string
+          streak_days: number
+          xp: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
