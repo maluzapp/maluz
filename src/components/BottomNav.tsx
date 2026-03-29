@@ -73,13 +73,13 @@ export function BottomNav() {
         {NAV_ITEMS_LEFT.map(renderItem)}
 
         {/* Center lamp button */}
-        <div className="flex items-center justify-center" style={{ width: '72px' }}>
+        <div className="flex items-center justify-center" style={{ width: '88px' }}>
           <button
             onClick={handleLampClick}
             className={cn(
-              'absolute -top-6 flex items-center justify-center w-14 h-14 rounded-full border-4 border-card/95 transition-all duration-300',
+              'absolute -top-10 flex items-center justify-center w-[72px] h-[72px] rounded-full border-4 border-card/95 transition-all duration-300',
               isGeneratePage || lampLit
-                ? 'bg-primary shadow-[0_0_20px_hsl(var(--primary)/0.5)] scale-110'
+                ? 'bg-primary shadow-[0_0_24px_hsl(var(--primary)/0.5)] scale-110'
                 : 'bg-card hover:bg-primary/20 shadow-lg'
             )}
           >
@@ -87,8 +87,8 @@ export function BottomNav() {
               src={lampadaIcon}
               alt="Gerar exercícios"
               className={cn(
-                'h-9 w-9 object-contain transition-all duration-300',
-                (isGeneratePage || lampLit) ? 'brightness-150 drop-shadow-[0_0_8px_rgba(245,200,66,0.8)]' : 'opacity-70'
+                'h-12 w-12 object-contain transition-all duration-300',
+                (isGeneratePage || lampLit) ? 'brightness-150 drop-shadow-[0_0_10px_rgba(245,200,66,0.8)]' : 'opacity-70'
               )}
             />
           </button>
