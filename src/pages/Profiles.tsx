@@ -441,8 +441,19 @@ export default function Profiles() {
                       size="sm"
                       className="gap-1.5 flex-1"
                       onClick={async () => {
-                        try { await openCustomerPortal(); }
-                        catch { toast.error('Erro ao abrir portal'); }
+                        try {
+                          const result = await openCustomerPortal();
+                          if (!result?.url) {
+                            toast.error('Você ainda não tem uma assinatura ativa no Stripe. Assine um plano primeiro.');
+                          }
+                        } catch (err: any) {
+                          const msg = err?.message || '';
+                          if (msg.includes('No Stripe customer')) {
+                            toast.error('Você ainda não tem uma assinatura. Assine um plano primeiro.');
+                          } else {
+                            toast.error('Erro ao abrir portal de assinatura');
+                          }
+                        }
                       }}
                     >
                       <CreditCard className="h-3.5 w-3.5" /> Gerenciar assinatura
