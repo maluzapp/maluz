@@ -50,7 +50,7 @@ export default function Install() {
 
         <div className="text-center mb-6">
           <div className="text-5xl mb-3">📲</div>
-          <h1 className="font-display text-2xl font-bold text-foreground">Instalar StudyApp</h1>
+          <h1 className="font-display text-2xl font-bold text-foreground">Instalar Maluz</h1>
           <p className="text-muted-foreground mt-2">
             Instale no celular para usar como um app de verdade!
           </p>
@@ -62,7 +62,7 @@ export default function Install() {
               <div className="text-4xl mb-3">✅</div>
               <p className="font-display font-bold text-foreground">App já instalado!</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Procure o ícone do StudyApp na tela inicial.
+                Procure o ícone do Maluz na tela inicial.
               </p>
             </CardContent>
           </Card>
