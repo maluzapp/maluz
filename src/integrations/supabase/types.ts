@@ -426,6 +426,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_friend: { Args: { _profile_id: string }; Returns: boolean }
       owns_profile: { Args: { _profile_id: string }; Returns: boolean }
     }
     Enums: {
