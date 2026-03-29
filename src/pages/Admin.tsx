@@ -116,6 +116,7 @@ const NAV_ITEMS = [
   { id: 'voice', label: 'Voz', icon: MessageCircle },
   { id: 'landing', label: 'Landing', icon: FileText },
   { id: 'share', label: 'Compartilhar', icon: Share2 },
+  { id: 'email', label: 'Emails', icon: Mail },
   { id: 'users', label: 'Usuários', icon: Users },
   { id: 'plans', label: 'Planos', icon: CreditCard },
 ];
