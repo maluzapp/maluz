@@ -20,7 +20,7 @@ export default function Confirmation() {
 
   useEffect(() => {
     if (!config) {
-      navigate('/');
+      navigate('/inicio');
       return;
     }
     if (!summary) {
