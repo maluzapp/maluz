@@ -289,7 +289,7 @@ export default function Results() {
   };
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 pb-24 md:py-12">
+    <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36">
       <div className="mx-auto max-w-lg">
         {hasActiveSession ? (
           <>

@@ -364,7 +364,7 @@ export default function Profiles() {
   );
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 pb-36">
+    <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36">
       <div className="mx-auto max-w-md">
         <div className="flex items-center justify-between mb-6">
           <div>
