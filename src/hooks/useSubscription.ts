@@ -17,6 +17,7 @@ export interface SubscriptionPlan {
   sort_order: number;
   store_product_id_google: string | null;
   store_product_id_apple: string | null;
+  stripe_price_id: string | null;
 }
 
 export interface UserSubscription {
@@ -30,6 +31,20 @@ export interface UserSubscription {
   expires_at: string | null;
   plan?: SubscriptionPlan;
 }
+
+// Stripe price → plan slug mapping
+export const STRIPE_PRICES: Record<string, { slug: string; period: 'monthly' | 'yearly' }> = {
+  'price_1TGJVgEWUivwufDD8qFByYML': { slug: 'pro', period: 'monthly' },
+  'price_1TGJWvEWUivwufDD6lWAQJIk': { slug: 'pro', period: 'yearly' },
+  'price_1TGJX3EWUivwufDDIy281CCo': { slug: 'familia', period: 'monthly' },
+  'price_1TGJX4EWUivwufDDp2uoTWVo': { slug: 'familia', period: 'yearly' },
+};
+
+// Yearly price IDs per plan slug
+export const STRIPE_YEARLY_PRICES: Record<string, string> = {
+  pro: 'price_1TGJWvEWUivwufDD6lWAQJIk',
+  familia: 'price_1TGJX4EWUivwufDDp2uoTWVo',
+};
 
 export function usePlans() {
   return useQuery({
@@ -64,6 +79,27 @@ export function useUserSubscription() {
   });
 }
 
+export interface StripeSubscriptionStatus {
+  subscribed: boolean;
+  price_id?: string;
+  product_id?: string;
+  subscription_end?: string;
+}
+
+export function useStripeSubscription() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ['stripe_subscription', user?.id],
+    enabled: !!user,
+    refetchInterval: 60_000, // Poll every 60s
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('check-stripe-subscription');
+      if (error) throw error;
+      return data as StripeSubscriptionStatus;
+    },
+  });
+}
+
 export function useDailyUsage() {
   const profileId = useProfileStore((s) => s.activeProfileId);
   return useQuery({
@@ -85,23 +121,29 @@ export function useDailyUsage() {
 
 export function useCanStartSession() {
   const { data: subscription } = useUserSubscription();
+  const { data: stripeStatus } = useStripeSubscription();
   const { data: usage } = useDailyUsage();
 
-  // If user has active pro/familia subscription, unlimited
-  if (subscription?.plan?.daily_session_limit === -1) {
-    return { canStart: true, sessionsUsed: usage?.sessions_count ?? 0, limit: -1, plan: subscription.plan };
+  // If Stripe says subscribed → unlimited
+  if (stripeStatus?.subscribed) {
+    const priceInfo = stripeStatus.price_id ? STRIPE_PRICES[stripeStatus.price_id] : null;
+    return { canStart: true, sessionsUsed: usage?.sessions_count ?? 0, limit: -1, planSlug: priceInfo?.slug ?? 'pro' };
   }
 
-  // Free tier: 3 sessions per day
+  // If DB subscription is active with unlimited
+  if (subscription?.plan?.daily_session_limit === -1) {
+    return { canStart: true, sessionsUsed: usage?.sessions_count ?? 0, limit: -1, planSlug: subscription.plan.slug };
+  }
+
+  // Free tier
   const limit = subscription?.plan?.daily_session_limit ?? 3;
   const used = usage?.sessions_count ?? 0;
-  return { canStart: used < limit, sessionsUsed: used, limit, plan: subscription?.plan ?? null };
+  return { canStart: used < limit, sessionsUsed: used, limit, planSlug: subscription?.plan?.slug ?? 'free' };
 }
 
 export async function incrementDailyUsage(profileId: string) {
   const today = new Date().toISOString().split('T')[0];
   
-  // Try to update existing record
   const { data: existing } = await supabase
     .from('daily_usage')
     .select('id, sessions_count')
@@ -119,4 +161,24 @@ export async function incrementDailyUsage(profileId: string) {
       .from('daily_usage')
       .insert({ profile_id: profileId, usage_date: today, sessions_count: 1 });
   }
+}
+
+export async function startCheckout(priceId: string) {
+  const { data, error } = await supabase.functions.invoke('create-checkout', {
+    body: { price_id: priceId },
+  });
+  if (error) throw error;
+  if (data?.url) {
+    window.open(data.url, '_blank');
+  }
+  return data;
+}
+
+export async function openCustomerPortal() {
+  const { data, error } = await supabase.functions.invoke('customer-portal');
+  if (error) throw error;
+  if (data?.url) {
+    window.open(data.url, '_blank');
+  }
+  return data;
 }

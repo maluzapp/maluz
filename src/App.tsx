@@ -21,6 +21,7 @@ import Admin from "./pages/Admin";
 import Install from "./pages/Install";
 import SessionReview from "./pages/SessionReview";
 import ResetPassword from "./pages/ResetPassword";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 import type { ReactNode } from "react";
 
@@ -67,6 +68,7 @@ const App = () => (
             <Route path="/instalar" element={<Install />} />
             <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/pagamento-sucesso" element={<RequireAuth><PaymentSuccess /></RequireAuth>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomNav />
