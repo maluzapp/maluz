@@ -341,6 +341,35 @@ export default function Landing() {
 
       <hr className="border-primary/15" />
 
+      {/* App Stores */}
+      <section className="py-16 md:py-20 px-5">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="font-mono text-[0.64rem] tracking-[0.22em] uppercase text-primary/70 mb-3">Disponibilidade</p>
+          <h2 className="font-display text-3xl md:text-5xl font-bold mb-4 text-foreground">
+            Em breve nas <em className="text-primary">melhores lojas</em>
+          </h2>
+          <p className="text-sm text-foreground/60 mb-8 max-w-md mx-auto">
+            {t('stores_description', 'A Maluz está sendo preparada com carinho para chegar ao Google Play e à App Store. Enquanto isso, acesse pelo navegador!')}
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="relative group cursor-default">
+              <GooglePlayBadge className="w-[160px] h-[48px] text-foreground opacity-50 group-hover:opacity-80 transition-opacity" />
+              <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[9px] font-bold px-2 py-0.5 rounded-full font-mono uppercase tracking-wider">
+                Em breve
+              </span>
+            </div>
+            <div className="relative group cursor-default">
+              <AppStoreBadge className="w-[160px] h-[48px] text-foreground opacity-50 group-hover:opacity-80 transition-opacity" />
+              <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[9px] font-bold px-2 py-0.5 rounded-full font-mono uppercase tracking-wider">
+                Em breve
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr className="border-primary/15" />
+
       {/* CTA */}
       <section className="py-20 px-5 text-center">
         <div className="max-w-lg mx-auto">
