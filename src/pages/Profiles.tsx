@@ -394,6 +394,7 @@ export default function Profiles() {
         {/* Meu Plano card */}
         {(() => {
           const isPro = !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
+          const hasStripePortal = !!stripeStatus?.subscribed;
           const currentPlanSlug = isPro
             ? (stripeStatus?.price_id
               ? (stripeStatus.price_id.includes('familia') ? 'familia' : 'pro')
@@ -436,34 +437,34 @@ export default function Profiles() {
 
                 <div className="flex gap-2">
                   {isPro ? (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-1.5 flex-1"
-                      onClick={async () => {
-                        try {
-                          const result = await openCustomerPortal();
-                          if (!result?.url) {
-                            toast('Você ainda não tem assinatura ativa.', {
-                              description: 'Assine um plano para gerenciar sua conta.',
-                              action: { label: 'Ver planos', onClick: () => navigate('/') },
-                            });
+                    hasStripePortal ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5 flex-1"
+                        onClick={async () => {
+                          try {
+                            const result = await openCustomerPortal();
+                            if (!result?.url) {
+                              toast.error('Não foi possível abrir o portal agora.');
+                            }
+                          } catch {
+                            toast.error('Não foi possível abrir o portal agora.');
                           }
-                        } catch (err: any) {
-                          const msg = typeof err?.message === 'string' ? err.message : String(err);
-                          if (msg.includes('No Stripe customer') || msg.includes('customer')) {
-                            toast('Você ainda não tem assinatura ativa.', {
-                              description: 'Assine um plano para gerenciar sua conta.',
-                              action: { label: 'Ver planos', onClick: () => navigate('/') },
-                            });
-                          } else {
-                            toast.error('Erro ao abrir portal. Tente novamente.');
-                          }
-                        }
-                      }}
-                    >
-                      <CreditCard className="h-3.5 w-3.5" /> Gerenciar assinatura
-                    </Button>
+                        }}
+                      >
+                        <CreditCard className="h-3.5 w-3.5" /> Gerenciar assinatura
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5 flex-1"
+                        onClick={() => navigate('/#planos')}
+                      >
+                        <ArrowUpRight className="h-3.5 w-3.5" /> Ver planos
+                      </Button>
+                    )
                   ) : (
                     <>
                       <Button
