@@ -48,7 +48,7 @@ export function ColumnClassification({ exercise, index, onAnswer }: Props) {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="font-display text-lg font-bold text-foreground mb-1">Classifique os itens</h2>
+      <h2 className="font-display text-xl font-bold text-foreground mb-1">Classifique os itens</h2>
       <p className="text-sm text-muted-foreground mb-3">{exercise.question}</p>
 
       {/* Column headers */}
