@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Users, Trophy, Heart } from 'lucide-react';
+import { Home, Users, Trophy, Heart, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProfileStore } from '@/hooks/useProfile';
 import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests';
