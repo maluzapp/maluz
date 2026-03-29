@@ -72,7 +72,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-3 bg-background/93 backdrop-blur-xl border-b border-primary/15">
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-3 bg-background/95 backdrop-blur-xl border-b border-primary/15">
         <a href="#" className="font-display text-xl font-bold text-foreground">Ma<span className="text-primary italic">luz</span></a>
         <div className="hidden md:flex items-center gap-6">
           <a href="#diferenciais" className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/50 hover:text-primary transition-colors">Diferenciais</a>
@@ -80,7 +80,6 @@ export default function Landing() {
           <a href="#planos" className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/50 hover:text-primary transition-colors">Planos</a>
         </div>
         <div className="flex items-center gap-4">
-          <a href="#planos" className="hidden md:inline-block text-xs font-mono tracking-[0.1em] uppercase text-foreground/40 hover:text-primary transition-colors">Preços</a>
           <Link to="/login" className="text-xs font-mono tracking-[0.12em] uppercase bg-primary text-primary-foreground px-4 py-1.5 rounded-full hover:opacity-90 transition-all">
             Entrar
           </Link>

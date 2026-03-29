@@ -176,9 +176,18 @@ export async function startCheckout(priceId: string) {
 
 export async function openCustomerPortal() {
   const { data, error } = await supabase.functions.invoke('customer-portal');
-  if (error) throw error;
+  if (error) {
+    // Check if the error contains the actual response with an error message
+    if (typeof error === 'object' && 'message' in error) {
+      throw new Error(error.message);
+    }
+    throw error;
+  }
+  if (data?.error) {
+    throw new Error(data.error);
+  }
   if (data?.url) {
-    window.open(data.url, '_blank');
+    window.location.href = data.url;
   }
   return data;
 }

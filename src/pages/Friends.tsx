@@ -260,7 +260,7 @@ export default function Friends() {
   }
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 pb-36 animate-fade-in">
+    <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36 animate-fade-in">
       <div className="mx-auto max-w-lg space-y-5">
         {/* Header */}
         <div>

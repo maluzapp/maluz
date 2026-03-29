@@ -100,7 +100,7 @@ export default function SessionReview() {
   };
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 pb-24">
+    <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36">
       <div className="mx-auto max-w-lg">
         <Button variant="ghost" className="mb-4 gap-2" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-4 w-4" /> Voltar

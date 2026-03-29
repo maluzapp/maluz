@@ -264,7 +264,7 @@ export default function Profiles() {
       : 0;
 
     return (
-      <div className="min-h-screen bg-background px-4 py-6 pb-36">
+      <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36">
         <div className="mx-auto max-w-md">
           <Button variant="ghost" className="mb-4 gap-2" onClick={() => setViewingChild(null)}>
             ← Voltar
@@ -364,7 +364,7 @@ export default function Profiles() {
   );
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 pb-36">
+    <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36">
       <div className="mx-auto max-w-md">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -441,8 +441,19 @@ export default function Profiles() {
                       size="sm"
                       className="gap-1.5 flex-1"
                       onClick={async () => {
-                        try { await openCustomerPortal(); }
-                        catch { toast.error('Erro ao abrir portal'); }
+                        try {
+                          const result = await openCustomerPortal();
+                          if (!result?.url) {
+                            toast.error('Você ainda não tem uma assinatura ativa no Stripe. Assine um plano primeiro.');
+                          }
+                        } catch (err: any) {
+                          const msg = err?.message || '';
+                          if (msg.includes('No Stripe customer')) {
+                            toast.error('Você ainda não tem uma assinatura. Assine um plano primeiro.');
+                          } else {
+                            toast.error('Erro ao abrir portal de assinatura');
+                          }
+                        }
                       }}
                     >
                       <CreditCard className="h-3.5 w-3.5" /> Gerenciar assinatura

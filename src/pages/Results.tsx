@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, XCircle, CheckCircle, Share2, Star, History, BookOpen, Trophy, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -190,9 +190,11 @@ export default function Results() {
   const total = exercises.length;
   const pct = total > 0 ? Math.round((score / total) * 100) : 0;
 
-  // Save results once
+  // Save results once - use ref to prevent React strict mode double-save
+  const savingRef = React.useRef(false);
   useEffect(() => {
-    if (saved || !config || !profileId || total === 0) return;
+    if (saved || savingRef.current || !config || !profileId || total === 0) return;
+    savingRef.current = true;
     const xp = calcXP(score, total);
     setXpEarned(xp);
 
@@ -287,7 +289,7 @@ export default function Results() {
   };
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 pb-24 md:py-12">
+    <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36">
       <div className="mx-auto max-w-lg">
         {hasActiveSession ? (
           <>
