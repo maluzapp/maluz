@@ -109,7 +109,7 @@ export default function Profiles() {
     const childIds = (links as any[]).map((link: any) => link.child_profile_id);
     const { data: children } = await supabase
       .from('profiles')
-      .select('id, name, avatar_emoji, school_year, xp, level, streak_days, profile_type, total_exercises, total_correct')
+      .select('id, name, avatar_emoji, school_year, xp, level, streak_days, profile_type, total_exercises, total_correct, friend_code')
       .in('id', childIds);
 
     return (links as any[])
