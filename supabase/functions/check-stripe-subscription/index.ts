@@ -64,15 +64,24 @@ serve(async (req) => {
     }
 
     const sub = subscriptions.data[0];
-    const priceId = sub.items.data[0].price.id;
-    const productId = sub.items.data[0].price.product as string;
+    const price = sub.items.data[0].price;
+    const priceId = price.id;
+    const productId = price.product as string;
     const subscriptionEnd = new Date(sub.current_period_end * 1000).toISOString();
-    logStep("Active subscription found", { priceId, productId, subscriptionEnd });
+
+    // Read plan_slug and period from price metadata (set by sync-plan-to-stripe)
+    const planSlug = (price.metadata?.plan_slug as string) || null;
+    const billingPeriod = (price.metadata?.period as string) || 
+      (price.recurring?.interval === "year" ? "yearly" : "monthly");
+
+    logStep("Active subscription found", { priceId, productId, planSlug, billingPeriod, subscriptionEnd });
 
     return new Response(JSON.stringify({
       subscribed: true,
       price_id: priceId,
       product_id: productId,
+      plan_slug: planSlug,
+      billing_period: billingPeriod,
       subscription_end: subscriptionEnd,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
