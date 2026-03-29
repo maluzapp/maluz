@@ -43,7 +43,7 @@ export function Ordering({ exercise, index, onAnswer }: Props) {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="font-display text-lg font-bold text-foreground mb-1">Ordene corretamente</h2>
+      <h2 className="font-display text-xl font-bold text-foreground mb-1">Ordene corretamente</h2>
       <p className="text-sm text-muted-foreground mb-4">{exercise.question}</p>
 
       <div className="space-y-2 mb-4">
