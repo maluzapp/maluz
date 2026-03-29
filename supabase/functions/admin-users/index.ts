@@ -44,20 +44,35 @@ Deno.serve(async (req) => {
 
     if (listError) throw listError;
 
-    // Get profiles for all users
+    // Get profiles, roles, and subscriptions for all users
     const userIds = users.map(u => u.id);
     const { data: profiles } = await adminClient.from("profiles").select("*").in("user_id", userIds);
     const { data: roles } = await adminClient.from("user_roles").select("*").in("user_id", userIds);
+    const { data: subscriptions } = await adminClient
+      .from("user_subscriptions")
+      .select("*, plan:subscription_plans(*)")
+      .in("user_id", userIds);
 
-    const enriched = users.map(u => ({
-      id: u.id,
-      email: u.email,
-      created_at: u.created_at,
-      last_sign_in_at: u.last_sign_in_at,
-      email_confirmed_at: u.email_confirmed_at,
-      profiles: profiles?.filter(p => p.user_id === u.id) || [],
-      roles: roles?.filter(r => r.user_id === u.id).map(r => r.role) || [],
-    }));
+    const enriched = users.map(u => {
+      const userSubs = subscriptions?.filter(s => s.user_id === u.id) || [];
+      const activeSub = userSubs.find(s => s.status === "active");
+      return {
+        id: u.id,
+        email: u.email,
+        created_at: u.created_at,
+        last_sign_in_at: u.last_sign_in_at,
+        email_confirmed_at: u.email_confirmed_at,
+        profiles: profiles?.filter(p => p.user_id === u.id) || [],
+        roles: roles?.filter(r => r.user_id === u.id).map(r => r.role) || [],
+        subscription: activeSub ? {
+          status: activeSub.status,
+          billing_period: activeSub.billing_period,
+          expires_at: activeSub.expires_at,
+          plan_name: activeSub.plan?.name || null,
+          plan_slug: activeSub.plan?.slug || null,
+        } : null,
+      };
+    });
 
     return new Response(JSON.stringify({ users: enriched, total: users.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
