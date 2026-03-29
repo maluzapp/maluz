@@ -680,7 +680,37 @@ export default function Admin() {
         store_product_id_apple: vals.store_product_id_apple || null,
         is_active: vals.is_active,
       }).eq('id', planId);
-      if (error) { toast.error('Erro ao salvar: ' + error.message); } else { toast.success('Plano atualizado!'); }
+      if (error) { toast.error('Erro ao salvar: ' + error.message); return; }
+
+      // Sync to Stripe if it's a paid plan
+      const priceMonthly = parseFloat(vals.price_monthly) || 0;
+      if (priceMonthly > 0) {
+        try {
+          const { data: stripeResult, error: stripeError } = await supabase.functions.invoke('sync-plan-to-stripe', {
+            body: {
+              plan_slug: vals.slug,
+              name: vals.name,
+              price_monthly: priceMonthly,
+              price_yearly: vals.price_yearly ? parseFloat(vals.price_yearly) : null,
+            },
+          });
+          if (stripeError) {
+            toast.error('Plano salvo, mas erro ao sincronizar com Stripe: ' + stripeError.message);
+          } else if (stripeResult?.monthly_price_id) {
+            // Update stripe_price_id in DB
+            await supabase.from('subscription_plans').update({
+              stripe_price_id: stripeResult.monthly_price_id,
+            }).eq('id', planId);
+            toast.success('Plano atualizado e sincronizado com Stripe!');
+          } else {
+            toast.success('Plano atualizado e sincronizado com Stripe!');
+          }
+        } catch (err: any) {
+          toast.error('Plano salvo, mas erro Stripe: ' + (err.message || 'desconhecido'));
+        }
+      } else {
+        toast.success('Plano atualizado!');
+      }
     };
 
     const setVal = (planId: string, key: string, value: any) => {
