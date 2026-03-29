@@ -164,7 +164,7 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
         <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">
           Associação
         </div>
-        <h2 className="mb-2 text-lg font-bold text-foreground">
+        <h2 className="mb-2 text-xl font-bold text-foreground">
           Conecte os conceitos relacionados
         </h2>
         <p className="mb-4 text-xs text-muted-foreground">
