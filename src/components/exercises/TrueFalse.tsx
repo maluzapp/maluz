@@ -34,7 +34,7 @@ export function TrueFalse({ exercise, index, onAnswer, readOnly, savedAnswer }: 
         <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary animate-fade-in">
           Verdadeiro ou Falso
         </div>
-        <h2 className="mb-6 text-lg font-bold text-foreground animate-fade-in" style={{ animationDelay: '100ms' }}>
+        <h2 className="mb-6 text-xl font-bold text-foreground animate-fade-in" style={{ animationDelay: '100ms' }}>
           {exercise.statement}
         </h2>
         <div className="grid grid-cols-2 gap-3">
