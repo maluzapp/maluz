@@ -70,6 +70,45 @@ export type Database = {
           },
         ]
       }
+      friendships: {
+        Row: {
+          created_at: string
+          id: string
+          requester_profile_id: string
+          status: string
+          target_profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          requester_profile_id: string
+          status?: string
+          target_profile_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          requester_profile_id?: string
+          status?: string
+          target_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friendships_requester_profile_id_fkey"
+            columns: ["requester_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friendships_target_profile_id_fkey"
+            columns: ["target_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invite_codes: {
         Row: {
           code: string
@@ -155,6 +194,7 @@ export type Database = {
         Row: {
           avatar_emoji: string
           created_at: string
+          friend_code: string | null
           id: string
           last_study_date: string | null
           level: number
@@ -170,6 +210,7 @@ export type Database = {
         Insert: {
           avatar_emoji?: string
           created_at?: string
+          friend_code?: string | null
           id?: string
           last_study_date?: string | null
           level?: number
@@ -185,6 +226,7 @@ export type Database = {
         Update: {
           avatar_emoji?: string
           created_at?: string
+          friend_code?: string | null
           id?: string
           last_study_date?: string | null
           level?: number
