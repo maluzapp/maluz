@@ -103,10 +103,16 @@ export default function PricingSection() {
                   ? 'bg-primary-foreground/20 text-primary-foreground'
                   : 'bg-accent/20 text-accent'
               }`}>
-                -44%
+                Economia
               </span>
             </button>
           </div>
+
+          <p className="text-xs text-foreground/50 mt-3">
+            {billingPeriod === 'monthly'
+              ? 'Cobrança mensal • cancele quando quiser'
+              : 'Cobrança anual única • economize até 44%'}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 items-start">
@@ -122,6 +128,9 @@ export default function PricingSection() {
             const monthlyEquiv = billingPeriod === 'yearly' && plan.price_yearly
               ? plan.price_yearly / 12
               : null;
+            const savingsPercent = plan.price_yearly && plan.price_monthly > 0
+              ? Math.round(100 - (plan.price_yearly / (plan.price_monthly * 12)) * 100)
+              : 0;
 
             return (
               <div
@@ -151,23 +160,38 @@ export default function PricingSection() {
                 <div className="mb-5">
                   {displayPrice > 0 ? (
                     <>
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-xs text-foreground/50">R$</span>
-                        <span className="font-display text-4xl font-black text-foreground">
-                          {displayPrice.toFixed(2).replace('.', ',')}
-                        </span>
-                        <span className="text-xs text-foreground/50">
-                          /{billingPeriod === 'yearly' ? 'ano' : 'mês'}
-                        </span>
-                      </div>
-                      {monthlyEquiv && (
-                        <p className="text-[0.7rem] text-accent mt-1 font-mono">
-                          R$ {monthlyEquiv.toFixed(2).replace('.', ',')}/mês
-                        </p>
+                      {billingPeriod === 'yearly' && plan.price_yearly ? (
+                        <>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-xs text-foreground/50">R$</span>
+                            <span className="font-display text-4xl font-black text-foreground">
+                              {monthlyEquiv!.toFixed(2).replace('.', ',')}
+                            </span>
+                            <span className="text-xs text-foreground/50">/mês</span>
+                          </div>
+                          <p className="text-[0.7rem] text-foreground/50 mt-1">
+                            Cobrado R$ {plan.price_yearly.toFixed(2).replace('.', ',')} por ano
+                          </p>
+                          {savingsPercent > 0 && (
+                            <p className="text-[0.7rem] text-accent mt-0.5 font-bold font-mono">
+                              Economia de {savingsPercent}% vs mensal
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-xs text-foreground/50">R$</span>
+                            <span className="font-display text-4xl font-black text-foreground">
+                              {displayPrice.toFixed(2).replace('.', ',')}
+                            </span>
+                            <span className="text-xs text-foreground/50">/mês</span>
+                          </div>
+                          <p className="text-[0.65rem] text-foreground/40 mt-1">
+                            Menos de R$ {(plan.price_monthly / 30).toFixed(2).replace('.', ',')} por dia
+                          </p>
+                        </>
                       )}
-                      <p className="text-[0.65rem] text-foreground/40 mt-1">
-                        Menos de R$ {((billingPeriod === 'yearly' && plan.price_yearly ? plan.price_yearly / 365 : plan.price_monthly / 30)).toFixed(2).replace('.', ',')} por dia
-                      </p>
                     </>
                   ) : (
                     <div className="flex items-baseline gap-1">
