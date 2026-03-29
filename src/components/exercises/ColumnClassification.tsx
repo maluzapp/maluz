@@ -78,8 +78,8 @@ export function ColumnClassification({ exercise, index, onAnswer }: Props) {
               }`}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-sm font-body text-foreground flex-1">{item.text}</span>
-                {submitted && (rightAnswer ? <Check className="h-4 w-4 text-success shrink-0" /> : wrongAnswer ? <X className="h-4 w-4 text-destructive shrink-0" /> : null)}
+                <span className="text-base font-body text-foreground flex-1">{item.text}</span>
+                {submitted && (rightAnswer ? <Check className="h-5 w-5 text-success shrink-0" /> : wrongAnswer ? <X className="h-5 w-5 text-destructive shrink-0" /> : null)}
               </div>
               <div className="grid gap-1.5 mt-2" style={{ gridTemplateColumns: `repeat(${exercise.columns.length}, 1fr)` }}>
                 {exercise.columns.map((col, ci) => {
