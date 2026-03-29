@@ -177,16 +177,15 @@ export default function Friends() {
       return;
     }
 
-    const { data: target } = await supabase
-      .from('profiles')
-      .select('id, name, avatar_emoji')
-      .eq('friend_code', code)
-      .single();
+    const { data: targets, error: findError } = await supabase
+      .rpc('find_profile_by_friend_code', { _code: code });
 
-    if (!target) {
+    if (findError || !targets || targets.length === 0) {
       toast.error('Código não encontrado');
       return;
     }
+
+    const target = targets[0];
 
     const { error } = await supabase.from('friendships' as any).insert({
       requester_profile_id: profileId,
