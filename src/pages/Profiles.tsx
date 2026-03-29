@@ -255,8 +255,75 @@ export default function Profiles() {
     toast.success('Filho vinculado com sucesso!');
     await loadPageData();
   };
+  // Link partner/spouse - share children between parents
+  const linkPartner = async () => {
+    if (!partnerCode.trim() || linkingPartner) return;
+    setLinkingPartner(true);
+    try {
+      const myParent = parentProfiles[0];
+      if (!myParent) {
+        toast.error('Crie um perfil de responsável primeiro');
+        return;
+      }
 
-  if (loading || loadingProfiles) {
+      // Find partner's parent profile by friend_code
+      const { data: partnerData } = await supabase
+        .rpc('find_profile_by_friend_code', { _code: partnerCode.trim() });
+
+      const partner = (partnerData as any)?.[0];
+      if (!partner) {
+        toast.error('Código não encontrado');
+        return;
+      }
+
+      // Get partner's linked children
+      const { data: partnerLinks } = await supabase
+        .from('parent_child_links' as any)
+        .select('child_profile_id')
+        .eq('parent_profile_id', partner.id);
+
+      // Get my linked children
+      const { data: myLinks } = await supabase
+        .from('parent_child_links' as any)
+        .select('child_profile_id')
+        .eq('parent_profile_id', myParent.id);
+
+      const myChildIds = new Set((myLinks as any[] || []).map((l: any) => l.child_profile_id));
+      const partnerChildIds = new Set((partnerLinks as any[] || []).map((l: any) => l.child_profile_id));
+
+      // Link partner's children to me
+      const toAddToMe = (partnerLinks as any[] || [])
+        .filter((l: any) => !myChildIds.has(l.child_profile_id))
+        .map((l: any) => ({ parent_profile_id: myParent.id, child_profile_id: l.child_profile_id }));
+
+      // Link my children to partner
+      const toAddToPartner = (myLinks as any[] || [])
+        .filter((l: any) => !partnerChildIds.has(l.child_profile_id))
+        .map((l: any) => ({ parent_profile_id: partner.id, child_profile_id: l.child_profile_id }));
+
+      if (toAddToMe.length > 0) {
+        await supabase.from('parent_child_links' as any).insert(toAddToMe);
+      }
+      if (toAddToPartner.length > 0) {
+        await supabase.from('parent_child_links' as any).insert(toAddToPartner);
+      }
+
+      if (toAddToMe.length === 0 && toAddToPartner.length === 0) {
+        toast.info('Vocês já compartilham os mesmos filhos!');
+      } else {
+        toast.success('Cônjuge vinculado! Filhos compartilhados com sucesso.');
+      }
+
+      setPartnerCode('');
+      await loadPageData();
+    } catch (err) {
+      toast.error('Erro ao vincular cônjuge');
+    } finally {
+      setLinkingPartner(false);
+    }
+  };
+
+
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
