@@ -81,7 +81,7 @@ function SessionHistory() {
         <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
         <h2 className="font-display text-xl font-bold text-foreground mb-2">Nenhum estudo ainda</h2>
         <p className="text-muted-foreground mb-6">Complete exercícios para ver seu histórico aqui</p>
-        <Button onClick={() => navigate('/')} className="gap-2">
+        <Button onClick={() => navigate('/inicio')} className="gap-2">
           <BookOpen className="h-4 w-4" />
           Começar a estudar
         </Button>
