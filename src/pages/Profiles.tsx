@@ -470,10 +470,7 @@ export default function Profiles() {
                       <Button
                         size="sm"
                         className="gap-1.5 flex-1"
-                        onClick={() => {
-                          const proPlan = plans?.find(p => p.slug === 'pro');
-                          if (proPlan?.stripe_price_id) startCheckout(proPlan.stripe_price_id);
-                        }}
+                        onClick={() => startCheckout('pro', 'yearly')}
                       >
                         <ArrowUpRight className="h-3.5 w-3.5" /> Upgrade Pro
                       </Button>
