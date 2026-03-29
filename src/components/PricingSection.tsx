@@ -28,7 +28,7 @@ export default function PricingSection() {
   const { data: stripeStatus } = useStripeSubscription();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('yearly');
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   if (isLoading || !plans?.length) return null;

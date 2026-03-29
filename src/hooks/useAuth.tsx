@@ -43,6 +43,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
+    // Clear all cached queries to prevent stale auth state
+    const { QueryClient } = await import('@tanstack/react-query');
+    // Clear localStorage subscription/profile caches
+    localStorage.removeItem('activeProfileId');
+    window.location.href = '/';
   };
 
   return (
