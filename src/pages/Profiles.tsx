@@ -324,7 +324,8 @@ export default function Profiles() {
     );
   }
 
-  const isPro = !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
+  const subDataLoaded = !stripeLoading && !dbSubLoading;
+  const isPro = subDataLoaded && !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
 
   const ProfileCard = ({ p, idx }: { p: Profile; idx: number }) => (
     <Card
