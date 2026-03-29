@@ -17,6 +17,7 @@ import Confirmation from "./pages/Confirmation";
 import Exercises from "./pages/Exercises";
 import Results from "./pages/Results";
 import Credits from "./pages/Credits";
+import Friends from "./pages/Friends";
 import Admin from "./pages/Admin";
 import Install from "./pages/Install";
 import SessionReview from "./pages/SessionReview";
