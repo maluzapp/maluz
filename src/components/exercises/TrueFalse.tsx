@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { fireCorrectConfetti } from './Confetti';
 import type { TrueFalseExercise, ExerciseAnswer } from '@/types/study';
 
 interface Props {
