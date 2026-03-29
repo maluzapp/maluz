@@ -169,7 +169,7 @@ export async function startCheckout(priceId: string) {
   });
   if (error) throw error;
   if (data?.url) {
-    window.open(data.url, '_blank');
+    window.location.href = data.url;
   }
   return data;
 }
