@@ -135,8 +135,14 @@ export default function Friends() {
       ...p, friend: profileMap[p.requester_profile_id]
     })).filter((p: any) => p.friend);
 
+    const mappedSent = (sent as any[] || []).map((s: any) => ({
+      ...s, friend: profileMap[s.target_profile_id]
+    })).filter((s: any) => s.friend);
+
     setFriends(mappedFriends);
     setPendingRequests(mappedPending);
+    setSentRequests(mappedSent);
+    setConnectedIds(new Set([...friendIds, ...pendingIds, ...sentIds]));
 
     // Get friends' recent sessions
     if (friendIds.length > 0) {
