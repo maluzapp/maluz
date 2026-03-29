@@ -24,7 +24,7 @@ export interface ContentSummary {
   keyPoints: string[];
 }
 
-export type ExerciseType = 'multiple_choice' | 'true_false' | 'fill_blank' | 'matching';
+export type ExerciseType = 'multiple_choice' | 'true_false' | 'fill_blank' | 'matching' | 'ordering' | 'complete_sentence' | 'column_classification';
 
 export interface MultipleChoiceExercise {
   type: 'multiple_choice';
@@ -43,7 +43,7 @@ export interface TrueFalseExercise {
 
 export interface FillBlankExercise {
   type: 'fill_blank';
-  sentence: string; // use ___ for the blank
+  sentence: string;
   answer: string;
   explanation: string;
 }
@@ -54,7 +54,31 @@ export interface MatchingExercise {
   explanation: string;
 }
 
-export type Exercise = MultipleChoiceExercise | TrueFalseExercise | FillBlankExercise | MatchingExercise;
+export interface OrderingExercise {
+  type: 'ordering';
+  question: string;
+  items: string[];
+  correctOrder: number[];
+  explanation: string;
+}
+
+export interface CompleteSentenceExercise {
+  type: 'complete_sentence';
+  sentence: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+export interface ColumnClassificationExercise {
+  type: 'column_classification';
+  question: string;
+  columns: string[];
+  items: { text: string; column: number }[];
+  explanation: string;
+}
+
+export type Exercise = MultipleChoiceExercise | TrueFalseExercise | FillBlankExercise | MatchingExercise | OrderingExercise | CompleteSentenceExercise | ColumnClassificationExercise;
 
 export interface ExerciseAnswer {
   exerciseIndex: number;
