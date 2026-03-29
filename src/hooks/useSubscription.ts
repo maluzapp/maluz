@@ -71,6 +71,8 @@ export interface StripeSubscriptionStatus {
   subscribed: boolean;
   price_id?: string;
   product_id?: string;
+  plan_slug?: string;
+  billing_period?: string;
   subscription_end?: string;
 }
 
