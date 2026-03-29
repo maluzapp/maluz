@@ -413,6 +413,7 @@ export default function Admin() {
     const [users, setUsers] = useState<any[]>([]);
     const [loadingUsers, setLoadingUsers] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [planFilter, setPlanFilter] = useState<string>('all');
 
     useEffect(() => {
       const fetchUsers = async () => {
@@ -432,15 +433,39 @@ export default function Admin() {
       fetchUsers();
     }, []);
 
-    const filtered = users.filter(u =>
-      (u.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.profiles?.some((p: any) => p.name?.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    const filtered = users.filter(u => {
+      const matchesSearch = (u.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.profiles?.some((p: any) => p.name?.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      if (planFilter === 'all') return matchesSearch;
+      if (planFilter === 'free') return matchesSearch && !u.subscription;
+      return matchesSearch && u.subscription?.plan_slug === planFilter;
+    });
 
     const formatDate = (d: string | null) => {
       if (!d) return '—';
       return new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
     };
+
+    const getPlanBadge = (sub: any) => {
+      if (!sub) return <Badge variant="outline" className="text-[10px] font-mono border-foreground/20">Free</Badge>;
+      const colors: Record<string, string> = {
+        pro: 'bg-primary/20 text-primary',
+        familia: 'bg-accent/20 text-accent-foreground',
+      };
+      const icons: Record<string, any> = { pro: Star, familia: Crown };
+      const Icon = icons[sub.plan_slug] || Star;
+      return (
+        <Badge className={`${colors[sub.plan_slug] || 'bg-primary/20 text-primary'} text-[10px] font-mono`}>
+          <Icon className="h-2.5 w-2.5 mr-0.5" /> {sub.plan_name}
+        </Badge>
+      );
+    };
+
+    // Counters
+    const totalPro = users.filter(u => u.subscription?.plan_slug === 'pro').length;
+    const totalFamilia = users.filter(u => u.subscription?.plan_slug === 'familia').length;
+    const totalFree = users.filter(u => !u.subscription).length;
 
     return (
       <div className="space-y-6">
@@ -450,12 +475,47 @@ export default function Admin() {
           <Badge variant="secondary" className="ml-auto font-mono text-xs">{users.length} total</Badge>
         </div>
 
-        <Input
-          placeholder="Buscar por email ou nome..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-          className="bg-card border-primary/20 text-foreground"
-        />
+        {/* Counters */}
+        <div className="grid grid-cols-4 gap-2">
+          <div className="rounded-xl border border-primary/15 bg-card/50 p-3 text-center">
+            <div className="text-lg font-bold text-foreground">{users.length}</div>
+            <div className="text-[10px] text-foreground/50 uppercase tracking-wider">Total</div>
+          </div>
+          <div className="rounded-xl border border-primary/15 bg-card/50 p-3 text-center">
+            <div className="text-lg font-bold text-foreground/60">{totalFree}</div>
+            <div className="text-[10px] text-foreground/50 uppercase tracking-wider">Free</div>
+          </div>
+          <div className="rounded-xl border border-primary/15 bg-card/50 p-3 text-center">
+            <div className="text-lg font-bold text-primary">{totalPro}</div>
+            <div className="text-[10px] text-foreground/50 uppercase tracking-wider">Pro</div>
+          </div>
+          <div className="rounded-xl border border-primary/15 bg-card/50 p-3 text-center">
+            <div className="text-lg font-bold text-accent-foreground">{totalFamilia}</div>
+            <div className="text-[10px] text-foreground/50 uppercase tracking-wider">Família</div>
+          </div>
+        </div>
+
+        {/* Search + Filter */}
+        <div className="flex gap-2">
+          <Input
+            placeholder="Buscar por email ou nome..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="bg-card border-primary/20 text-foreground flex-1"
+          />
+          <Select value={planFilter} onValueChange={setPlanFilter}>
+            <SelectTrigger className="w-[130px] bg-card border-primary/20">
+              <Filter className="h-3.5 w-3.5 mr-1" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="free">Free</SelectItem>
+              <SelectItem value="pro">Pro</SelectItem>
+              <SelectItem value="familia">Família</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         {loadingUsers ? (
           <div className="flex justify-center py-12">
@@ -484,7 +544,8 @@ export default function Admin() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex gap-1 shrink-0">
+                  <div className="flex gap-1 shrink-0 flex-wrap">
+                    {getPlanBadge(user.subscription)}
                     {user.roles?.includes('admin') && (
                       <Badge className="bg-primary/20 text-primary text-[10px] font-mono">
                         <Shield className="h-2.5 w-2.5 mr-0.5" /> Admin
@@ -497,6 +558,19 @@ export default function Admin() {
                     )}
                   </div>
                 </div>
+                {/* Subscription details */}
+                {user.subscription && (
+                  <div className="flex items-center gap-3 text-xs text-foreground/50 bg-background/30 rounded-lg px-3 py-1.5">
+                    <CreditCard className="h-3 w-3 text-primary/60" />
+                    <span>Período: <strong className="text-foreground/70">{user.subscription.billing_period === 'yearly' ? 'Anual' : user.subscription.billing_period === 'quarterly' ? 'Trimestral' : 'Mensal'}</strong></span>
+                    {user.subscription.expires_at && (
+                      <span>Expira: <strong className="text-foreground/70">{formatDate(user.subscription.expires_at)}</strong></span>
+                    )}
+                    <Badge variant={user.subscription.status === 'active' ? 'secondary' : 'destructive'} className="text-[9px]">
+                      {user.subscription.status === 'active' ? '✓ Ativo' : user.subscription.status}
+                    </Badge>
+                  </div>
+                )}
                 {user.profiles?.length > 0 && (
                   <div className="flex flex-wrap gap-2 pt-1 border-t border-primary/10">
                     {user.profiles.map((p: any) => (
@@ -520,6 +594,168 @@ export default function Admin() {
     );
   };
 
+  const PlansSection = () => {
+    const [plans, setPlans] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [editValues, setEditValues] = useState<Record<string, any>>({});
+
+    useEffect(() => {
+      const fetchPlans = async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('subscription_plans')
+          .select('*')
+          .order('sort_order');
+        if (error) {
+          toast.error('Erro ao carregar planos');
+        } else {
+          setPlans(data || []);
+          const vals: Record<string, any> = {};
+          (data || []).forEach(p => { vals[p.id] = { ...p }; });
+          setEditValues(vals);
+        }
+        setLoading(false);
+      };
+      fetchPlans();
+    }, []);
+
+    const updatePlan = async (planId: string) => {
+      const vals = editValues[planId];
+      if (!vals) return;
+      const { error } = await supabase
+        .from('subscription_plans')
+        .update({
+          name: vals.name,
+          price_monthly: parseFloat(vals.price_monthly) || 0,
+          price_yearly: vals.price_yearly ? parseFloat(vals.price_yearly) : null,
+          price_weekly: vals.price_weekly ? parseFloat(vals.price_weekly) : null,
+          daily_session_limit: parseInt(vals.daily_session_limit) || 3,
+          max_profiles: parseInt(vals.max_profiles) || 1,
+          features: typeof vals.features === 'string' ? JSON.parse(vals.features) : vals.features,
+          store_product_id_google: vals.store_product_id_google || null,
+          store_product_id_apple: vals.store_product_id_apple || null,
+          is_active: vals.is_active,
+        })
+        .eq('id', planId);
+      if (error) {
+        toast.error('Erro ao salvar: ' + error.message);
+      } else {
+        toast.success('Plano atualizado!');
+      }
+    };
+
+    const setVal = (planId: string, key: string, value: any) => {
+      setEditValues(prev => ({
+        ...prev,
+        [planId]: { ...prev[planId], [key]: value },
+      }));
+    };
+
+    if (loading) {
+      return (
+        <div className="flex justify-center py-12">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 mb-2">
+          <CreditCard className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-lg font-bold text-foreground">Gestão de Planos</h2>
+        </div>
+
+        {plans.map(plan => {
+          const vals = editValues[plan.id] || plan;
+          return (
+            <div key={plan.id} className="rounded-xl border border-primary/15 bg-card/50 p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {plan.slug === 'pro' ? <Star className="h-5 w-5 text-primary" /> : plan.slug === 'familia' ? <Crown className="h-5 w-5 text-primary" /> : <Users className="h-5 w-5 text-foreground/40" />}
+                  <h3 className="font-display font-bold text-foreground">{plan.name}</h3>
+                  <Badge variant={vals.is_active ? 'secondary' : 'destructive'} className="text-[10px]">
+                    {vals.is_active ? 'Ativo' : 'Inativo'}
+                  </Badge>
+                </div>
+                <label className="flex items-center gap-2 text-xs text-foreground/60">
+                  Ativo
+                  <input type="checkbox" checked={vals.is_active} onChange={e => setVal(plan.id, 'is_active', e.target.checked)} className="accent-primary" />
+                </label>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs text-foreground/70">Nome</Label>
+                  <Input value={vals.name} onChange={e => setVal(plan.id, 'name', e.target.value)} className="bg-card border-primary/20 text-foreground text-sm" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-foreground/70">Slug</Label>
+                  <Input value={vals.slug} disabled className="bg-card border-primary/10 text-foreground/40 text-sm" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs text-foreground/70">Preço Mensal (R$)</Label>
+                  <Input type="number" step="0.01" value={vals.price_monthly} onChange={e => setVal(plan.id, 'price_monthly', e.target.value)} className="bg-card border-primary/20 text-foreground text-sm font-mono" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-foreground/70">Preço Anual (R$)</Label>
+                  <Input type="number" step="0.01" value={vals.price_yearly ?? ''} onChange={e => setVal(plan.id, 'price_yearly', e.target.value)} className="bg-card border-primary/20 text-foreground text-sm font-mono" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-foreground/70">Preço Semanal (R$)</Label>
+                  <Input type="number" step="0.01" value={vals.price_weekly ?? ''} onChange={e => setVal(plan.id, 'price_weekly', e.target.value)} className="bg-card border-primary/20 text-foreground text-sm font-mono" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs text-foreground/70">Sessões/dia (-1 = ilimitado)</Label>
+                  <Input type="number" value={vals.daily_session_limit} onChange={e => setVal(plan.id, 'daily_session_limit', e.target.value)} className="bg-card border-primary/20 text-foreground text-sm font-mono" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-foreground/70">Max Perfis</Label>
+                  <Input type="number" value={vals.max_profiles} onChange={e => setVal(plan.id, 'max_profiles', e.target.value)} className="bg-card border-primary/20 text-foreground text-sm font-mono" />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs text-foreground/70">Features (JSON array)</Label>
+                <Textarea
+                  value={typeof vals.features === 'string' ? vals.features : JSON.stringify(vals.features, null, 2)}
+                  onChange={e => setVal(plan.id, 'features', e.target.value)}
+                  rows={3}
+                  className="bg-card border-primary/20 text-foreground font-mono text-xs resize-y"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs text-foreground/70">Product ID Google Play</Label>
+                  <Input value={vals.store_product_id_google ?? ''} onChange={e => setVal(plan.id, 'store_product_id_google', e.target.value)} placeholder="com.maluz.pro.monthly" className="bg-card border-primary/20 text-foreground text-xs font-mono" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-foreground/70">Product ID Apple Store</Label>
+                  <Input value={vals.store_product_id_apple ?? ''} onChange={e => setVal(plan.id, 'store_product_id_apple', e.target.value)} placeholder="com.maluz.pro.monthly" className="bg-card border-primary/20 text-foreground text-xs font-mono" />
+                </div>
+              </div>
+
+              <Button
+                onClick={() => updatePlan(plan.id)}
+                className="w-full bg-primary text-primary-foreground font-display font-bold hover:opacity-90"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Salvar {plan.name}
+              </Button>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
@@ -537,30 +773,33 @@ export default function Admin() {
 
       <div className="max-w-2xl mx-auto px-4 py-6">
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="w-full grid grid-cols-4 md:grid-cols-8 h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl">
-            <TabsTrigger value="general" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
+          <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl">
+            <TabsTrigger value="general" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 flex-1 min-w-[70px]">
               <Settings className="h-3.5 w-3.5 mr-1" /> Geral
             </TabsTrigger>
-            <TabsTrigger value="colors" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
+            <TabsTrigger value="colors" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 flex-1 min-w-[70px]">
               <Palette className="h-3.5 w-3.5 mr-1" /> Cores
             </TabsTrigger>
-            <TabsTrigger value="typography" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
+            <TabsTrigger value="typography" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 flex-1 min-w-[70px]">
               <Type className="h-3.5 w-3.5 mr-1" /> Fontes
             </TabsTrigger>
-            <TabsTrigger value="sizes" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
+            <TabsTrigger value="sizes" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 flex-1 min-w-[70px]">
               <Maximize className="h-3.5 w-3.5 mr-1" /> Logos
             </TabsTrigger>
-            <TabsTrigger value="voice" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
+            <TabsTrigger value="voice" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 flex-1 min-w-[70px]">
               <MessageCircle className="h-3.5 w-3.5 mr-1" /> Voz
             </TabsTrigger>
-            <TabsTrigger value="landing" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
+            <TabsTrigger value="landing" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 flex-1 min-w-[70px]">
               <FileText className="h-3.5 w-3.5 mr-1" /> Landing
             </TabsTrigger>
-            <TabsTrigger value="share" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
+            <TabsTrigger value="share" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 flex-1 min-w-[70px]">
               <Share2 className="h-3.5 w-3.5 mr-1" /> Compartilhar
             </TabsTrigger>
-            <TabsTrigger value="users" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
+            <TabsTrigger value="users" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 flex-1 min-w-[70px]">
               <Users className="h-3.5 w-3.5 mr-1" /> Usuários
+            </TabsTrigger>
+            <TabsTrigger value="plans" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 flex-1 min-w-[70px]">
+              <CreditCard className="h-3.5 w-3.5 mr-1" /> Planos
             </TabsTrigger>
           </TabsList>
 
@@ -588,6 +827,9 @@ export default function Admin() {
             </TabsContent>
             <TabsContent value="users">
               <UsersSection />
+            </TabsContent>
+            <TabsContent value="plans">
+              <PlansSection />
             </TabsContent>
           </div>
         </Tabs>
