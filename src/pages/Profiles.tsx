@@ -122,12 +122,40 @@ export default function Profiles() {
       .filter((link) => link.child) as LinkedChild[];
   };
 
+  const fetchSpouseData = async (profileList: Profile[], childLinks: LinkedChild[]) => {
+    const parentIds = profileList.filter(p => p.profile_type === 'parent').map(p => p.id);
+    if (parentIds.length === 0 || childLinks.length === 0) return null;
+
+    const childIds = childLinks.map(l => l.child.id);
+    // Find other parents linked to the same children
+    const { data: otherLinks } = await supabase
+      .from('parent_child_links' as any)
+      .select('parent_profile_id')
+      .in('child_profile_id', childIds);
+
+    if (!otherLinks) return null;
+
+    const otherParentIds = [...new Set((otherLinks as any[])
+      .map((l: any) => l.parent_profile_id)
+      .filter((id: string) => !parentIds.includes(id)))];
+
+    if (otherParentIds.length === 0) return null;
+
+    const { data: spouseData } = await supabase
+      .rpc('get_profiles_by_ids', { _ids: otherParentIds });
+
+    const spouse = (spouseData as any)?.[0];
+    return spouse ? { name: spouse.name, avatar_emoji: spouse.avatar_emoji, friend_code: spouse.friend_code || '' } : null;
+  };
+
   const loadPageData = async () => {
     const profileList = await fetchProfilesData();
     const childLinks = await fetchLinkedChildrenData(profileList);
+    const spouse = await fetchSpouseData(profileList, childLinks);
 
     setProfiles(profileList);
     setLinkedChildren(childLinks);
+    setLinkedSpouse(spouse);
     syncActiveProfile(profileList);
     setLoadingProfiles(false);
   };
