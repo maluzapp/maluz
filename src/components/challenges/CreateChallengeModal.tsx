@@ -80,7 +80,7 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
 
       if (shareVia === 'whatsapp') {
         const childName = children.find(c => c.id === childId)?.name || '';
-        const text = `💡 *Maluz — Novo Desafio!*\n\n🎯 ${childName}, seu pai/mãe mandou um desafio para você!\n📖 ${subject} — ${topic}\n${message ? `💬 "${message}"\n` : ''}\n🚀 Abra o Maluz e mostre que você sabe!\n👉 https://maluz.lovable.app`;
+        const text = `💡 *Maluz — Novo Desafio!*\n\n🎯 ${childName}, seu pai/mãe mandou um desafio para você!\n📖 ${subject} — ${topic}\n${message ? `💬 "${message}"\n` : ''}\n🚀 Abra o Maluz e mostre que você sabe!\n👉 https://maluz.app`;
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
       }
 
