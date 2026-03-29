@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { FriendsTab } from '@/components/FriendsTab';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfileStore } from '@/hooks/useProfile';
 import { useStripeSubscription, useUserSubscription, usePlans, startCheckout, openCustomerPortal } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, LogOut, Trash2, Pencil, Link2, Copy, UserPlus, Users, Baby, ShieldCheck, Eye, Crown, CreditCard, ArrowUpRight, Heart, Search, Check, X, Star, Flame, Clock } from 'lucide-react';
+import { Plus, LogOut, Trash2, Pencil, Link2, Copy, UserPlus, Users, Baby, ShieldCheck, Eye, Crown, CreditCard, ArrowUpRight, Heart, Search, Check, X, Star, Flame, Clock, ChevronDown } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -674,80 +675,8 @@ export default function Profiles() {
           <TabsContent value="familia">
             {hasParent ? (
               <div className="space-y-4">
-                {/* Link child section */}
-                <Card className="border-primary/20">
-                  <CardContent className="p-4 space-y-3">
-                    <h3 className="font-display font-bold text-foreground flex items-center gap-2">
-                      <UserPlus className="h-4 w-4 text-primary" />
-                      Vincular filho
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      Digite o código de convite gerado no perfil do seu filho
-                    </p>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Ex: ABC123"
-                        value={linkingCode}
-                        onChange={(e) => setLinkingCode(e.target.value.toUpperCase())}
-                        className="font-mono tracking-widest"
-                      />
-                      <Button
-                        onClick={() => {
-                          const parent = parentProfiles[0];
-                          if (parent) linkChild(parent.id);
-                        }}
-                        disabled={!linkingCode.trim()}
-                      >
-                        Vincular
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Link partner/spouse section */}
-                <Card className="border-primary/20">
-                  <CardContent className="p-4 space-y-3">
-                    <h3 className="font-display font-bold text-foreground flex items-center gap-2">
-                      <Users className="h-4 w-4 text-primary" />
-                      Vincular cônjuge
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      Compartilhe seu código com o outro responsável, ou digite o código dele(a) para compartilhar os filhos vinculados
-                    </p>
-
-                    {/* Show own parent friend code */}
-                    {parentProfiles[0]?.friend_code && (
-                      <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
-                        <span className="text-xs text-muted-foreground">Seu código:</span>
-                        <span className="font-mono text-sm font-bold text-primary tracking-widest flex-1">{parentProfiles[0].friend_code}</span>
-                        <Button variant="outline" size="sm" className="h-7 px-2" onClick={() => {
-                          navigator.clipboard.writeText(parentProfiles[0].friend_code || '');
-                          toast.success('Código copiado!');
-                        }}>
-                          <Copy className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    )}
-
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Código do cônjuge"
-                        value={partnerCode}
-                        onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
-                        className="font-mono tracking-widest"
-                      />
-                      <Button
-                        onClick={linkPartner}
-                        disabled={!partnerCode.trim() || linkingPartner}
-                      >
-                        {linkingPartner ? '...' : 'Vincular'}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Linked children */}
-                {linkedChildren.length > 0 ? (
+                {/* Family members first */}
+                {linkedChildren.length > 0 && (
                   <div>
                     <h3 className="font-display font-bold text-foreground mb-3 flex items-center gap-2">
                       <Baby className="h-4 w-4 text-primary" />
@@ -780,13 +709,115 @@ export default function Profiles() {
                       })}
                     </div>
                   </div>
-                ) : (
-                  <div className="text-center py-8">
+                )}
+
+                {/* Spouse info if linked */}
+                {parentProfiles[0]?.friend_code && (
+                  <Card className="border-primary/10">
+                    <CardContent className="p-4 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Users className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-display font-bold text-sm text-foreground">Responsável</p>
+                        <p className="text-xs text-muted-foreground">{parentProfiles[0].name}</p>
+                      </div>
+                      <span className="font-mono text-xs text-primary tracking-wider">{parentProfiles[0].friend_code}</span>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Empty state when no children */}
+                {linkedChildren.length === 0 && (
+                  <div className="text-center py-6">
                     <Users className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
                     <p className="text-sm text-muted-foreground">Nenhum filho vinculado ainda</p>
-                    <p className="text-xs text-muted-foreground/60 mt-1">Use o código de convite para vincular</p>
+                    <p className="text-xs text-muted-foreground/60 mt-1">Use as opções abaixo para vincular</p>
                   </div>
                 )}
+
+                {/* Collapsible link actions */}
+                <Collapsible>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="outline" className="w-full gap-2 text-sm">
+                      <Link2 className="h-4 w-4" />
+                      Vincular filho ou cônjuge
+                      <ChevronDown className="h-4 w-4 ml-auto transition-transform [[data-state=open]>&]:rotate-180" />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-3 pt-3">
+                    {/* Link child */}
+                    <Card className="border-primary/20">
+                      <CardContent className="p-4 space-y-3">
+                        <h3 className="font-display font-bold text-foreground flex items-center gap-2 text-sm">
+                          <UserPlus className="h-4 w-4 text-primary" />
+                          Vincular filho
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
+                          Digite o código de convite gerado no perfil do seu filho
+                        </p>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Ex: ABC123"
+                            value={linkingCode}
+                            onChange={(e) => setLinkingCode(e.target.value.toUpperCase())}
+                            className="font-mono tracking-widest"
+                          />
+                          <Button
+                            onClick={() => {
+                              const parent = parentProfiles[0];
+                              if (parent) linkChild(parent.id);
+                            }}
+                            disabled={!linkingCode.trim()}
+                          >
+                            Vincular
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Link spouse */}
+                    <Card className="border-primary/20">
+                      <CardContent className="p-4 space-y-3">
+                        <h3 className="font-display font-bold text-foreground flex items-center gap-2 text-sm">
+                          <Users className="h-4 w-4 text-primary" />
+                          Vincular cônjuge
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
+                          Compartilhe seu código ou digite o do cônjuge para compartilhar filhos
+                        </p>
+
+                        {parentProfiles[0]?.friend_code && (
+                          <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
+                            <span className="text-xs text-muted-foreground">Seu código:</span>
+                            <span className="font-mono text-sm font-bold text-primary tracking-widest flex-1">{parentProfiles[0].friend_code}</span>
+                            <Button variant="outline" size="sm" className="h-7 px-2" onClick={() => {
+                              navigator.clipboard.writeText(parentProfiles[0].friend_code || '');
+                              toast.success('Código copiado!');
+                            }}>
+                              <Copy className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        )}
+
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Código do cônjuge"
+                            value={partnerCode}
+                            onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
+                            className="font-mono tracking-widest"
+                          />
+                          <Button
+                            onClick={linkPartner}
+                            disabled={!partnerCode.trim() || linkingPartner}
+                          >
+                            {linkingPartner ? '...' : 'Vincular'}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </CollapsibleContent>
+                </Collapsible>
               </div>
             ) : (
               <div className="text-center py-12">
