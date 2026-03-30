@@ -383,6 +383,9 @@ export default function Friends() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
                           <p className="text-sm font-semibold text-foreground">{a.profile.name}</p>
+                          {proProfileIds.has(a.profile.id) && (
+                            <Badge className="bg-primary text-primary-foreground border-0 text-[9px] px-1.5 py-0 h-4"><Crown className="h-3 w-3 mr-0.5" /> PRO</Badge>
+                          )}
                           <span className="text-[10px] text-muted-foreground">{formatRelativeDate(a.created_at)}</span>
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5">
