@@ -200,6 +200,12 @@ export default function Challenges() {
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
+  const resendViaWhatsApp = (challenge: Challenge) => {
+    const childName = childNames[challenge.child_profile_id] || 'Filho(a)';
+    const text = `💡 *Maluz — Novo Desafio!*\n\n🎯 ${challenge.subject} — ${challenge.topic}\n📝 ${challenge.total} exercícios\n${challenge.message ? `💬 "${challenge.message}"\n` : ''}\n🚀 Abra o Maluz para resolver!\n👉 https://maluz.app`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
