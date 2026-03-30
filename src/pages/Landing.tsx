@@ -82,6 +82,17 @@ export default function Landing() {
   const [isIOS, setIsIOS] = useState(false);
   const [showInstallBanner, setShowInstallBanner] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const footerLogoHeight = settings?.landing?.['logo_height_landing_footer']?.value
+    ? `${settings.landing['logo_height_landing_footer'].value}px`
+    : '96px';
 
   useEffect(() => {
     const ua = navigator.userAgent;
