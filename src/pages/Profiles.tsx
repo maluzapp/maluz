@@ -511,59 +511,68 @@ export default function Profiles() {
     );
   }
 
-  const ProfileCard = ({ p, idx }: { p: Profile; idx: number }) => (
-    <Card
-      key={p.id}
-      className="cursor-pointer hover:border-primary/50 transition-all duration-300"
-    >
-      <CardContent className="p-4 flex items-center gap-4">
-        <button onClick={() => selectProfile(p.id)} className="flex-1 flex items-center gap-4 text-left">
-          <div className="relative">
-            <span className="text-4xl">{p.avatar_emoji}</span>
-            {isPro && (
-              <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[8px] font-bold px-1 py-0.5 rounded-full leading-none">PRO</span>
-            )}
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <p className="font-display font-bold text-foreground">{p.name}</p>
-              {p.profile_type === 'parent' && (
-                <span className="bg-primary/15 text-primary text-[10px] px-1.5 py-0.5 rounded-full font-mono">Pai/Mãe</span>
+  const ProfileCard = ({ p, idx }: { p: Profile; idx: number }) => {
+    const isActive = activeProfileId === p.id;
+    return (
+      <Card
+        key={p.id}
+        className={cn(
+          'cursor-pointer hover:border-primary/50 transition-all duration-300',
+          isActive && 'border-primary/40 ring-1 ring-primary/20'
+        )}
+      >
+        <CardContent className="p-4 flex items-center gap-4">
+          <button onClick={() => setViewingChild(p)} className="flex-1 flex items-center gap-4 text-left">
+            <div className="relative">
+              <span className="text-4xl">{p.avatar_emoji}</span>
+              {isActive && (
+                <span className="absolute -bottom-1 -right-2 bg-primary text-primary-foreground text-[8px] font-bold px-1 py-0.5 rounded-full leading-none">ATIVO</span>
               )}
-              {isPro && (
-                <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-1.5 py-0 h-4"><Crown className="h-3 w-3 mr-0.5" /> PRO</Badge>
+              {isPro && !isActive && (
+                <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[8px] font-bold px-1 py-0.5 rounded-full leading-none">PRO</span>
               )}
             </div>
-            {p.school_year && (
-              <p className="text-xs text-primary font-medium">{getYearLabel(p.school_year)}</p>
-            )}
-            <div className="flex gap-3 text-xs text-muted-foreground mt-1">
-              <span>⭐ {p.xp} XP</span>
-              <span>📊 Nível {p.level}</span>
-              <span>🔥 {p.streak_days} dias</span>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <p className="font-display font-bold text-foreground">{p.name}</p>
+                {p.profile_type === 'parent' && (
+                  <span className="bg-primary/15 text-primary text-[10px] px-1.5 py-0.5 rounded-full font-mono">Pai/Mãe</span>
+                )}
+                {isPro && (
+                  <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-1.5 py-0 h-4"><Crown className="h-3 w-3 mr-0.5" /> PRO</Badge>
+                )}
+              </div>
+              {p.school_year && (
+                <p className="text-xs text-primary font-medium">{getYearLabel(p.school_year)}</p>
+              )}
+              <div className="flex gap-3 text-xs text-muted-foreground mt-1">
+                <span>⭐ {p.xp} XP</span>
+                <span>📊 Nível {p.level}</span>
+                <span>🔥 {p.streak_days} dias</span>
+              </div>
             </div>
-          </div>
-        </button>
-        <div className="flex flex-col gap-1 shrink-0">
-          {p.profile_type === 'child' && (
+          </button>
+          <div className="flex flex-col gap-1 shrink-0">
+            {p.profile_type === 'child' && (
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary h-8 w-8"
+                onClick={(e) => { e.stopPropagation(); generateInviteCode(p.id); }}
+                title="Gerar código de convite">
+                <Link2 className="h-3.5 w-3.5" />
+              </Button>
+            )}
             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary h-8 w-8"
-              onClick={(e) => { e.stopPropagation(); generateInviteCode(p.id); }}
-              title="Gerar código de convite">
-              <Link2 className="h-3.5 w-3.5" />
+              onClick={(e) => { e.stopPropagation(); startEditing(p); }}>
+              <Pencil className="h-3.5 w-3.5" />
             </Button>
-          )}
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary h-8 w-8"
-            onClick={(e) => { e.stopPropagation(); startEditing(p); }}>
-            <Pencil className="h-3.5 w-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive h-8 w-8"
-            onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(p.id); setDeleteConfirmName(p.name); }}>
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive h-8 w-8"
+              onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(p.id); setDeleteConfirmName(p.name); }}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36">
