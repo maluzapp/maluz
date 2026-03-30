@@ -398,6 +398,13 @@ export default function Profiles() {
         toast.success('Cônjuge vinculado! Filhos compartilhados com sucesso.');
       }
 
+      // Auto-create friendship between spouses
+      await supabase.from('friendships' as any).upsert({
+        requester_profile_id: myParent.id,
+        target_profile_id: partner.id,
+        status: 'accepted',
+      }, { onConflict: 'requester_profile_id,target_profile_id' } as any);
+
       setPartnerCode('');
       await loadPageData();
     } catch (err) {
