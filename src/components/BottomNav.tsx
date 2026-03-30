@@ -32,6 +32,7 @@ export function BottomNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [lampLit, setLampLit] = useState(false);
+  const [useRemoteLogo, setUseRemoteLogo] = useState(true);
   const profileId = useProfileStore((s) => s.activeProfileId);
   const pendingFriends = usePendingFriendRequests();
   const pendingChallenges = usePendingChallenges();
