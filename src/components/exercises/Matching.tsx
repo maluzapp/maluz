@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Undo2 } from 'lucide-react';
+import { Undo2, Check, X } from 'lucide-react';
 import { fireCorrectConfetti } from './Confetti';
 import type { MatchingExercise, ExerciseAnswer } from '@/types/study';
 
@@ -15,13 +15,19 @@ interface Props {
 }
 
 const MATCH_COLORS = [
-  { line: '#D4A843', bg: 'bg-primary/15', border: 'border-primary', text: 'text-primary' },
-  { line: '#5EEAD4', bg: 'bg-accent/20', border: 'border-accent', text: 'text-accent-foreground' },
-  { line: '#94A3B8', bg: 'bg-secondary/30', border: 'border-secondary', text: 'text-secondary-foreground' },
-  { line: '#A78BFA', bg: 'bg-muted/40', border: 'border-muted-foreground', text: 'text-muted-foreground' },
-  { line: '#FB923C', bg: 'bg-primary/10', border: 'border-primary/60', text: 'text-primary' },
-  { line: '#38BDF8', bg: 'bg-accent/10', border: 'border-accent/60', text: 'text-accent-foreground' },
+  { line: '#6366F1', bg: 'bg-[hsl(239,84%,67%)]/15', border: 'border-[hsl(239,84%,67%)]', text: 'text-[hsl(239,84%,67%)]' },
+  { line: '#F59E0B', bg: 'bg-[hsl(38,92%,50%)]/15', border: 'border-[hsl(38,92%,50%)]', text: 'text-[hsl(38,92%,50%)]' },
+  { line: '#10B981', bg: 'bg-[hsl(160,84%,39%)]/15', border: 'border-[hsl(160,84%,39%)]', text: 'text-[hsl(160,84%,39%)]' },
+  { line: '#EC4899', bg: 'bg-[hsl(330,81%,60%)]/15', border: 'border-[hsl(330,81%,60%)]', text: 'text-[hsl(330,81%,60%)]' },
+  { line: '#8B5CF6', bg: 'bg-[hsl(258,90%,66%)]/15', border: 'border-[hsl(258,90%,66%)]', text: 'text-[hsl(258,90%,66%)]' },
+  { line: '#14B8A6', bg: 'bg-[hsl(173,80%,40%)]/15', border: 'border-[hsl(173,80%,40%)]', text: 'text-[hsl(173,80%,40%)]' },
 ];
+
+interface CurveLine {
+  path: string;
+  color: string;
+  isCorrect?: boolean;
+}
 
 export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: Props) {
   const [shuffledRight] = useState(() => {
@@ -41,39 +47,47 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
   const containerRef = useRef<HTMLDivElement>(null);
   const leftRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const rightRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const svgRef = useRef<SVGSVGElement>(null);
-  const [lines, setLines] = useState<{ x1: number; y1: number; x2: number; y2: number; color: string }[]>([]);
+  const [curves, setCurves] = useState<CurveLine[]>([]);
 
-  // Recalculate lines whenever matches change
-  useEffect(() => {
-    const updateLines = () => {
-      if (!containerRef.current) return;
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const newLines: typeof lines = [];
-      let matchIdx = 0;
-      matches.forEach((rightShuffledIdx, leftIdx) => {
-        const leftEl = leftRefs.current[leftIdx];
-        const rightEl = rightRefs.current[rightShuffledIdx];
-        if (leftEl && rightEl) {
-          const lr = leftEl.getBoundingClientRect();
-          const rr = rightEl.getBoundingClientRect();
-          const color = MATCH_COLORS[matchIdx % MATCH_COLORS.length].line;
-          newLines.push({
-            x1: lr.right - containerRect.left,
-            y1: lr.top + lr.height / 2 - containerRect.top,
-            x2: rr.left - containerRect.left,
-            y2: rr.top + rr.height / 2 - containerRect.top,
-            color,
-          });
+  const updateLines = useCallback(() => {
+    if (!containerRef.current) return;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const newCurves: CurveLine[] = [];
+    let matchIdx = 0;
+    matches.forEach((rightShuffledIdx, leftIdx) => {
+      const leftEl = leftRefs.current[leftIdx];
+      const rightEl = rightRefs.current[rightShuffledIdx];
+      if (leftEl && rightEl) {
+        const lr = leftEl.getBoundingClientRect();
+        const rr = rightEl.getBoundingClientRect();
+        const x1 = lr.right - containerRect.left;
+        const y1 = lr.top + lr.height / 2 - containerRect.top;
+        const x2 = rr.left - containerRect.left;
+        const y2 = rr.top + rr.height / 2 - containerRect.top;
+
+        // Cubic bezier curve with horizontal control points
+        const dx = (x2 - x1) * 0.45;
+        const path = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+
+        let color = MATCH_COLORS[matchIdx % MATCH_COLORS.length].line;
+        let isCorrect: boolean | undefined;
+        if (answered) {
+          isCorrect = shuffledRight[rightShuffledIdx].originalIndex === leftIdx;
+          color = isCorrect ? 'hsl(142, 71%, 45%)' : 'hsl(0, 84%, 60%)';
         }
-        matchIdx++;
-      });
-      setLines(newLines);
-    };
+
+        newCurves.push({ path, color, isCorrect });
+      }
+      matchIdx++;
+    });
+    setCurves(newCurves);
+  }, [matches, answered, shuffledRight]);
+
+  useEffect(() => {
     updateLines();
     window.addEventListener('resize', updateLines);
     return () => window.removeEventListener('resize', updateLines);
-  }, [matches]);
+  }, [updateLines]);
 
   // Try to create a match whenever both sides are selected
   useEffect(() => {
@@ -103,7 +117,6 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
   const handleRightClick = (rightIdx: number) => {
     if (answered) return;
     const alreadyUsed = Array.from(matches.values()).includes(rightIdx);
-    // If already used, undo that match
     if (alreadyUsed) {
       const newMatches = new Map(matches);
       for (const [l, r] of newMatches.entries()) {
@@ -149,14 +162,24 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
     return MATCH_COLORS[matchIdx % MATCH_COLORS.length];
   };
 
-  const getResultColor = (leftIdx: number) => {
-    if (!answered || !matches.has(leftIdx)) return '';
+  const isLeftCorrect = (leftIdx: number): boolean | null => {
+    if (!answered || !matches.has(leftIdx)) return null;
     const rightShuffledIdx = matches.get(leftIdx)!;
-    const isCorrect = shuffledRight[rightShuffledIdx].originalIndex === leftIdx;
-    return isCorrect ? 'border-success bg-success/10' : 'border-destructive bg-destructive/10';
+    return shuffledRight[rightShuffledIdx].originalIndex === leftIdx;
+  };
+
+  const isRightCorrect = (rightIdx: number): boolean | null => {
+    if (!answered) return null;
+    for (const [leftIdx, rIdx] of matches.entries()) {
+      if (rIdx === rightIdx) {
+        return shuffledRight[rightIdx].originalIndex === leftIdx;
+      }
+    }
+    return null;
   };
 
   const allMatched = matches.size === exercise.pairs.length;
+  const allCorrect = answered && Array.from(matches.entries()).every(([l, r]) => shuffledRight[r].originalIndex === l);
 
   return (
     <Card className="animate-slide-up overflow-hidden">
@@ -168,38 +191,44 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
           Conecte os conceitos relacionados
         </h2>
         <p className="mb-4 text-xs text-muted-foreground">
-          Toque em qualquer lado para começar a conectar. Toque em um par já conectado para refazer.
+          Toque em qualquer lado para conectar. Toque em um par já conectado para refazer.
         </p>
 
         <div className="relative" ref={containerRef}>
-          {/* SVG lines overlay */}
+          {/* SVG curved lines overlay */}
           <svg
-            ref={svgRef}
             className="absolute inset-0 w-full h-full pointer-events-none z-10"
             style={{ overflow: 'visible' }}
           >
-            {lines.map((l, i) => (
-              <line
+            {curves.map((c, i) => (
+              <path
                 key={i}
-                x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2}
-                stroke={l.color}
-                strokeWidth={2.5}
+                d={c.path}
+                stroke={c.color}
+                strokeWidth={answered ? 3 : 2.5}
                 strokeLinecap="round"
-                opacity={answered ? 0.4 : 0.8}
+                fill="none"
+                opacity={answered ? 0.85 : 0.7}
                 className="transition-all duration-300"
+                strokeDasharray={answered ? 'none' : '1000'}
+                strokeDashoffset="0"
               >
-                <animate attributeName="stroke-dashoffset" from="100" to="0" dur="0.4s" fill="freeze" />
-              </line>
+                {!answered && (
+                  <animate attributeName="stroke-dashoffset" from="1000" to="0" dur="0.5s" fill="freeze" />
+                )}
+              </path>
             ))}
           </svg>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-[1fr_24px_1fr] items-start">
             {/* Left column */}
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {exercise.pairs.map((pair, i) => {
                 const matchIdx = getMatchIndex(i);
                 const colorClass = getMatchColorClass(matchIdx);
                 const isMatched = matches.has(i);
+                const correctResult = isLeftCorrect(i);
+
                 return (
                   <button
                     key={`l-${i}`}
@@ -207,17 +236,23 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
                     onClick={() => handleLeftClick(i)}
                     disabled={answered}
                     className={cn(
-                    'w-full rounded-xl border-2 px-3 py-3.5 text-left text-base font-medium transition-all duration-300 relative z-20',
-                      selectedLeft === i && 'border-primary bg-primary/10 ring-2 ring-primary/30 shimmer-glow',
+                      'w-full rounded-xl border-2 px-3 py-3.5 text-left text-sm font-medium transition-all duration-200 relative z-20',
+                      // Before answer
+                      !answered && selectedLeft === i && 'border-primary bg-primary/10 ring-2 ring-primary/30 scale-[1.02]',
                       !answered && isMatched && colorClass && `${colorClass.border} ${colorClass.bg}`,
-                      !answered && !isMatched && selectedLeft !== i && 'border-border hover:border-primary/50',
-                      answered && getResultColor(i),
+                      !answered && !isMatched && selectedLeft !== i && 'border-border bg-card hover:border-primary/50',
+                      // After answer
+                      answered && correctResult === true && 'border-success bg-success/10',
+                      answered && correctResult === false && 'border-destructive bg-destructive/10',
+                      answered && correctResult === null && 'border-border bg-card opacity-60',
                     )}
                   >
                     <span className="flex items-center justify-between gap-1">
-                      <span>{pair.left}</span>
+                      <span className="flex-1">{pair.left}</span>
+                      {answered && correctResult === true && <Check className="h-4 w-4 text-success shrink-0" />}
+                      {answered && correctResult === false && <X className="h-4 w-4 text-destructive shrink-0" />}
                       {isMatched && !answered && colorClass && (
-                        <span className={cn('text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center', colorClass.bg, colorClass.text)}>
+                        <span className={cn('text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0', colorClass.bg, colorClass.text)}>
                           {(matchIdx ?? 0) + 1}
                         </span>
                       )}
@@ -227,12 +262,17 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
               })}
             </div>
 
+            {/* Gap for curves */}
+            <div />
+
             {/* Right column */}
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {shuffledRight.map((item, i) => {
                 const isUsed = Array.from(matches.values()).includes(i);
                 const matchIdx = getRightMatchIndex(i);
                 const colorClass = getMatchColorClass(matchIdx);
+                const correctResult = isRightCorrect(i);
+
                 return (
                   <button
                     key={`r-${i}`}
@@ -240,17 +280,23 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
                     onClick={() => handleRightClick(i)}
                     disabled={answered}
                     className={cn(
-                      'w-full rounded-xl border-2 px-3 py-3.5 text-left text-base font-medium transition-all duration-300 relative z-20',
-                      selectedRight === i && 'border-accent bg-accent/10 ring-2 ring-accent/30 shimmer-glow',
+                      'w-full rounded-xl border-2 px-3 py-3.5 text-left text-sm font-medium transition-all duration-200 relative z-20',
+                      // Before answer
+                      !answered && selectedRight === i && 'border-accent bg-accent/10 ring-2 ring-accent/30 scale-[1.02]',
                       !answered && isUsed && colorClass && `${colorClass.border} ${colorClass.bg}`,
-                      !answered && !isUsed && selectedRight !== i && 'border-border hover:border-accent/50',
-                      answered && isUsed && 'opacity-60',
+                      !answered && !isUsed && selectedRight !== i && 'border-border bg-card hover:border-accent/50',
+                      // After answer
+                      answered && correctResult === true && 'border-success bg-success/10',
+                      answered && correctResult === false && 'border-destructive bg-destructive/10',
+                      answered && correctResult === null && 'border-border bg-card opacity-60',
                     )}
                   >
                     <span className="flex items-center justify-between gap-1">
-                      <span>{item.text}</span>
+                      <span className="flex-1">{item.text}</span>
+                      {answered && correctResult === true && <Check className="h-4 w-4 text-success shrink-0" />}
+                      {answered && correctResult === false && <X className="h-4 w-4 text-destructive shrink-0" />}
                       {isUsed && !answered && colorClass && (
-                        <span className={cn('text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center', colorClass.bg, colorClass.text)}>
+                        <span className={cn('text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0', colorClass.bg, colorClass.text)}>
                           {(matchIdx ?? 0) + 1}
                         </span>
                       )}
@@ -284,19 +330,18 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
         )}
 
         {answered && (
-          <div className={cn(
-            'mt-4 rounded-lg px-4 py-3 text-sm',
-            Array.from(matches.entries()).every(([l, r]) => shuffledRight[r].originalIndex === l)
-              ? 'bg-success/10 text-success'
-              : 'bg-destructive/10 text-destructive'
+          <Card className={cn(
+            'mt-4 p-4',
+            allCorrect ? 'border-success bg-success/10' : 'border-destructive bg-destructive/10'
           )}>
-            <p className="font-semibold">
-              {Array.from(matches.entries()).every(([l, r]) => shuffledRight[r].originalIndex === l)
-                ? '✅ Todas corretas!'
-                : '❌ Algumas associações estão incorretas'}
-            </p>
-            <p className="mt-1 opacity-80">{exercise.explanation}</p>
-          </div>
+            <div className="flex items-center gap-2 mb-1">
+              {allCorrect ? <Check className="h-5 w-5 text-success" /> : <X className="h-5 w-5 text-destructive" />}
+              <span className="font-display font-bold text-foreground">
+                {allCorrect ? 'Perfeito!' : 'Algumas associações estão incorretas'}
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground">{exercise.explanation}</p>
+          </Card>
         )}
       </CardContent>
     </Card>
