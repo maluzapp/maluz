@@ -196,7 +196,15 @@ export default function Challenges() {
   const shareWhatsApp = (challenge: Challenge) => {
     const pct = challenge.score && challenge.total ? Math.round((challenge.score / challenge.total) * 100) : 0;
     const childName = childNames[challenge.child_profile_id] || 'a criança';
-    const text = `💡 *Maluz — Desafio Concluído!*\n\n🎯 Desafio: ${challenge.subject} — ${challenge.topic}\n👤 ${childName} acertou *${challenge.score} de ${challenge.total}* (${pct}%)\n\n🚀 Que tal desafiar seu filho também?\n👉 https://maluz.app`;
+    const text = [
+      '*Maluz \u2014 Desafio Conclu\u00eddo!*',
+      '',
+      `Desafio: ${challenge.subject} \u2014 ${challenge.topic}`,
+      `${childName} acertou *${challenge.score} de ${challenge.total}* (${pct}%)`,
+      '',
+      'Que tal desafiar seu filho tamb\u00e9m?',
+      'https://maluz.app',
+    ].join('\n');
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
