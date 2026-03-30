@@ -93,8 +93,9 @@ export function BottomNav() {
             )}
           >
             <img
-              src={lampadaIcon}
+              src={useRemoteLogo ? centralButtonUrl : lampadaFallback}
               alt="Gerar exercícios"
+              onError={() => setUseRemoteLogo(false)}
               className={cn(
                 'h-12 w-12 object-contain transition-all duration-300',
                 (isGeneratePage || lampLit) ? 'brightness-150 drop-shadow-[0_0_10px_rgba(245,200,66,0.8)]' : 'opacity-70'
