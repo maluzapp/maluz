@@ -70,7 +70,7 @@ const App = () => (
           <UpdateModal />
           <AppUpdateChecker />
           <Routes>
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={<SmartHome />} />
             <Route path="/login" element={<Login />} />
             <Route path="/perfis" element={<Profiles />} />
             <Route path="/inicio" element={<RequireAuth><Index /></RequireAuth>} />
