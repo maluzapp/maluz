@@ -530,7 +530,7 @@ export default function Landing() {
       <hr className="border-primary/15" />
 
       {/* CTA */}
-      <section className="py-20 px-5 text-center">
+      <section className="py-20 px-5 text-center scroll-reveal">
         <div className="max-w-lg mx-auto">
           <img src={lampadaIcon} alt="Maluz" className="h-20 mx-auto mb-6 animate-float" />
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-foreground">
