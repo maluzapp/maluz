@@ -428,11 +428,13 @@ export default function Profiles() {
   const parentProfiles = profiles.filter(p => p.profile_type === 'parent');
   const hasParent = parentProfiles.length > 0;
 
-  // Child detail view for parents
+  // Detail view for any profile (own or linked child)
   if (viewingChild) {
     const accuracy = viewingChild.total_exercises > 0
       ? Math.round((viewingChild.total_correct / viewingChild.total_exercises) * 100)
       : 0;
+    const isActive = activeProfileId === viewingChild.id;
+    const isOwnProfile = profiles.some(p => p.id === viewingChild.id);
 
     return (
       <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36">
@@ -442,10 +444,18 @@ export default function Profiles() {
           </Button>
 
           <div className="text-center mb-6 animate-fade-in">
-            <span className="text-6xl block mb-2">{viewingChild.avatar_emoji}</span>
+            <div className="relative inline-block">
+              <span className="text-6xl block mb-2">{viewingChild.avatar_emoji}</span>
+              {isActive && (
+                <span className="absolute -bottom-1 -right-2 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full">ATIVO</span>
+              )}
+            </div>
             <h1 className="font-display text-2xl font-bold text-foreground">{viewingChild.name}</h1>
+            {viewingChild.profile_type === 'parent' && (
+              <Badge className="mt-1 bg-primary/15 text-primary border-0 text-xs">Pai/Mãe</Badge>
+            )}
             {viewingChild.school_year && (
-              <p className="text-sm text-primary">{getYearLabel(viewingChild.school_year)}</p>
+              <p className="text-sm text-primary mt-0.5">{getYearLabel(viewingChild.school_year)}</p>
             )}
           </div>
 
@@ -476,13 +486,26 @@ export default function Profiles() {
             </Card>
           </div>
 
-          <Card className="border-primary/10 animate-fade-in" style={{ animationDelay: '200ms' }}>
+          <Card className="border-primary/10 animate-fade-in mb-5" style={{ animationDelay: '200ms' }}>
             <CardContent className="p-4 text-center">
               <p className="text-sm text-muted-foreground mb-1">Total de exercícios</p>
               <p className="font-display font-bold text-3xl text-foreground">{viewingChild.total_exercises}</p>
               <p className="text-xs text-muted-foreground mt-1">{viewingChild.total_correct} acertos</p>
             </CardContent>
           </Card>
+
+          {/* Explicit profile switch button - only for own profiles */}
+          {isOwnProfile && !isActive && (
+            <Button className="w-full gap-2 font-display font-bold animate-fade-in" style={{ animationDelay: '300ms' }}
+              onClick={() => selectProfile(viewingChild.id)}>
+              Usar este perfil
+            </Button>
+          )}
+          {isOwnProfile && isActive && (
+            <p className="text-center text-sm text-primary font-medium animate-fade-in" style={{ animationDelay: '300ms' }}>
+              ✓ Este é o perfil ativo
+            </p>
+          )}
         </div>
       </div>
     );
