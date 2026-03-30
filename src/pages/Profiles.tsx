@@ -529,9 +529,6 @@ export default function Profiles() {
               {isActive && (
                 <span className="absolute -bottom-1 -right-2 bg-primary text-primary-foreground text-[8px] font-bold px-1 py-0.5 rounded-full leading-none">ATIVO</span>
               )}
-              {isPro && !isActive && (
-                <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[8px] font-bold px-1 py-0.5 rounded-full leading-none">PRO</span>
-              )}
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2">
