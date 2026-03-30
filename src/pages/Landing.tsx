@@ -159,8 +159,29 @@ export default function Landing() {
 
   const showBanner = showInstallBanner && !isInstalled && !bannerDismissed;
 
+  // Scroll-reveal observer
+  const containerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = containerRef.current;
+    if (!root) return;
+    const els = root.querySelectorAll('.scroll-reveal');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div ref={containerRef} className="min-h-screen bg-background text-foreground">
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-3 bg-background/95 backdrop-blur-xl border-b border-primary/15">
         <a href="#" className="font-display text-xl font-bold text-foreground">Ma<span className="text-primary italic">luz</span></a>
