@@ -210,7 +210,16 @@ export default function Challenges() {
 
   const resendViaWhatsApp = (challenge: Challenge) => {
     const childName = childNames[challenge.child_profile_id] || 'Filho(a)';
-    const text = `💡 *Maluz — Novo Desafio!*\n\n🎯 ${challenge.subject} — ${challenge.topic}\n📝 ${challenge.total} exercícios\n${challenge.message ? `💬 "${challenge.message}"\n` : ''}\n🚀 Abra o Maluz para resolver!\n👉 https://maluz.app`;
+    const text = [
+      '*Maluz \u2014 Novo Desafio!*',
+      '',
+      `${challenge.subject} \u2014 ${challenge.topic}`,
+      `${challenge.total} exerc\u00edcios`,
+      challenge.message ? `"${challenge.message}"` : '',
+      '',
+      'Abra o Maluz para resolver!',
+      'https://maluz.app',
+    ].filter(Boolean).join('\n');
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
