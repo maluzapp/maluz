@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserPlus, Search, Copy, Users, Trophy, Star, Flame, Check, X, Clock } from 'lucide-react';
+import { ReactionBar } from '@/components/ReactionBar';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -357,6 +358,9 @@ export default function Friends() {
                             {pct}% acerto
                           </Badge>
                           <span className="text-xs text-primary font-mono">+{a.xp_earned} XP</span>
+                        </div>
+                        <div className="mt-2">
+                          <ReactionBar targetType="session" targetId={a.id} />
                         </div>
                       </div>
                     </CardContent>
