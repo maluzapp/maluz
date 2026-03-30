@@ -307,8 +307,11 @@ export default function Challenges() {
                             )}
                             {profileType === 'parent' && (
                               <>
-                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => resendChallenge(c)}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => resendChallenge(c)} title="Reenviar no app">
                                   <RefreshCw className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-green-500" onClick={() => resendViaWhatsApp(c)} title="Reenviar via WhatsApp">
+                                  <MessageCircle className="h-4 w-4" />
                                 </Button>
                                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => deleteChallenge(c.id)}>
                                   <Trash2 className="h-4 w-4" />
