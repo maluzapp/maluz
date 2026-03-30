@@ -205,7 +205,6 @@ export default function Challenges() {
     const text = `\u{1F4A1} *Maluz \u2014 Novo Desafio!*\n\n\u{1F3AF} ${challenge.subject} \u2014 ${challenge.topic}\n\u{1F4DD} ${challenge.total} exerc\u00edcios\n${challenge.message ? `\u{1F4AC} "${challenge.message}"\n` : ''}\n\u{1F680} Abra o Maluz para resolver!\nhttps://maluz.app`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
-  };
 
   if (loading) {
     return (
