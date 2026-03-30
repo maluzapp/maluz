@@ -1,9 +1,17 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useBrandingByCategory } from '@/hooks/useBrandingSettings';
 import logoMaluz from '@/assets/logo_maluz.png';
 import lampadaIcon from '@/assets/lampada-2.png';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import PricingSection from '@/components/PricingSection';
+import { Button } from '@/components/ui/button';
+import { Download, X, Share } from 'lucide-react';
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
 
 const FEATURES = [
   { icon: '📸', title: 'Entrada por Foto', desc: 'A criança fotografa a página do seu livro. O exercício é 100% alinhado ao que está sendo estudado naquele momento.' },
