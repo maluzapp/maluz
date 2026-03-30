@@ -436,7 +436,12 @@ export default function Friends() {
                         </span>
                         <span className="text-2xl">{f.friend.avatar_emoji}</span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-foreground">{f.friend.name}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-sm font-semibold text-foreground">{f.friend.name}</p>
+                            {proProfileIds.has(f.friend.id) && (
+                              <Badge className="bg-primary text-primary-foreground border-0 text-[9px] px-1.5 py-0 h-4"><Crown className="h-3 w-3 mr-0.5" /> PRO</Badge>
+                            )}
+                          </div>
                           <div className="flex gap-2 text-[10px] text-muted-foreground mt-0.5">
                             <span className="flex items-center gap-0.5"><Star className="h-3 w-3 text-primary" /> {f.friend.xp} XP</span>
                             <span className="flex items-center gap-0.5"><Flame className="h-3 w-3 text-destructive" /> {f.friend.streak_days}d</span>
