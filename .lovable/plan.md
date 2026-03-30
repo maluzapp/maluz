@@ -1,40 +1,40 @@
+## Diferenciação de Fotos e Áudio por Plano
+
+### Proposta de limites
 
 
-# Contornar o problema do setup de email nativo
+| Recurso          | Free      | Pro / Família |
+| ---------------- | --------- | ------------- |
+| Fotos por sessão | até 2     | ilimitadas    |
+| Áudio            | bloqueado | liberado      |
 
-## Situação
 
-O domínio `maluz.app` está configurado como custom domain do projeto, mas o modal de setup de email falhou 4 vezes seguidas — erro "Couldn't connect maluz.app". Não há nenhum domínio de email configurado no workspace.
+> Concordo com a ideia, mas sugiro **2 fotos no Free** em vez de 3 — cria mais incentivo de upgrade sem frustrar demais. Ilimitadas no Pro faz sentido. Áudio como recurso exclusivo Pro é um ótimo gatilho de conversão, pois agrega muito valor pedagógico.
 
-## Problema
+### Alterações
 
-O único caminho nativo para configurar o domínio de email é via o modal `<lov-open-email-setup>`. Não existe ferramenta de CLI ou API alternativa para registrar o domínio manualmente — todas as ferramentas (scaffold, infra) dependem de um domínio já registrado.
+**1. `src/hooks/useSubscription.ts**`
 
-## Opções reais
+- Expandir o retorno de `useCanStartSession` para incluir `planSlug` (já existe) e exportar um helper `usePlanLimits()` que retorna `{ maxPhotos: number | null, canUseAudio: boolean }` baseado no `planSlug`.
+  - Free: `{ maxPhotos: 2, canUseAudio: false }`
+  - Pro/Família: `{ maxPhotos: null, canUseAudio: true }`
 
-### Opção A — Tentar o modal novamente com diagnóstico
-O erro pode ser intermitente (DNS propagation do custom domain, ou problema temporário do lado do Lovable). Podemos:
-1. Verificar se o custom domain `maluz.app` está ativo e resolvendo corretamente
-2. Tentar o setup em horário diferente (pode ser instabilidade temporária)
-3. Se persistir, reportar ao suporte do Lovable como bug
+**2. `src/pages/Generate.tsx**`
 
-### Opção B — Usar Resend como provedor de email
-Contornar completamente o sistema nativo e usar Resend:
-1. Criar conta no Resend e verificar o domínio `maluz.app` (ou subdomínio `mail.maluz.app`)
-2. Adicionar `RESEND_API_KEY` como secret
-3. Criar edge function `send-email` que usa a API do Resend
-4. Templates de email customizáveis via `branding_settings` (categoria `email`)
-5. Integrar envio no fluxo de pagamento e auth
+- Importar `usePlanLimits`.
+- No upload de fotos: limitar `images.length` ao `maxPhotos` se definido; mostrar badge "PRO" e mensagem quando atingir o limite.
+- No bloco de áudio: se `!canUseAudio`, exibir o botão desabilitado com badge "PRO" e texto explicativo ("Recurso disponível no plano Pro").
+- Mostrar um mini-banner sutil indicando os limites do plano Free.
 
-### Opção C — Aguardar e usar emails padrão por enquanto
-Os emails de autenticação (confirmação, reset de senha) já funcionam com o template padrão do Lovable — sem branding customizado. Podemos:
-1. Continuar usando os emails padrão para auth
-2. Focar em outras features enquanto o problema do modal é resolvido
-3. Voltar para o setup nativo quando estiver funcionando
+**3. `src/components/PricingSection.tsx**`
 
-## Recomendação
+- Adicionar "Até 2 fotos por exercício" nas features do Free e "Fotos ilimitadas + áudio" no Pro/Família (renderizado dinamicamente a partir das features do banco, mas como fallback visual).
 
-**Opção B (Resend)** é a mais confiável e independente. O setup é simples (1 API key), o free tier tem 3.000 emails/mês, e não depende do modal do Lovable. Podemos usar `mail.maluz.app` como subdomínio para evitar conflitos futuros se o email nativo voltar a funcionar.
+### Detalhes técnicos
 
-Se preferir não criar conta em outro serviço, a **Opção A** vale uma última tentativa — o erro pode ser temporário.
-
+- Nenhuma migração necessária — os limites são derivados do `planSlug` no frontend.
+- A lógica fica centralizada no hook `usePlanLimits` para reutilização futura.
+- O bloco de áudio no Free mostrará um overlay/lock visual com ícone de coroa, mantendo o padrão visual PRO já usado no app.  
+  
+  
+Finalizar inserindo esses novos limites e caracteristicas na landing page, tb, pra ficar claro as diferenças e no backend tb, já estar config pra essa modulação.
