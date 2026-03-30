@@ -251,6 +251,8 @@ export default function Profiles() {
     await loadPageData();
   };
 
+  const activeProfileId = useProfileStore((s) => s.activeProfileId);
+
   const selectProfile = (id: string) => {
     setActiveProfile(id);
     navigate('/inicio');
