@@ -196,30 +196,13 @@ export default function Challenges() {
   const shareWhatsApp = (challenge: Challenge) => {
     const pct = challenge.score && challenge.total ? Math.round((challenge.score / challenge.total) * 100) : 0;
     const childName = childNames[challenge.child_profile_id] || 'a criança';
-    const text = [
-      '*Maluz \u2014 Desafio Conclu\u00eddo!*',
-      '',
-      `Desafio: ${challenge.subject} \u2014 ${challenge.topic}`,
-      `${childName} acertou *${challenge.score} de ${challenge.total}* (${pct}%)`,
-      '',
-      'Que tal desafiar seu filho tamb\u00e9m?',
-      'https://maluz.app',
-    ].join('\n');
+    const text = `\u{1F4A1} *Maluz \u2014 Desafio Conclu\u00eddo!*\n\n\u{1F3AF} Desafio: ${challenge.subject} \u2014 ${challenge.topic}\n\u{1F3C6} ${childName} acertou *${challenge.score} de ${challenge.total}* (${pct}%)\n\n\u{1F680} Que tal desafiar seu filho tamb\u00e9m?\nhttps://maluz.app`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const resendViaWhatsApp = (challenge: Challenge) => {
     const childName = childNames[challenge.child_profile_id] || 'Filho(a)';
-    const text = [
-      '*Maluz \u2014 Novo Desafio!*',
-      '',
-      `${challenge.subject} \u2014 ${challenge.topic}`,
-      `${challenge.total} exerc\u00edcios`,
-      challenge.message ? `"${challenge.message}"` : '',
-      '',
-      'Abra o Maluz para resolver!',
-      'https://maluz.app',
-    ].filter(Boolean).join('\n');
+    const text = `\u{1F4A1} *Maluz \u2014 Novo Desafio!*\n\n\u{1F3AF} ${challenge.subject} \u2014 ${challenge.topic}\n\u{1F4DD} ${challenge.total} exerc\u00edcios\n${challenge.message ? `\u{1F4AC} "${challenge.message}"\n` : ''}\n\u{1F680} Abra o Maluz para resolver!\nhttps://maluz.app`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
