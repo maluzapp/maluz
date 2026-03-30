@@ -17,6 +17,8 @@ const NAV_ITEMS_RIGHT = [
   { path: '/desafios', icon: Swords, label: 'Desafios' },
 ];
 
+const FRIENDS_PATH = '/amigos';
+
 const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/', '/admin'];
 const HIDDEN_PREFIXES = ['/desafio/'];
 
