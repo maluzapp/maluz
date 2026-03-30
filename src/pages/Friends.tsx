@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UserPlus, Search, Copy, Users, Trophy, Star, Flame, Check, X, Clock } from 'lucide-react';
+import { UserPlus, Search, Copy, Users, Trophy, Star, Flame, Check, X, Clock, Crown } from 'lucide-react';
 import { ReactionBar } from '@/components/ReactionBar';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -70,6 +70,7 @@ export default function Friends() {
   const [loading, setLoading] = useState(true);
   // Track IDs already connected (friends + pending sent/received)
   const [connectedIds, setConnectedIds] = useState<Set<string>>(new Set());
+  const [proProfileIds, setProProfileIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!profileId || !user) return;
@@ -143,7 +144,7 @@ export default function Friends() {
     setSentRequests(mappedSent);
     setConnectedIds(new Set([...friendIds, ...pendingIds, ...sentIds]));
 
-    // Get friends' recent sessions
+    // Get friends' recent sessions and PRO status
     if (friendIds.length > 0) {
       const { data: sessions } = await supabase
         .from('study_sessions')
@@ -158,6 +159,43 @@ export default function Friends() {
       })).filter((a: any) => a.profile);
 
       setActivities(mappedActivities as FriendActivity[]);
+
+      // Check which friends have active subscriptions (PRO)
+      const { data: friendProfiles } = await supabase
+        .from('profiles')
+        .select('id, user_id')
+        .in('id', friendIds);
+
+      if (friendProfiles && friendProfiles.length > 0) {
+        const userIdToProfileId: Record<string, string> = {};
+        for (const fp of friendProfiles) {
+          userIdToProfileId[fp.user_id] = fp.id;
+        }
+        const friendUserIds = friendProfiles.map(fp => fp.user_id);
+
+        const { data: subs } = await supabase
+          .from('user_subscriptions')
+          .select('user_id, status, plan_id')
+          .in('user_id', friendUserIds)
+          .eq('status', 'active');
+
+        if (subs && subs.length > 0) {
+          // Get free plan id to exclude
+          const { data: freePlan } = await supabase
+            .from('subscription_plans')
+            .select('id')
+            .eq('slug', 'free')
+            .maybeSingle();
+
+          const proIds = new Set(
+            subs
+              .filter(s => !freePlan || s.plan_id !== freePlan.id)
+              .map(s => userIdToProfileId[s.user_id])
+              .filter(Boolean)
+          );
+          setProProfileIds(proIds);
+        }
+      }
     }
 
     setLoading(false);
@@ -345,6 +383,9 @@ export default function Friends() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
                           <p className="text-sm font-semibold text-foreground">{a.profile.name}</p>
+                          {proProfileIds.has(a.profile.id) && (
+                            <Badge className="bg-primary text-primary-foreground border-0 text-[9px] px-1.5 py-0 h-4"><Crown className="h-3 w-3 mr-0.5" /> PRO</Badge>
+                          )}
                           <span className="text-[10px] text-muted-foreground">{formatRelativeDate(a.created_at)}</span>
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5">
@@ -395,7 +436,12 @@ export default function Friends() {
                         </span>
                         <span className="text-2xl">{f.friend.avatar_emoji}</span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-foreground">{f.friend.name}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-sm font-semibold text-foreground">{f.friend.name}</p>
+                            {proProfileIds.has(f.friend.id) && (
+                              <Badge className="bg-primary text-primary-foreground border-0 text-[9px] px-1.5 py-0 h-4"><Crown className="h-3 w-3 mr-0.5" /> PRO</Badge>
+                            )}
+                          </div>
                           <div className="flex gap-2 text-[10px] text-muted-foreground mt-0.5">
                             <span className="flex items-center gap-0.5"><Star className="h-3 w-3 text-primary" /> {f.friend.xp} XP</span>
                             <span className="flex items-center gap-0.5"><Flame className="h-3 w-3 text-destructive" /> {f.friend.streak_days}d</span>
