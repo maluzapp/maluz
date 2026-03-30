@@ -5,7 +5,13 @@ import { cn } from '@/lib/utils';
 import { useProfileStore } from '@/hooks/useProfile';
 import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests';
 import { usePendingChallenges } from '@/hooks/usePendingChallenges';
-import lampadaIcon from '@/assets/lampada-logo.png';
+import { supabase } from '@/integrations/supabase/client';
+import lampadaFallback from '@/assets/lampada-logo.png';
+
+const centralButtonUrl = (() => {
+  const { data } = supabase.storage.from('logos').getPublicUrl('icon_central_button.png');
+  return data.publicUrl;
+})();
 
 const NAV_ITEMS_LEFT = [
   { path: '/inicio', icon: Home, label: 'Início' },
