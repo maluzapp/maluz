@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { usePlans, useStripeSubscription, startCheckout } from '@/hooks/useSubscription';
 import { useAuth } from '@/hooks/useAuth';
-import { Check, Star, Crown, Sparkles, Zap, Loader2 } from 'lucide-react';
+import { Check, Star, Crown, Sparkles, Zap, Loader2, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
