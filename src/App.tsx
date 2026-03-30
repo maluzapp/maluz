@@ -53,6 +53,26 @@ function RequireAuth({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+function SmartHome() {
+  const { user, loading } = useAuth();
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || (navigator as any).standalone === true;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (isStandalone) {
+    return user ? <Navigate to="/inicio" replace /> : <Navigate to="/login" replace />;
+  }
+
+  return <Landing />;
+}
+
 function AppUpdateChecker() {
   useAppUpdateToast();
   return null;
@@ -70,7 +90,7 @@ const App = () => (
           <UpdateModal />
           <AppUpdateChecker />
           <Routes>
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={<SmartHome />} />
             <Route path="/login" element={<Login />} />
             <Route path="/perfis" element={<Profiles />} />
             <Route path="/inicio" element={<RequireAuth><Index /></RequireAuth>} />
