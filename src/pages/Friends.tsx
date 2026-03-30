@@ -70,6 +70,7 @@ export default function Friends() {
   const [loading, setLoading] = useState(true);
   // Track IDs already connected (friends + pending sent/received)
   const [connectedIds, setConnectedIds] = useState<Set<string>>(new Set());
+  const [proProfileIds, setProProfileIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!profileId || !user) return;
