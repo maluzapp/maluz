@@ -557,17 +557,19 @@ export default function Landing() {
       </section>
 
       {/* Scroll to top button */}
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="fixed bottom-20 right-4 z-40 w-10 h-10 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/20 flex items-center justify-center hover:scale-110 transition-transform"
-        aria-label="Voltar ao topo"
-      >
-        <ChevronUp className="h-5 w-5" />
-      </button>
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-6 right-6 z-50 w-11 h-11 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200"
+          aria-label="Voltar ao topo"
+        >
+          <ChevronUp className="h-5 w-5" />
+        </button>
+      )}
 
       {/* Footer */}
       <footer className="py-10 border-t border-primary/10 text-center">
-        <img src={logoMaluz} alt="Maluz" className="h-24 mx-auto mb-3" />
+        <img src={logoMaluz} alt="Maluz" className="mx-auto mb-3" style={{ height: footerLogoHeight }} />
         <p className="text-xs tracking-widest uppercase text-foreground/40 mb-4">{t('app_tagline', 'O conhecimento que ilumina')}</p>
         <div className="w-8 h-px bg-primary mx-auto mb-4 opacity-40" />
         <p className="text-[0.65rem] text-foreground/25 tracking-wide">
