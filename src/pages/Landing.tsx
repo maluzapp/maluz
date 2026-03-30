@@ -501,7 +501,7 @@ export default function Landing() {
       <hr className="border-primary/15" />
 
       {/* App Stores */}
-      <section className="py-16 md:py-20 px-5">
+      <section className="py-16 md:py-20 px-5 scroll-reveal">
         <div className="max-w-3xl mx-auto text-center">
           <p className="font-mono text-[0.64rem] tracking-[0.22em] uppercase text-primary/70 mb-3">Disponibilidade</p>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4 text-foreground">
