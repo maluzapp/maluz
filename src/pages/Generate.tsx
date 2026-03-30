@@ -11,7 +11,7 @@ import { GamificationBar } from '@/components/GamificationBar';
 import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { YEAR_OPTIONS } from '@/constants/years';
-import { useCanStartSession } from '@/hooks/useSubscription';
+import { useCanStartSession, usePlanLimits } from '@/hooks/useSubscription';
 import { UpgradePrompt } from '@/components/UpgradePrompt';
 import lampadaIcon from '@/assets/lampada-2.png';
 import type { SchoolYear, Subject } from '@/types/study';
