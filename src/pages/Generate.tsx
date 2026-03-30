@@ -35,6 +35,7 @@ export default function Generate() {
   const [year, setYear] = useState<SchoolYear | ''>('');
   const activeProfileId = useProfileStore((s) => s.activeProfileId);
   const { canStart } = useCanStartSession();
+  const { maxPhotos, canUseAudio } = usePlanLimits();
 
   useEffect(() => {
     if (!activeProfileId) return;
