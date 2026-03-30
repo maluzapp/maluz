@@ -59,15 +59,15 @@ interface LogoFieldConfig {
 }
 
 const LOGO_FIELDS: LogoFieldConfig[] = [
-  { key: 'logo_landing_hero', label: 'Logo Hero (Landing)', sizeKey: 'logo_height_landing_hero', min: 32, max: 256 },
-  { key: 'logo_landing_footer', label: 'Logo Footer', sizeKey: 'logo_height_landing_footer', min: 24, max: 128 },
-  { key: 'logo_login', label: 'Logo Login', sizeKey: 'logo_height_login', min: 64, max: 512 },
-  { key: 'logo_nav', label: 'Logo Nav', sizeKey: 'logo_height_nav', min: 16, max: 64 },
-  { key: 'logo_index', label: 'Logo Index', sizeKey: 'logo_height_index', min: 32, max: 128 },
-  { key: 'symbol_landing_hero', label: 'Símbolo Hero (Landing)', sizeKey: 'symbol_height_landing_hero', min: 32, max: 256 },
-  { key: 'symbol_index', label: 'Símbolo Index', sizeKey: 'symbol_height_index', min: 32, max: 128 },
-  { key: 'symbol_login', label: 'Símbolo Login', sizeKey: 'symbol_height_login', min: 32, max: 256 },
-  { key: 'icon_pwa', label: 'Ícone do App (PWA)', sizeKey: 'icon_pwa_size', min: 128, max: 512 },
+  { key: 'logo_landing_hero', label: 'Logo Hero (Landing)', sizeKey: 'logo_height_landing_hero', min: 32, max: 256, hint: 'Aparece no topo da landing page, seção principal' },
+  { key: 'logo_landing_footer', label: 'Logo Footer', sizeKey: 'logo_height_landing_footer', min: 24, max: 128, hint: 'Rodapé da landing page' },
+  { key: 'logo_login', label: 'Logo Login', sizeKey: 'logo_height_login', min: 64, max: 512, hint: 'Tela de login/cadastro do app' },
+  { key: 'logo_nav', label: 'Logo Nav', sizeKey: 'logo_height_nav', min: 16, max: 64, hint: 'Barra de navegação superior (header)' },
+  { key: 'logo_index', label: 'Logo Index', sizeKey: 'logo_height_index', min: 32, max: 128, hint: 'Tela inicial (dashboard) do app' },
+  { key: 'symbol_landing_hero', label: 'Símbolo Hero (Landing)', sizeKey: 'symbol_height_landing_hero', min: 32, max: 256, hint: 'Ícone/símbolo ao lado do título na landing' },
+  { key: 'symbol_index', label: 'Símbolo Index', sizeKey: 'symbol_height_index', min: 32, max: 128, hint: 'Ícone/símbolo na tela inicial do app' },
+  { key: 'symbol_login', label: 'Símbolo Login', sizeKey: 'symbol_height_login', min: 32, max: 256, hint: 'Ícone/símbolo na tela de login' },
+  { key: 'icon_pwa', label: 'Ícone do App (PWA)', sizeKey: 'icon_pwa_size', min: 128, max: 512, hint: 'Ícone que aparece na tela inicial do celular' },
 ];
 
 const VOICE_FIELDS: FieldConfig[] = [
