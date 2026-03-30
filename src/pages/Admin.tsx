@@ -836,8 +836,8 @@ export default function Admin() {
 
       {/* Sidebar */}
       <aside className={cn(
-        'w-56 xl:w-64 shrink-0 border-r border-primary/15 bg-card/30 flex flex-col h-screen',
-        'fixed md:sticky top-0 z-40 transition-transform duration-200',
+        'w-56 xl:w-64 shrink-0 border-r border-primary/15 bg-card flex flex-col h-screen',
+        'fixed md:sticky top-0 z-50 md:z-auto transition-transform duration-200',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
       )}>
         <div className="p-4 border-b border-primary/15">
@@ -877,7 +877,7 @@ export default function Admin() {
       </aside>
 
       {/* Content area */}
-      <main className="flex-1 min-h-screen overflow-y-auto pt-14 md:pt-0">
+      <main className="flex-1 min-h-screen overflow-y-auto pt-14 md:pt-0 md:ml-0">
         <div className="p-4 md:p-6 lg:p-8 xl:p-10 max-w-6xl">
           {activeSection === 'general' && <SectionPanel fields={GENERAL_FIELDS} icon={<Settings className="h-5 w-5 text-primary" />} title="Configurações Gerais" />}
           {activeSection === 'colors' && <SectionPanel fields={COLOR_FIELDS} icon={<Palette className="h-5 w-5 text-primary" />} title="Paleta de Cores" />}

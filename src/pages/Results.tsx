@@ -243,7 +243,7 @@ export default function Results() {
     const cta = s.share_cta || `🚀 Que tal tentar também? Baixe o ${appName} e descubra o seu resultado!`;
     const appUrl = s.share_app_url || 'https://maluz.app';
 
-    const text = `${header}\n\n📖 ${config.subject} — ${config.topic} (${config.year})\n🏆 Acertei *${score} de ${total}* (${pct}%)\n⭐ Ganhei ${xpEarned} XP!\n\n${getMessage(pct)}\n\n${cta}\n👉 ${appUrl}`;
+    const text = `${header}\n\n📖 ${config.subject} — ${config.topic} (${config.year})\n🏆 Acertei *${score} de ${total}* (${pct}%)\n⭐ Ganhei ${xpEarned} XP!\n\n${getMessage(pct)}\n\n${cta}\n👉 ${appUrl.replace(/\/$/, '')}`;
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };

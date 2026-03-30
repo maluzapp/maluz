@@ -45,7 +45,10 @@ function RequireAuth({ children }: { children: ReactNode }) {
   }
 
   if (!user) return <Navigate to="/login" replace />;
-  if (!profileId) return <Navigate to="/perfis" replace />;
+  if (!profileId) {
+    // Don't redirect to profiles if we're still loading initial data
+    return <Navigate to="/perfis" replace />;
+  }
 
   return <>{children}</>;
 }
@@ -77,7 +80,7 @@ const App = () => (
             <Route path="/resultado" element={<RequireAuth><Results /></RequireAuth>} />
             <Route path="/sessao/:id" element={<RequireAuth><SessionReview /></RequireAuth>} />
             <Route path="/creditos" element={<Credits />} />
-            <Route path="/amigos" element={<Navigate to="/perfis" replace />} />
+            <Route path="/amigos" element={<RequireAuth><Friends /></RequireAuth>} />
             <Route path="/instalar" element={<Install />} />
             <Route path="/desafios" element={<RequireAuth><Challenges /></RequireAuth>} />
             <Route path="/desafio/:id" element={<RequireAuth><ChallengeExercise /></RequireAuth>} />

@@ -312,6 +312,14 @@ export default function Profiles() {
       used_by: parentProfileId,
     } as any).eq('id', (codeData as any).id);
 
+    // Auto-create friendship between parent and child
+    const childId = (codeData as any).profile_id;
+    await supabase.from('friendships' as any).upsert({
+      requester_profile_id: parentProfileId,
+      target_profile_id: childId,
+      status: 'accepted',
+    }, { onConflict: 'requester_profile_id,target_profile_id' } as any);
+
     setLinkingCode('');
     toast.success('Filho vinculado com sucesso!');
     await loadPageData();
@@ -389,6 +397,13 @@ export default function Profiles() {
       } else {
         toast.success('Cônjuge vinculado! Filhos compartilhados com sucesso.');
       }
+
+      // Auto-create friendship between spouses
+      await supabase.from('friendships' as any).upsert({
+        requester_profile_id: myParent.id,
+        target_profile_id: partner.id,
+        status: 'accepted',
+      }, { onConflict: 'requester_profile_id,target_profile_id' } as any);
 
       setPartnerCode('');
       await loadPageData();
@@ -653,15 +668,12 @@ export default function Profiles() {
         })()}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-3 h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl mb-4">
+          <TabsList className="w-full grid grid-cols-2 h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl mb-4">
             <TabsTrigger value="meus" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2.5">
               <Baby className="h-3.5 w-3.5 mr-1" /> Perfis
             </TabsTrigger>
             <TabsTrigger value="familia" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2.5">
               <Users className="h-3.5 w-3.5 mr-1" /> Família
-            </TabsTrigger>
-            <TabsTrigger value="amigos" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2.5">
-              <Heart className="h-3.5 w-3.5 mr-1" /> Amigos
             </TabsTrigger>
           </TabsList>
 
@@ -922,11 +934,12 @@ export default function Profiles() {
               </div>
             )}
           </TabsContent>
-
-          <TabsContent value="amigos">
-            <FriendsTab />
-          </TabsContent>
         </Tabs>
+
+        {/* Quick link to friends */}
+        <Button variant="outline" className="w-full gap-2 mt-4" onClick={() => navigate('/amigos')}>
+          <Heart className="h-4 w-4 text-primary" /> Ver amigos e atividades
+        </Button>
       </div>
 
       {/* Delete confirmation dialog */}

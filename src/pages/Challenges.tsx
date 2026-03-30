@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Swords, Send, Clock, CheckCircle, Trophy, Plus, Share2, Eye, RefreshCw, Trash2 } from 'lucide-react';
+import { Swords, Send, Clock, CheckCircle, Trophy, Plus, Share2, Eye, RefreshCw, Trash2, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { CreateChallengeModal } from '@/components/challenges/CreateChallengeModal';
@@ -200,6 +200,12 @@ export default function Challenges() {
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
+  const resendViaWhatsApp = (challenge: Challenge) => {
+    const childName = childNames[challenge.child_profile_id] || 'Filho(a)';
+    const text = `💡 *Maluz — Novo Desafio!*\n\n🎯 ${challenge.subject} — ${challenge.topic}\n📝 ${challenge.total} exercícios\n${challenge.message ? `💬 "${challenge.message}"\n` : ''}\n🚀 Abra o Maluz para resolver!\n👉 https://maluz.app`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -301,8 +307,11 @@ export default function Challenges() {
                             )}
                             {profileType === 'parent' && (
                               <>
-                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => resendChallenge(c)}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => resendChallenge(c)} title="Reenviar no app">
                                   <RefreshCw className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-green-500" onClick={() => resendViaWhatsApp(c)} title="Reenviar via WhatsApp">
+                                  <MessageCircle className="h-4 w-4" />
                                 </Button>
                                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => deleteChallenge(c.id)}>
                                   <Trash2 className="h-4 w-4" />
