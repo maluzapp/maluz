@@ -22,6 +22,12 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
+    const admin = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+      { auth: { persistSession: false } }
+    );
+
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
@@ -30,16 +36,18 @@ Deno.serve(async (req) => {
     const { action } = await req.json();
 
     if (action === 'check') {
-      // Get user's active subscription
-      const { data: sub } = await supabase
+      const { data: effectiveUserId } = await admin.rpc('get_effective_plan_user_id', { _user_id: user.id });
+
+      const { data: sub } = await admin
         .from('user_subscriptions')
         .select('*, plan:subscription_plans(*)')
-        .eq('user_id', user.id)
+        .eq('user_id', effectiveUserId || user.id)
         .eq('status', 'active')
         .maybeSingle();
 
       return new Response(JSON.stringify({
         subscription: sub,
+        effective_user_id: effectiveUserId || user.id,
         plan: sub?.plan ?? { slug: 'free', daily_session_limit: 3, max_profiles: 1 },
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
