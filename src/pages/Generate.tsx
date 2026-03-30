@@ -173,12 +173,30 @@ export default function Generate() {
 
           <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '400ms' }}>
             <CardContent className="p-4">
-              <Label className="mb-2 block font-semibold font-display">📷 Fotos do livro (opcional)</Label>
+              <div className="flex items-center justify-between mb-2">
+                <Label className="font-semibold font-display">{'\u{1F4F7}'} Fotos do livro (opcional)</Label>
+                {maxPhotos !== null && (
+                  <span className="text-[0.65rem] text-muted-foreground font-mono">
+                    {images.length}/{maxPhotos}
+                  </span>
+                )}
+              </div>
               <p className="mb-3 text-sm text-muted-foreground">Tire foto ou envie imagens das páginas</p>
               <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
-              <Button variant="outline" className="w-full gap-2" onClick={() => fileInputRef.current?.click()}>
+              <Button
+                variant="outline"
+                className="w-full gap-2"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={maxPhotos !== null && images.length >= maxPhotos}
+              >
                 <Camera className="h-4 w-4" /> Adicionar fotos
               </Button>
+              {maxPhotos !== null && images.length >= maxPhotos && (
+                <div className="mt-2 flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2 text-xs text-primary">
+                  <Crown className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span>Limite de {maxPhotos} fotos no plano Free. <button onClick={() => navigate('/login')} className="underline font-bold">Upgrade para Pro</button> para fotos ilimitadas.</span>
+                </div>
+              )}
               {images.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {images.map((img, i) => (
