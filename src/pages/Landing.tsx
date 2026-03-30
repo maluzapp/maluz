@@ -6,7 +6,7 @@ import lampadaIcon from '@/assets/lampada-2.png';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import PricingSection from '@/components/PricingSection';
 import { Button } from '@/components/ui/button';
-import { Download, X, Share } from 'lucide-react';
+import { Download, X, Share, ChevronUp } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
