@@ -836,8 +836,8 @@ export default function Admin() {
 
       {/* Sidebar */}
       <aside className={cn(
-        'w-56 xl:w-64 shrink-0 border-r border-primary/15 bg-card/30 flex flex-col h-screen',
-        'fixed md:sticky top-0 z-40 transition-transform duration-200',
+        'w-56 xl:w-64 shrink-0 border-r border-primary/15 bg-card flex flex-col h-screen',
+        'fixed md:sticky top-0 z-50 md:z-auto transition-transform duration-200',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
       )}>
         <div className="p-4 border-b border-primary/15">
