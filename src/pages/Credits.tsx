@@ -68,7 +68,7 @@ export default function Credits() {
           </Card>
 
           <a
-            href="/landing"
+            href="/"
             className="block text-center text-sm text-primary font-medium hover:underline transition-colors py-3"
           >
             Conheça mais sobre o Maluz →
