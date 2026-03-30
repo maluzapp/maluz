@@ -307,6 +307,42 @@ export type Database = {
         }
         Relationships: []
       }
+      spouse_links: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string
+          spouse_profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id: string
+          spouse_profile_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string
+          spouse_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spouse_links_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spouse_links_spouse_profile_id_fkey"
+            columns: ["spouse_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       study_sessions: {
         Row: {
           answers_data: Json | null
@@ -496,6 +532,10 @@ export type Database = {
           streak_days: number
           xp: number
         }[]
+      }
+      get_effective_plan_user_id: {
+        Args: { _user_id: string }
+        Returns: string
       }
       get_profiles_by_ids: {
         Args: { _ids: string[] }

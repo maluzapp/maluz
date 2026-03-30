@@ -55,14 +55,11 @@ export function useUserSubscription() {
     queryKey: ['user_subscription', user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_subscriptions')
-        .select('*, plan:subscription_plans(*)')
-        .eq('user_id', user!.id)
-        .eq('status', 'active')
-        .maybeSingle();
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        body: { action: 'check' },
+      });
       if (error) throw error;
-      return data as (UserSubscription & { plan: SubscriptionPlan }) | null;
+      return (data?.subscription ?? null) as (UserSubscription & { plan: SubscriptionPlan }) | null;
     },
   });
 }

@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Swords, Send, Clock, CheckCircle, Trophy, Plus, Share2, Eye } from 'lucide-react';
+import { Swords, Send, Clock, CheckCircle, Trophy, Plus, Share2, Eye, RefreshCw, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { CreateChallengeModal } from '@/components/challenges/CreateChallengeModal';
@@ -155,6 +155,44 @@ export default function Challenges() {
     navigate(`/desafio/${challenge.id}`);
   };
 
+  const resendChallenge = async (challenge: Challenge) => {
+    const { error } = await supabase.from('challenges' as any).insert({
+      parent_profile_id: challenge.parent_profile_id,
+      child_profile_id: challenge.child_profile_id,
+      subject: challenge.subject,
+      topic: challenge.topic,
+      year: challenge.year,
+      exercises_data: challenge.exercises_data,
+      total: challenge.total,
+      message: challenge.message,
+      status: 'pending',
+    });
+
+    if (error) {
+      toast.error('Não foi possível reenviar o desafio');
+      return;
+    }
+
+    toast.success('Desafio reenviado com sucesso!');
+    loadData();
+  };
+
+  const deleteChallenge = async (challengeId: string) => {
+    const { error } = await supabase.from('challenges').delete().eq('id', challengeId);
+
+    if (error) {
+      toast.error('Não foi possível excluir o desafio');
+      return;
+    }
+
+    if (selectedChallenge?.id === challengeId) {
+      setSelectedChallenge(null);
+    }
+
+    toast.success('Desafio excluído');
+    loadData();
+  };
+
   const shareWhatsApp = (challenge: Challenge) => {
     const pct = challenge.score && challenge.total ? Math.round((challenge.score / challenge.total) * 100) : 0;
     const childName = childNames[challenge.child_profile_id] || 'a criança';
@@ -255,11 +293,23 @@ export default function Challenges() {
                               </p>
                             )}
                           </div>
-                          {profileType === 'child' && c.status === 'pending' && (
-                            <Button size="sm" onClick={() => startChallenge(c)} className="gap-1.5 shrink-0">
-                              <Swords className="h-3.5 w-3.5" /> Iniciar
-                            </Button>
-                          )}
+                          <div className="flex gap-1.5 shrink-0">
+                            {profileType === 'child' && c.status === 'pending' && (
+                              <Button size="sm" onClick={() => startChallenge(c)} className="gap-1.5 shrink-0">
+                                <Swords className="h-3.5 w-3.5" /> Iniciar
+                              </Button>
+                            )}
+                            {profileType === 'parent' && (
+                              <>
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => resendChallenge(c)}>
+                                  <RefreshCw className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => deleteChallenge(c.id)}>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -302,8 +352,14 @@ export default function Challenges() {
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); setSelectedChallenge(c); }}>
                               <Eye className="h-4 w-4" />
                             </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); resendChallenge(c); }}>
+                              <RefreshCw className="h-4 w-4" />
+                            </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); shareWhatsApp(c); }}>
                               <Share2 className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); deleteChallenge(c.id); }}>
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>

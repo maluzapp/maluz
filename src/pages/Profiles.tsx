@@ -70,6 +70,10 @@ export default function Profiles() {
   const [partnerCode, setPartnerCode] = useState('');
   const [linkingPartner, setLinkingPartner] = useState(false);
   const [linkedSpouse, setLinkedSpouse] = useState<{ name: string; avatar_emoji: string; friend_code: string } | null>(null);
+  const subDataLoaded = !stripeLoading && !dbSubLoading;
+  const isPro = subDataLoaded && !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
+  const currentPlan = dbSub?.plan ?? plans?.find((plan) => plan.slug === stripeStatus?.plan_slug) ?? plans?.find((plan) => plan.slug === 'free');
+  const maxProfiles = currentPlan?.max_profiles ?? 1;
 
   useEffect(() => {
     if (!loading && !user) navigate('/login');
@@ -124,7 +128,30 @@ export default function Profiles() {
 
   const fetchSpouseData = async (profileList: Profile[], childLinks: LinkedChild[]) => {
     const parentIds = profileList.filter(p => p.profile_type === 'parent').map(p => p.id);
-    if (parentIds.length === 0 || childLinks.length === 0) return null;
+    if (parentIds.length === 0) return null;
+
+    const { data: spouseLinksA } = await supabase
+      .from('spouse_links' as any)
+      .select('profile_id, spouse_profile_id')
+      .in('profile_id', parentIds);
+
+    const { data: spouseLinksB } = await supabase
+      .from('spouse_links' as any)
+      .select('profile_id, spouse_profile_id')
+      .in('spouse_profile_id', parentIds);
+
+    const explicitSpouseIds = [...new Set([
+      ...((spouseLinksA as any[] | null) ?? []).map((l: any) => l.spouse_profile_id),
+      ...((spouseLinksB as any[] | null) ?? []).map((l: any) => l.profile_id),
+    ].filter((id: string) => !parentIds.includes(id)))];
+
+    if (explicitSpouseIds.length > 0) {
+      const { data: spouseData } = await supabase.rpc('get_profiles_by_ids', { _ids: explicitSpouseIds });
+      const spouse = (spouseData as any)?.[0];
+      return spouse ? { name: spouse.name, avatar_emoji: spouse.avatar_emoji, friend_code: spouse.friend_code || '' } : null;
+    }
+
+    if (childLinks.length === 0) return null;
 
     const childIds = childLinks.map(l => l.child.id);
     // Find other parents linked to the same children
@@ -170,6 +197,10 @@ export default function Profiles() {
 
   const createProfile = async () => {
     if (!newName.trim() || !user) return;
+    if (profiles.length >= maxProfiles) {
+      toast.error(`Seu plano ${currentPlan?.name || 'atual'} permite até ${maxProfiles} perfis.`);
+      return;
+    }
     await supabase.from('profiles').insert({
       user_id: user.id,
       name: newName.trim(),
@@ -306,6 +337,21 @@ export default function Profiles() {
         return;
       }
 
+      if (partner.id === myParent.id) {
+        toast.error('Use o código de outro responsável');
+        return;
+      }
+
+      const { error: spouseLinkError } = await supabase.from('spouse_links' as any).upsert([
+        { profile_id: myParent.id, spouse_profile_id: partner.id },
+        { profile_id: partner.id, spouse_profile_id: myParent.id },
+      ], { onConflict: 'profile_id,spouse_profile_id' } as any);
+
+      if (spouseLinkError) {
+        toast.error('Erro ao registrar o vínculo familiar');
+        return;
+      }
+
       // Get partner's linked children
       const { data: partnerLinks } = await supabase
         .from('parent_child_links' as any)
@@ -424,9 +470,6 @@ export default function Profiles() {
       </div>
     );
   }
-
-  const subDataLoaded = !stripeLoading && !dbSubLoading;
-  const isPro = subDataLoaded && !!(stripeStatus?.subscribed || (dbSub?.status === 'active' && dbSub?.plan?.slug !== 'free'));
 
   const ProfileCard = ({ p, idx }: { p: Profile; idx: number }) => (
     <Card
@@ -695,7 +738,7 @@ export default function Profiles() {
                 </CardContent>
               </Card>
             ) : (
-              <Button variant="outline" className="w-full gap-2" onClick={() => setCreating(true)}>
+              <Button variant="outline" className="w-full gap-2" onClick={() => setCreating(true)} disabled={profiles.length >= maxProfiles}>
                 <Plus className="h-4 w-4" /> Adicionar perfil
               </Button>
             )}

@@ -6,10 +6,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useStudyStore } from '@/store/study-store';
 import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
-import { incrementDailyUsage } from '@/hooks/useSubscription';
 import { getYearLabel } from '@/constants/years';
 import { cn } from '@/lib/utils';
 import { PerfectScoreConfetti, firePerfectScoreConfetti } from '@/components/exercises/Confetti';
+import { awardStudyProgress, calculateXp } from '@/lib/studyProgress';
 
 function getEmoji(pct: number) {
   if (pct >= 90) return '🏆';
@@ -23,12 +23,6 @@ function getMessage(pct: number) {
   if (pct >= 70) return 'Muito bem! Continue assim!';
   if (pct >= 50) return 'Bom trabalho! Pode melhorar!';
   return 'Vamos revisar e tentar de novo!';
-}
-
-function calcXP(score: number, total: number) {
-  const base = score * 10;
-  const bonus = score === total ? 20 : 0;
-  return base + bonus;
 }
 
 interface SessionRecord {
@@ -197,72 +191,29 @@ export default function Results() {
     const savedSessionId = sessionStorage.getItem('lastSavedStudySessionId');
     if (savedSessionId === sessionId) {
       setSaved(true);
-      setXpEarned(calcXP(score, total));
+      setXpEarned(calculateXp(score, total));
       return;
     }
 
-    const xp = calcXP(score, total);
+    const xp = calculateXp(score, total);
     setXpEarned(xp);
 
     const saveResults = async () => {
-      const { error: insertError } = await supabase.from('study_sessions').insert({
-        profile_id: profileId,
+      const result = await awardStudyProgress({
+        profileId,
         subject: config.subject,
         topic: config.topic,
         year: config.year,
         score,
         total,
-        xp_earned: xp,
-        exercises_data: JSON.parse(JSON.stringify(exercises)),
-        answers_data: JSON.parse(JSON.stringify(answers)),
+        exercises,
+        answers,
+        countDailyUsage: true,
       });
 
-      if (insertError) return;
+      if (result.error) return;
 
       sessionStorage.setItem('lastSavedStudySessionId', sessionId);
-
-      await incrementDailyUsage(profileId);
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('xp, level, streak_days, last_study_date, total_exercises, total_correct')
-        .eq('id', profileId)
-        .single();
-
-      if (profile) {
-        const newXp = (profile.xp || 0) + xp;
-        const newTotalEx = (profile.total_exercises || 0) + total;
-        const newTotalCorrect = (profile.total_correct || 0) + score;
-
-        let newLevel = profile.level || 1;
-        let remainingXp = newXp;
-        while (remainingXp >= newLevel * 100) {
-          remainingXp -= newLevel * 100;
-          newLevel++;
-        }
-
-        const today = new Date().toISOString().split('T')[0];
-        const lastDate = profile.last_study_date;
-        let newStreak = profile.streak_days || 0;
-        if (lastDate !== today) {
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          const yesterdayStr = yesterday.toISOString().split('T')[0];
-          newStreak = lastDate === yesterdayStr ? newStreak + 1 : 1;
-        }
-
-        await supabase
-          .from('profiles')
-          .update({
-            xp: newXp,
-            level: newLevel,
-            streak_days: newStreak,
-            last_study_date: today,
-            total_exercises: newTotalEx,
-            total_correct: newTotalCorrect,
-          })
-          .eq('id', profileId);
-      }
 
       setSaved(true);
     };
