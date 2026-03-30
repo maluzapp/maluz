@@ -56,6 +56,7 @@ interface LogoFieldConfig {
   sizeKey: string;
   min: number;
   max: number;
+  hint?: string;
 }
 
 const LOGO_FIELDS: LogoFieldConfig[] = [
