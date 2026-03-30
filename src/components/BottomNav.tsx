@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { useProfileStore } from '@/hooks/useProfile';
 import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests';
 import { usePendingChallenges } from '@/hooks/usePendingChallenges';
-import lampadaIcon from '@/assets/lampada-2.png';
+import lampadaIcon from '@/assets/lampada-logo.png';
 
 const NAV_ITEMS_LEFT = [
   { path: '/inicio', icon: Home, label: 'Início' },
