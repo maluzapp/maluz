@@ -359,6 +359,9 @@ export default function Friends() {
                           </Badge>
                           <span className="text-xs text-primary font-mono">+{a.xp_earned} XP</span>
                         </div>
+                        <div className="mt-2">
+                          <ReactionBar targetType="session" targetId={a.id} />
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
