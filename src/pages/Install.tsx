@@ -61,7 +61,10 @@ export default function Install() {
     if (deferredPrompt) {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') setIsInstalled(true);
+      if (outcome === 'accepted') {
+        setIsInstalled(true);
+        localStorage.setItem('maluz_installed', '1');
+      }
       setDeferredPrompt(null);
     }
   };
