@@ -184,7 +184,7 @@ export default function Landing() {
             </button>
           </div>
         </div>
-      )
+      )}
 
       {/* Hero */}
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-14">
