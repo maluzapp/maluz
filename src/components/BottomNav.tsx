@@ -5,7 +5,13 @@ import { cn } from '@/lib/utils';
 import { useProfileStore } from '@/hooks/useProfile';
 import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests';
 import { usePendingChallenges } from '@/hooks/usePendingChallenges';
-import lampadaIcon from '@/assets/lampada-logo.png';
+import { supabase } from '@/integrations/supabase/client';
+import lampadaFallback from '@/assets/lampada-logo.png';
+
+const centralButtonUrl = (() => {
+  const { data } = supabase.storage.from('logos').getPublicUrl('icon_central_button.png');
+  return data.publicUrl;
+})();
 
 const NAV_ITEMS_LEFT = [
   { path: '/inicio', icon: Home, label: 'Início' },
@@ -26,6 +32,7 @@ export function BottomNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [lampLit, setLampLit] = useState(false);
+  const [useRemoteLogo, setUseRemoteLogo] = useState(true);
   const profileId = useProfileStore((s) => s.activeProfileId);
   const pendingFriends = usePendingFriendRequests();
   const pendingChallenges = usePendingChallenges();
@@ -86,8 +93,9 @@ export function BottomNav() {
             )}
           >
             <img
-              src={lampadaIcon}
+              src={useRemoteLogo ? centralButtonUrl : lampadaFallback}
               alt="Gerar exercícios"
+              onError={() => setUseRemoteLogo(false)}
               className={cn(
                 'h-12 w-12 object-contain transition-all duration-300',
                 (isGeneratePage || lampLit) ? 'brightness-150 drop-shadow-[0_0_10px_rgba(245,200,66,0.8)]' : 'opacity-70'
