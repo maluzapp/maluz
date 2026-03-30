@@ -365,9 +365,12 @@ export default function Admin() {
             const imgSrc = `${logoUrl}?t=${ts}`;
             return (
               <div key={field.key} className="rounded-xl border border-primary/15 bg-card/50 p-4 space-y-3">
-                <div className="flex justify-between items-center">
-                  <Label className="text-sm font-semibold text-foreground">{field.label}</Label>
-                  <span className="font-mono text-xs text-primary">{size}px</span>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <Label className="text-sm font-semibold text-foreground">{field.label}</Label>
+                    {field.hint && <p className="text-[10px] text-muted-foreground mt-0.5">{field.hint}</p>}
+                  </div>
+                  <span className="font-mono text-xs text-primary shrink-0">{size}px</span>
                 </div>
                 <div className="flex items-center justify-center p-4 rounded-lg border border-primary/10 bg-background min-h-[80px]">
                   <img src={imgSrc} alt={field.label} style={{ height: `${Math.min(size, 120)}px` }} className="object-contain max-w-full" onError={(e) => {
