@@ -208,6 +208,31 @@ export default function PricingSection() {
                       <span>{feat}</span>
                     </li>
                   ))}
+                  {/* Plan-specific photo/audio limits */}
+                  {plan.slug === 'free' && (
+                    <>
+                      <li className="flex items-start gap-2.5 text-sm text-foreground/80">
+                        <Check className="h-4 w-4 text-accent mt-0.5 flex-shrink-0" />
+                        <span>Até 2 fotos por exercício</span>
+                      </li>
+                      <li className="flex items-start gap-2.5 text-sm text-foreground/50">
+                        <X className="h-4 w-4 text-foreground/30 mt-0.5 flex-shrink-0" />
+                        <span>Envio de áudio (somente Pro)</span>
+                      </li>
+                    </>
+                  )}
+                  {(plan.slug === 'pro' || plan.slug === 'familia') && (
+                    <>
+                      <li className="flex items-start gap-2.5 text-sm text-foreground/80">
+                        <Check className="h-4 w-4 text-accent mt-0.5 flex-shrink-0" />
+                        <span>Fotos ilimitadas por exercício</span>
+                      </li>
+                      <li className="flex items-start gap-2.5 text-sm text-foreground/80">
+                        <Check className="h-4 w-4 text-accent mt-0.5 flex-shrink-0" />
+                        <span>Envio de áudio com resumo</span>
+                      </li>
+                    </>
+                  )}
                 </ul>
 
                 {/* CTA */}
