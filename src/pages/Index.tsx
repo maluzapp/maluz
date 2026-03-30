@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useStripeSubscription, useUserSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
-import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings } from 'lucide-react';
+import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings, Crown, Lock, Mic, Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProfileData {
