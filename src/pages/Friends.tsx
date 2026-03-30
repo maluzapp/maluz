@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserPlus, Search, Copy, Users, Trophy, Star, Flame, Check, X, Clock } from 'lucide-react';
+import { ReactionBar } from '@/components/ReactionBar';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
