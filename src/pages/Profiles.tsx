@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { YEAR_OPTIONS, getYearLabel } from '@/constants/years';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 const AVATARS = ['🧑‍🎓', '👧', '👦', '🦸', '🧙', '🦊', '🐱', '🦄', '🚀', '⭐', '🐶', '🐼', '🦁', '🐸', '🦋', '🌟', '🎨', '🎮', '🏀', '🎸', '🧑‍🚀', '🧑‍💻', '👩‍🔬', '🧑‍🏫', '🦸‍♀️', '🧚', '🐉', '🌈', '🎯', '🏆'];
 
@@ -251,6 +252,8 @@ export default function Profiles() {
     await loadPageData();
   };
 
+  const activeProfileId = useProfileStore((s) => s.activeProfileId);
+
   const selectProfile = (id: string) => {
     setActiveProfile(id);
     navigate('/inicio');
@@ -426,11 +429,13 @@ export default function Profiles() {
   const parentProfiles = profiles.filter(p => p.profile_type === 'parent');
   const hasParent = parentProfiles.length > 0;
 
-  // Child detail view for parents
+  // Detail view for any profile (own or linked child)
   if (viewingChild) {
     const accuracy = viewingChild.total_exercises > 0
       ? Math.round((viewingChild.total_correct / viewingChild.total_exercises) * 100)
       : 0;
+    const isActive = activeProfileId === viewingChild.id;
+    const isOwnProfile = profiles.some(p => p.id === viewingChild.id);
 
     return (
       <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36">
@@ -440,10 +445,18 @@ export default function Profiles() {
           </Button>
 
           <div className="text-center mb-6 animate-fade-in">
-            <span className="text-6xl block mb-2">{viewingChild.avatar_emoji}</span>
+            <div className="relative inline-block">
+              <span className="text-6xl block mb-2">{viewingChild.avatar_emoji}</span>
+              {isActive && (
+                <span className="absolute -bottom-1 -right-2 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full">ATIVO</span>
+              )}
+            </div>
             <h1 className="font-display text-2xl font-bold text-foreground">{viewingChild.name}</h1>
+            {viewingChild.profile_type === 'parent' && (
+              <Badge className="mt-1 bg-primary/15 text-primary border-0 text-xs">Pai/Mãe</Badge>
+            )}
             {viewingChild.school_year && (
-              <p className="text-sm text-primary">{getYearLabel(viewingChild.school_year)}</p>
+              <p className="text-sm text-primary mt-0.5">{getYearLabel(viewingChild.school_year)}</p>
             )}
           </div>
 
@@ -474,71 +487,93 @@ export default function Profiles() {
             </Card>
           </div>
 
-          <Card className="border-primary/10 animate-fade-in" style={{ animationDelay: '200ms' }}>
+          <Card className="border-primary/10 animate-fade-in mb-5" style={{ animationDelay: '200ms' }}>
             <CardContent className="p-4 text-center">
               <p className="text-sm text-muted-foreground mb-1">Total de exercícios</p>
               <p className="font-display font-bold text-3xl text-foreground">{viewingChild.total_exercises}</p>
               <p className="text-xs text-muted-foreground mt-1">{viewingChild.total_correct} acertos</p>
             </CardContent>
           </Card>
+
+          {/* Explicit profile switch button - only for own profiles */}
+          {isOwnProfile && !isActive && (
+            <Button className="w-full gap-2 font-display font-bold animate-fade-in" style={{ animationDelay: '300ms' }}
+              onClick={() => selectProfile(viewingChild.id)}>
+              Usar este perfil
+            </Button>
+          )}
+          {isOwnProfile && isActive && (
+            <p className="text-center text-sm text-primary font-medium animate-fade-in" style={{ animationDelay: '300ms' }}>
+              ✓ Este é o perfil ativo
+            </p>
+          )}
         </div>
       </div>
     );
   }
 
-  const ProfileCard = ({ p, idx }: { p: Profile; idx: number }) => (
-    <Card
-      key={p.id}
-      className="cursor-pointer hover:border-primary/50 transition-all duration-300"
-    >
-      <CardContent className="p-4 flex items-center gap-4">
-        <button onClick={() => selectProfile(p.id)} className="flex-1 flex items-center gap-4 text-left">
-          <div className="relative">
-            <span className="text-4xl">{p.avatar_emoji}</span>
-            {isPro && (
-              <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[8px] font-bold px-1 py-0.5 rounded-full leading-none">PRO</span>
-            )}
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <p className="font-display font-bold text-foreground">{p.name}</p>
-              {p.profile_type === 'parent' && (
-                <span className="bg-primary/15 text-primary text-[10px] px-1.5 py-0.5 rounded-full font-mono">Pai/Mãe</span>
+  const ProfileCard = ({ p, idx }: { p: Profile; idx: number }) => {
+    const isActive = activeProfileId === p.id;
+    return (
+      <Card
+        key={p.id}
+        className={cn(
+          'cursor-pointer hover:border-primary/50 transition-all duration-300',
+          isActive && 'border-primary/40 ring-1 ring-primary/20'
+        )}
+      >
+        <CardContent className="p-4 flex items-center gap-4">
+          <button onClick={() => setViewingChild(p)} className="flex-1 flex items-center gap-4 text-left">
+            <div className="relative">
+              <span className="text-4xl">{p.avatar_emoji}</span>
+              {isActive && (
+                <span className="absolute -bottom-1 -right-2 bg-primary text-primary-foreground text-[8px] font-bold px-1 py-0.5 rounded-full leading-none">ATIVO</span>
               )}
-              {isPro && (
-                <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-1.5 py-0 h-4"><Crown className="h-3 w-3 mr-0.5" /> PRO</Badge>
+              {isPro && !isActive && (
+                <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[8px] font-bold px-1 py-0.5 rounded-full leading-none">PRO</span>
               )}
             </div>
-            {p.school_year && (
-              <p className="text-xs text-primary font-medium">{getYearLabel(p.school_year)}</p>
-            )}
-            <div className="flex gap-3 text-xs text-muted-foreground mt-1">
-              <span>⭐ {p.xp} XP</span>
-              <span>📊 Nível {p.level}</span>
-              <span>🔥 {p.streak_days} dias</span>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <p className="font-display font-bold text-foreground">{p.name}</p>
+                {p.profile_type === 'parent' && (
+                  <span className="bg-primary/15 text-primary text-[10px] px-1.5 py-0.5 rounded-full font-mono">Pai/Mãe</span>
+                )}
+                {isPro && (
+                  <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-1.5 py-0 h-4"><Crown className="h-3 w-3 mr-0.5" /> PRO</Badge>
+                )}
+              </div>
+              {p.school_year && (
+                <p className="text-xs text-primary font-medium">{getYearLabel(p.school_year)}</p>
+              )}
+              <div className="flex gap-3 text-xs text-muted-foreground mt-1">
+                <span>⭐ {p.xp} XP</span>
+                <span>📊 Nível {p.level}</span>
+                <span>🔥 {p.streak_days} dias</span>
+              </div>
             </div>
-          </div>
-        </button>
-        <div className="flex flex-col gap-1 shrink-0">
-          {p.profile_type === 'child' && (
+          </button>
+          <div className="flex flex-col gap-1 shrink-0">
+            {p.profile_type === 'child' && (
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary h-8 w-8"
+                onClick={(e) => { e.stopPropagation(); generateInviteCode(p.id); }}
+                title="Gerar código de convite">
+                <Link2 className="h-3.5 w-3.5" />
+              </Button>
+            )}
             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary h-8 w-8"
-              onClick={(e) => { e.stopPropagation(); generateInviteCode(p.id); }}
-              title="Gerar código de convite">
-              <Link2 className="h-3.5 w-3.5" />
+              onClick={(e) => { e.stopPropagation(); startEditing(p); }}>
+              <Pencil className="h-3.5 w-3.5" />
             </Button>
-          )}
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary h-8 w-8"
-            onClick={(e) => { e.stopPropagation(); startEditing(p); }}>
-            <Pencil className="h-3.5 w-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive h-8 w-8"
-            onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(p.id); setDeleteConfirmName(p.name); }}>
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive h-8 w-8"
+              onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(p.id); setDeleteConfirmName(p.name); }}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36">
