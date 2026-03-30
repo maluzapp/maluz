@@ -197,6 +197,8 @@ export default function Friends() {
         }
       }
     }
+
+    setLoading(false);
   };
 
   const copyMyCode = () => {
