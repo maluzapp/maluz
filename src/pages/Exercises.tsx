@@ -11,12 +11,16 @@ import { Matching } from '@/components/exercises/Matching';
 import { Ordering } from '@/components/exercises/Ordering';
 import { CompleteSentence } from '@/components/exercises/CompleteSentence';
 import { ColumnClassification } from '@/components/exercises/ColumnClassification';
+import { ExitExerciseDialog } from '@/components/exercises/ExitExerciseDialog';
+import { useExerciseExitGuard } from '@/hooks/useExerciseExitGuard';
 import type { Exercise, ExerciseAnswer } from '@/types/study';
 
 export default function Exercises() {
   const navigate = useNavigate();
-  const { exercises, currentIndex, addAnswer, nextExercise, config } = useStudyStore();
+  const { exercises, answers, currentIndex, addAnswer, nextExercise, config } = useStudyStore();
   const [answered, setAnswered] = useState(false);
+  const hasProgress = exercises.length > 0 && (answers.length > 0 || currentIndex > 0);
+  const exitGuard = useExerciseExitGuard({ enabled: hasProgress, exitTo: '/confirmacao' });
 
   useEffect(() => {
     if (!config || exercises.length === 0) {
@@ -98,6 +102,12 @@ export default function Exercises() {
             <ArrowRight className="h-4 w-4" />
           </Button>
         )}
+
+        <ExitExerciseDialog
+          open={exitGuard.isDialogOpen}
+          onOpenChange={exitGuard.setIsDialogOpen}
+          onConfirm={exitGuard.confirmExit}
+        />
       </div>
     </div>
   );
