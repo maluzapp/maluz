@@ -69,7 +69,6 @@ export default function Generate() {
       setImages((prev) => [...prev, ...newFiles]);
     }
   };
-  };
 
   const removeImage = (index: number) => setImages((prev) => prev.filter((_, i) => i !== index));
 
