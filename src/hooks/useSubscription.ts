@@ -127,6 +127,16 @@ export function useCanStartSession() {
   return { canStart: used < limit, sessionsUsed: used, limit, planSlug: subscription?.plan?.slug ?? 'free' };
 }
 
+export function usePlanLimits() {
+  const { planSlug } = useCanStartSession();
+  const isPro = planSlug === 'pro' || planSlug === 'familia';
+  return {
+    maxPhotos: isPro ? null : 2,
+    canUseAudio: isPro,
+    planSlug,
+  };
+}
+
 export async function incrementDailyUsage(profileId: string) {
   const today = new Date().toISOString().split('T')[0];
   
