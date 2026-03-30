@@ -877,7 +877,7 @@ export default function Admin() {
       </aside>
 
       {/* Content area */}
-      <main className="flex-1 min-h-screen overflow-y-auto pt-14 md:pt-0">
+      <main className="flex-1 min-h-screen overflow-y-auto pt-14 md:pt-0 md:ml-0">
         <div className="p-4 md:p-6 lg:p-8 xl:p-10 max-w-6xl">
           {activeSection === 'general' && <SectionPanel fields={GENERAL_FIELDS} icon={<Settings className="h-5 w-5 text-primary" />} title="Configurações Gerais" />}
           {activeSection === 'colors' && <SectionPanel fields={COLOR_FIELDS} icon={<Palette className="h-5 w-5 text-primary" />} title="Paleta de Cores" />}

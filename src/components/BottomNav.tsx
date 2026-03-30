@@ -17,7 +17,7 @@ const NAV_ITEMS_RIGHT = [
   { path: '/desafios', icon: Swords, label: 'Desafios' },
 ];
 
-const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/'];
+const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/', '/admin'];
 const HIDDEN_PREFIXES = ['/desafio/'];
 
 export function BottomNav() {

@@ -45,7 +45,10 @@ function RequireAuth({ children }: { children: ReactNode }) {
   }
 
   if (!user) return <Navigate to="/login" replace />;
-  if (!profileId) return <Navigate to="/perfis" replace />;
+  if (!profileId) {
+    // Don't redirect to profiles if we're still loading initial data
+    return <Navigate to="/perfis" replace />;
+  }
 
   return <>{children}</>;
 }
