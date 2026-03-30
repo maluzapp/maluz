@@ -307,6 +307,33 @@ export type Database = {
         }
         Relationships: []
       }
+      reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          profile_id: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          profile_id: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          profile_id?: string
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: []
+      }
       spouse_links: {
         Row: {
           created_at: string
