@@ -77,6 +77,60 @@ export default function Landing() {
   const { data: settings } = useBrandingByCategory();
   const t = (key: string, fallback: string) => settings?.landing?.[key]?.value ?? settings?.general?.[key]?.value ?? fallback;
 
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    setIsIOS(/iPad|iPhone|iPod/.test(ua));
+
+    // Check if already installed as PWA
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setIsInstalled(true);
+      return;
+    }
+
+    // Check if banner was dismissed this session
+    if (sessionStorage.getItem('install_banner_dismissed')) {
+      setBannerDismissed(true);
+    }
+
+    // Show banner after a short delay
+    const timer = setTimeout(() => setShowInstallBanner(true), 2000);
+
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+      clearTimeout(timer);
+    };
+  }, []);
+
+  const handleInstall = async () => {
+    if (deferredPrompt) {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') setIsInstalled(true);
+      setDeferredPrompt(null);
+      setShowInstallBanner(false);
+    }
+  };
+
+  const dismissBanner = () => {
+    setShowInstallBanner(false);
+    setBannerDismissed(true);
+    sessionStorage.setItem('install_banner_dismissed', '1');
+  };
+
+  const showBanner = showInstallBanner && !isInstalled && !bannerDismissed;
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
