@@ -19,24 +19,52 @@ export default function Install() {
     const ua = navigator.userAgent;
     setIsIOS(/iPad|iPhone|iPod/.test(ua));
 
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+      || (navigator as any).standalone === true;
+    const wasInstalled = localStorage.getItem('maluz_installed') === '1';
+
+    if (isStandalone || wasInstalled) {
       setIsInstalled(true);
+      localStorage.setItem('maluz_installed', '1');
+      return;
+    }
+
+    if ('getInstalledRelatedApps' in navigator) {
+      (navigator as any).getInstalledRelatedApps().then((apps: any[]) => {
+        if (apps && apps.length > 0) {
+          setIsInstalled(true);
+          localStorage.setItem('maluz_installed', '1');
+        }
+      }).catch(() => {});
     }
 
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
-
     window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+
+    const installedHandler = () => {
+      setIsInstalled(true);
+      setDeferredPrompt(null);
+      localStorage.setItem('maluz_installed', '1');
+    };
+    window.addEventListener('appinstalled', installedHandler);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener('appinstalled', installedHandler);
+    };
   }, []);
 
   const handleInstall = async () => {
     if (deferredPrompt) {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') setIsInstalled(true);
+      if (outcome === 'accepted') {
+        setIsInstalled(true);
+        localStorage.setItem('maluz_installed', '1');
+      }
       setDeferredPrompt(null);
     }
   };
