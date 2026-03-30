@@ -312,6 +312,14 @@ export default function Profiles() {
       used_by: parentProfileId,
     } as any).eq('id', (codeData as any).id);
 
+    // Auto-create friendship between parent and child
+    const childId = (codeData as any).profile_id;
+    await supabase.from('friendships' as any).upsert({
+      requester_profile_id: parentProfileId,
+      target_profile_id: childId,
+      status: 'accepted',
+    }, { onConflict: 'requester_profile_id,target_profile_id' } as any);
+
     setLinkingCode('');
     toast.success('Filho vinculado com sucesso!');
     await loadPageData();
