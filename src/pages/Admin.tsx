@@ -69,6 +69,7 @@ const LOGO_FIELDS: LogoFieldConfig[] = [
   { key: 'symbol_index', label: 'Símbolo Index', sizeKey: 'symbol_height_index', min: 32, max: 128, hint: 'Ícone/símbolo na tela inicial do app' },
   { key: 'symbol_login', label: 'Símbolo Login', sizeKey: 'symbol_height_login', min: 32, max: 256, hint: 'Ícone/símbolo na tela de login' },
   { key: 'icon_pwa', label: 'Ícone do App (PWA)', sizeKey: 'icon_pwa_size', min: 128, max: 512, hint: 'Ícone que aparece na tela inicial do celular' },
+  { key: 'icon_central_button', label: 'Ícone Botão Central', sizeKey: 'icon_central_button_size', min: 32, max: 96, hint: 'Lâmpada no botão central da barra inferior do app' },
 ];
 
 const VOICE_FIELDS: FieldConfig[] = [
