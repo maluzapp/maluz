@@ -141,12 +141,50 @@ export default function Landing() {
           <a href="#experiencia" className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/50 hover:text-primary transition-colors">Experiência</a>
           <a href="#planos" className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/50 hover:text-primary transition-colors">Planos</a>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          {!isInstalled && (
+            <Link to="/instalar" className="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono tracking-[0.1em] uppercase text-primary hover:text-primary/80 transition-colors">
+              <Download className="h-3.5 w-3.5" /> Instalar
+            </Link>
+          )}
           <Link to="/login" className="text-xs font-mono tracking-[0.12em] uppercase bg-primary text-primary-foreground px-4 py-1.5 rounded-full hover:opacity-90 transition-all">
             Entrar
           </Link>
         </div>
       </nav>
+
+      {/* Install banner */}
+      {showBanner && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-fade-in">
+          <div className="max-w-lg mx-auto bg-card border border-primary/30 rounded-2xl p-4 shadow-2xl shadow-primary/10 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+              <img src={lampadaIcon} alt="Maluz" className="h-8 w-8 object-contain" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-display font-bold text-foreground text-sm">Instale o Maluz!</p>
+              <p className="text-xs text-muted-foreground">
+                {isIOS
+                  ? 'Toque em Compartilhar → Adicionar à Tela de Início'
+                  : 'Acesse como um app direto do celular'}
+              </p>
+            </div>
+            {deferredPrompt ? (
+              <Button size="sm" onClick={handleInstall} className="shrink-0 gap-1.5 rounded-full font-display font-bold">
+                <Download className="h-3.5 w-3.5" /> Instalar
+              </Button>
+            ) : (
+              <Link to="/instalar">
+                <Button size="sm" className="shrink-0 gap-1.5 rounded-full font-display font-bold">
+                  <Download className="h-3.5 w-3.5" /> Como instalar
+                </Button>
+              </Link>
+            )}
+            <button onClick={dismissBanner} className="shrink-0 text-muted-foreground hover:text-foreground p-1">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )
 
       {/* Hero */}
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-14">
