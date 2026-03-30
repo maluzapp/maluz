@@ -934,11 +934,12 @@ export default function Profiles() {
               </div>
             )}
           </TabsContent>
-
-          <TabsContent value="amigos">
-            <FriendsTab />
-          </TabsContent>
         </Tabs>
+
+        {/* Quick link to friends */}
+        <Button variant="outline" className="w-full gap-2 mt-4" onClick={() => navigate('/amigos')}>
+          <Heart className="h-4 w-4 text-primary" /> Ver amigos e atividades
+        </Button>
       </div>
 
       {/* Delete confirmation dialog */}
