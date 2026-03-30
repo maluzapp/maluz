@@ -1,9 +1,17 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useBrandingByCategory } from '@/hooks/useBrandingSettings';
 import logoMaluz from '@/assets/logo_maluz.png';
 import lampadaIcon from '@/assets/lampada-2.png';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import PricingSection from '@/components/PricingSection';
+import { Button } from '@/components/ui/button';
+import { Download, X, Share } from 'lucide-react';
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
 
 const FEATURES = [
   { icon: '📸', title: 'Entrada por Foto', desc: 'A criança fotografa a página do seu livro. O exercício é 100% alinhado ao que está sendo estudado naquele momento.' },
@@ -69,6 +77,60 @@ export default function Landing() {
   const { data: settings } = useBrandingByCategory();
   const t = (key: string, fallback: string) => settings?.landing?.[key]?.value ?? settings?.general?.[key]?.value ?? fallback;
 
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    setIsIOS(/iPad|iPhone|iPod/.test(ua));
+
+    // Check if already installed as PWA
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setIsInstalled(true);
+      return;
+    }
+
+    // Check if banner was dismissed this session
+    if (sessionStorage.getItem('install_banner_dismissed')) {
+      setBannerDismissed(true);
+    }
+
+    // Show banner after a short delay
+    const timer = setTimeout(() => setShowInstallBanner(true), 2000);
+
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+      clearTimeout(timer);
+    };
+  }, []);
+
+  const handleInstall = async () => {
+    if (deferredPrompt) {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') setIsInstalled(true);
+      setDeferredPrompt(null);
+      setShowInstallBanner(false);
+    }
+  };
+
+  const dismissBanner = () => {
+    setShowInstallBanner(false);
+    setBannerDismissed(true);
+    sessionStorage.setItem('install_banner_dismissed', '1');
+  };
+
+  const showBanner = showInstallBanner && !isInstalled && !bannerDismissed;
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
@@ -79,12 +141,50 @@ export default function Landing() {
           <a href="#experiencia" className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/50 hover:text-primary transition-colors">Experiência</a>
           <a href="#planos" className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/50 hover:text-primary transition-colors">Planos</a>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          {!isInstalled && (
+            <Link to="/instalar" className="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono tracking-[0.1em] uppercase text-primary hover:text-primary/80 transition-colors">
+              <Download className="h-3.5 w-3.5" /> Instalar
+            </Link>
+          )}
           <Link to="/login" className="text-xs font-mono tracking-[0.12em] uppercase bg-primary text-primary-foreground px-4 py-1.5 rounded-full hover:opacity-90 transition-all">
             Entrar
           </Link>
         </div>
       </nav>
+
+      {/* Install banner */}
+      {showBanner && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-fade-in">
+          <div className="max-w-lg mx-auto bg-card border border-primary/30 rounded-2xl p-4 shadow-2xl shadow-primary/10 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+              <img src={lampadaIcon} alt="Maluz" className="h-8 w-8 object-contain" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-display font-bold text-foreground text-sm">Instale o Maluz!</p>
+              <p className="text-xs text-muted-foreground">
+                {isIOS
+                  ? 'Toque em Compartilhar → Adicionar à Tela de Início'
+                  : 'Acesse como um app direto do celular'}
+              </p>
+            </div>
+            {deferredPrompt ? (
+              <Button size="sm" onClick={handleInstall} className="shrink-0 gap-1.5 rounded-full font-display font-bold">
+                <Download className="h-3.5 w-3.5" /> Instalar
+              </Button>
+            ) : (
+              <Link to="/instalar">
+                <Button size="sm" className="shrink-0 gap-1.5 rounded-full font-display font-bold">
+                  <Download className="h-3.5 w-3.5" /> Como instalar
+                </Button>
+              </Link>
+            )}
+            <button onClick={dismissBanner} className="shrink-0 text-muted-foreground hover:text-foreground p-1">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Hero */}
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-14">
