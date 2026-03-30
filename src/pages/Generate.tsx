@@ -59,7 +59,16 @@ export default function Generate() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) setImages((prev) => [...prev, ...Array.from(e.target.files!)]);
+    if (!e.target.files) return;
+    const newFiles = Array.from(e.target.files);
+    if (maxPhotos !== null) {
+      const remaining = maxPhotos - images.length;
+      if (remaining <= 0) return;
+      setImages((prev) => [...prev, ...newFiles.slice(0, remaining)]);
+    } else {
+      setImages((prev) => [...prev, ...newFiles]);
+    }
+  };
   };
 
   const removeImage = (index: number) => setImages((prev) => prev.filter((_, i) => i !== index));
