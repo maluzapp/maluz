@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useStripeSubscription, useUserSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
-import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings } from 'lucide-react';
+import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings, Crown, Lock, Mic, Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProfileData {
@@ -218,7 +218,57 @@ export default function Index() {
           </Card>
         )}
 
-        {/* Recent sessions */}
+        {/* PRO upsell for free users */}
+        {!isPro && (
+          <Card className="animate-fade-in border-primary/20 bg-gradient-to-br from-primary/[0.06] to-card overflow-hidden" style={{ animationDelay: '280ms' }}>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Crown className="h-5 w-5 text-primary" />
+                <h2 className="font-display font-bold text-foreground">Recursos PRO</h2>
+                <span className="ml-auto bg-primary text-primary-foreground text-[9px] font-bold px-2 py-0.5 rounded-full font-mono uppercase tracking-wider">PRO</span>
+              </div>
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-3 opacity-70">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Camera className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground">Fotos ilimitadas</p>
+                    <p className="text-[10px] text-muted-foreground">Envie quantas fotos do livro quiser</p>
+                  </div>
+                  <Lock className="h-3.5 w-3.5 text-primary/50 shrink-0" />
+                </div>
+                <div className="flex items-center gap-3 opacity-70">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Mic className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground">Áudio de resumo</p>
+                    <p className="text-[10px] text-muted-foreground">Grave e envie áudio com a matéria</p>
+                  </div>
+                  <Lock className="h-3.5 w-3.5 text-primary/50 shrink-0" />
+                </div>
+                <div className="flex items-center gap-3 opacity-70">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <BarChart3 className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground">Sessões ilimitadas</p>
+                    <p className="text-[10px] text-muted-foreground">Estude sem limite diário</p>
+                  </div>
+                  <Lock className="h-3.5 w-3.5 text-primary/50 shrink-0" />
+                </div>
+              </div>
+              <button
+                onClick={() => navigate('/#planos')}
+                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-primary text-primary-foreground font-display font-bold text-sm hover:opacity-90 transition-all hover:scale-[1.02]"
+              >
+                <Crown className="h-4 w-4" /> Desbloquear PRO
+              </button>
+            </CardContent>
+          </Card>
+        )}
+
         {recentSessions.length > 0 ? (
           <div className="animate-fade-in" style={{ animationDelay: '320ms' }}>
             <h2 className="font-display font-bold text-foreground mb-3 flex items-center gap-2">
