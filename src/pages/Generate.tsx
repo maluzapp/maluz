@@ -212,17 +212,37 @@ export default function Generate() {
             </CardContent>
           </Card>
 
-          <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '500ms' }}>
-            <CardContent className="p-4">
-              <Label className="mb-2 block font-semibold font-display">🎤 Áudio com resumo (opcional)</Label>
-              <p className="mb-3 text-sm text-muted-foreground">Grave um resumo da matéria com suas palavras</p>
-              <Button variant={isRecording ? 'destructive' : 'outline'} className="w-full gap-2" onClick={toggleRecording}>
-                {isRecording ? (<><MicOff className="h-4 w-4" /> Parar gravação</>) : (<><Mic className="h-4 w-4" /> {audioBlob ? 'Regravar áudio' : 'Gravar áudio'}</>)}
-              </Button>
-              {audioBlob && !isRecording && (
-                <div className="mt-3 flex items-center gap-2 rounded-md bg-success/10 px-3 py-2 text-sm text-success animate-fade-in">
-                  ✅ Áudio gravado com sucesso
+          <Card className={`animate-fade-in border-primary/10 ${!canUseAudio ? 'opacity-75' : ''}`} style={{ animationDelay: '500ms' }}>
+            <CardContent className="p-4 relative">
+              {!canUseAudio && (
+                <div className="absolute top-3 right-3 flex items-center gap-1 bg-primary/15 text-primary text-[0.6rem] font-bold px-2 py-0.5 rounded-full font-mono uppercase tracking-wider">
+                  <Crown className="h-3 w-3" /> PRO
                 </div>
+              )}
+              <Label className="mb-2 block font-semibold font-display">{'\u{1F3A4}'} Áudio com resumo {canUseAudio ? '(opcional)' : ''}</Label>
+              {canUseAudio ? (
+                <>
+                  <p className="mb-3 text-sm text-muted-foreground">Grave um resumo da matéria com suas palavras</p>
+                  <Button variant={isRecording ? 'destructive' : 'outline'} className="w-full gap-2" onClick={toggleRecording}>
+                    {isRecording ? (<><MicOff className="h-4 w-4" /> Parar gravação</>) : (<><Mic className="h-4 w-4" /> {audioBlob ? 'Regravar áudio' : 'Gravar áudio'}</>)}
+                  </Button>
+                  {audioBlob && !isRecording && (
+                    <div className="mt-3 flex items-center gap-2 rounded-md bg-success/10 px-3 py-2 text-sm text-success animate-fade-in">
+                      {'\u2705'} Áudio gravado com sucesso
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="mb-3 text-sm text-muted-foreground">Grave um resumo da matéria — recurso exclusivo do plano Pro</p>
+                  <Button variant="outline" className="w-full gap-2" disabled>
+                    <Lock className="h-4 w-4" /> Gravar áudio
+                  </Button>
+                  <div className="mt-2 flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2 text-xs text-primary">
+                    <Crown className="h-3.5 w-3.5 flex-shrink-0" />
+                    <span><button onClick={() => navigate('/login')} className="underline font-bold">Faça upgrade para Pro</button> e desbloqueie o envio de áudio.</span>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
