@@ -292,7 +292,7 @@ export default function Landing() {
       <hr className="border-primary/15" />
 
       {/* Story */}
-      <section className="py-16 md:py-20 px-5">
+      <section className="py-16 md:py-20 px-5 scroll-reveal">
         <div className="max-w-4xl mx-auto md:grid md:grid-cols-5 md:gap-12 md:items-center">
           <div className="md:col-span-3">
             <p className="font-mono text-[0.64rem] tracking-[0.22em] uppercase text-primary/70 mb-3">01 — Brand Story</p>
