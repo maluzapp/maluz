@@ -400,7 +400,7 @@ export default function Landing() {
       <hr className="border-primary/15" />
 
       {/* UX Principles */}
-      <section id="experiencia" className="py-16 md:py-20 px-5 scroll-mt-16">
+      <section id="experiencia" className="py-16 md:py-20 px-5 scroll-mt-16 scroll-reveal">
         <div className="max-w-3xl mx-auto">
           <p className="font-mono text-[0.64rem] tracking-[0.22em] uppercase text-primary/70 mb-3">Experiência</p>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-10 text-foreground">
