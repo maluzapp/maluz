@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useBrandingByCategory } from '@/hooks/useBrandingSettings';
 import logoMaluz from '@/assets/logo_maluz.png';
@@ -159,8 +159,29 @@ export default function Landing() {
 
   const showBanner = showInstallBanner && !isInstalled && !bannerDismissed;
 
+  // Scroll-reveal observer
+  const containerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = containerRef.current;
+    if (!root) return;
+    const els = root.querySelectorAll('.scroll-reveal');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div ref={containerRef} className="min-h-screen bg-background text-foreground">
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-3 bg-background/95 backdrop-blur-xl border-b border-primary/15">
         <a href="#" className="font-display text-xl font-bold text-foreground">Ma<span className="text-primary italic">luz</span></a>
@@ -271,7 +292,7 @@ export default function Landing() {
       <hr className="border-primary/15" />
 
       {/* Story */}
-      <section className="py-16 md:py-20 px-5">
+      <section className="py-16 md:py-20 px-5 scroll-reveal">
         <div className="max-w-4xl mx-auto md:grid md:grid-cols-5 md:gap-12 md:items-center">
           <div className="md:col-span-3">
             <p className="font-mono text-[0.64rem] tracking-[0.22em] uppercase text-primary/70 mb-3">01 — Brand Story</p>
@@ -321,7 +342,7 @@ export default function Landing() {
       <hr className="border-primary/15" />
 
       {/* Differentials / Features */}
-      <section id="diferenciais" className="py-16 md:py-20 px-5 scroll-mt-16">
+      <section id="diferenciais" className="py-16 md:py-20 px-5 scroll-mt-16 scroll-reveal">
         <div className="max-w-4xl mx-auto">
           <p className="font-mono text-[0.64rem] tracking-[0.22em] uppercase text-primary/70 mb-3">Diferenciais</p>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-10 text-foreground">
@@ -347,7 +368,7 @@ export default function Landing() {
       <hr className="border-primary/15" />
 
       {/* Personas */}
-      <section className="py-16 md:py-20 px-5">
+      <section className="py-16 md:py-20 px-5 scroll-reveal">
         <div className="max-w-4xl mx-auto">
           <p className="font-mono text-[0.64rem] tracking-[0.22em] uppercase text-primary/70 mb-3">Público-Alvo</p>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-10 text-foreground">
@@ -379,7 +400,7 @@ export default function Landing() {
       <hr className="border-primary/15" />
 
       {/* UX Principles */}
-      <section id="experiencia" className="py-16 md:py-20 px-5 scroll-mt-16">
+      <section id="experiencia" className="py-16 md:py-20 px-5 scroll-mt-16 scroll-reveal">
         <div className="max-w-3xl mx-auto">
           <p className="font-mono text-[0.64rem] tracking-[0.22em] uppercase text-primary/70 mb-3">Experiência</p>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-10 text-foreground">
@@ -406,7 +427,7 @@ export default function Landing() {
       <hr className="border-primary/15" />
 
       {/* Mockup Preview */}
-      <section className="py-16 md:py-20 px-5">
+      <section className="py-16 md:py-20 px-5 scroll-reveal">
         <div className="max-w-4xl mx-auto text-center">
           <p className="font-mono text-[0.64rem] tracking-[0.22em] uppercase text-primary/70 mb-3">App</p>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4 text-foreground">
@@ -480,7 +501,7 @@ export default function Landing() {
       <hr className="border-primary/15" />
 
       {/* App Stores */}
-      <section className="py-16 md:py-20 px-5">
+      <section className="py-16 md:py-20 px-5 scroll-reveal">
         <div className="max-w-3xl mx-auto text-center">
           <p className="font-mono text-[0.64rem] tracking-[0.22em] uppercase text-primary/70 mb-3">Disponibilidade</p>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4 text-foreground">
@@ -509,7 +530,7 @@ export default function Landing() {
       <hr className="border-primary/15" />
 
       {/* CTA */}
-      <section className="py-20 px-5 text-center">
+      <section className="py-20 px-5 text-center scroll-reveal">
         <div className="max-w-lg mx-auto">
           <img src={lampadaIcon} alt="Maluz" className="h-20 mx-auto mb-6 animate-float" />
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-foreground">
