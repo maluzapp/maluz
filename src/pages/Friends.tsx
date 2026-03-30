@@ -144,7 +144,7 @@ export default function Friends() {
     setSentRequests(mappedSent);
     setConnectedIds(new Set([...friendIds, ...pendingIds, ...sentIds]));
 
-    // Get friends' recent sessions
+    // Get friends' recent sessions and PRO status
     if (friendIds.length > 0) {
       const { data: sessions } = await supabase
         .from('study_sessions')
@@ -159,9 +159,44 @@ export default function Friends() {
       })).filter((a: any) => a.profile);
 
       setActivities(mappedActivities as FriendActivity[]);
-    }
 
-    setLoading(false);
+      // Check which friends have active subscriptions (PRO)
+      const { data: friendProfiles } = await supabase
+        .from('profiles')
+        .select('id, user_id')
+        .in('id', friendIds);
+
+      if (friendProfiles && friendProfiles.length > 0) {
+        const userIdToProfileId: Record<string, string> = {};
+        for (const fp of friendProfiles) {
+          userIdToProfileId[fp.user_id] = fp.id;
+        }
+        const friendUserIds = friendProfiles.map(fp => fp.user_id);
+
+        const { data: subs } = await supabase
+          .from('user_subscriptions')
+          .select('user_id, status, plan_id')
+          .in('user_id', friendUserIds)
+          .eq('status', 'active');
+
+        if (subs && subs.length > 0) {
+          // Get free plan id to exclude
+          const { data: freePlan } = await supabase
+            .from('subscription_plans')
+            .select('id')
+            .eq('slug', 'free')
+            .maybeSingle();
+
+          const proIds = new Set(
+            subs
+              .filter(s => !freePlan || s.plan_id !== freePlan.id)
+              .map(s => userIdToProfileId[s.user_id])
+              .filter(Boolean)
+          );
+          setProProfileIds(proIds);
+        }
+      }
+    }
   };
 
   const copyMyCode = () => {
