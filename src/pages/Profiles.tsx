@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { YEAR_OPTIONS, getYearLabel } from '@/constants/years';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 const AVATARS = ['🧑‍🎓', '👧', '👦', '🦸', '🧙', '🦊', '🐱', '🦄', '🚀', '⭐', '🐶', '🐼', '🦁', '🐸', '🦋', '🌟', '🎨', '🎮', '🏀', '🎸', '🧑‍🚀', '🧑‍💻', '👩‍🔬', '🧑‍🏫', '🦸‍♀️', '🧚', '🐉', '🌈', '🎯', '🏆'];
 
