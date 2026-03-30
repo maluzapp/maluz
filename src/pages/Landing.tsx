@@ -87,10 +87,25 @@ export default function Landing() {
     const ua = navigator.userAgent;
     setIsIOS(/iPad|iPhone|iPod/.test(ua));
 
-    // Check if already installed as PWA
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    // Check if already installed as PWA (multiple signals)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+      || (navigator as any).standalone === true;
+    const wasInstalled = localStorage.getItem('maluz_installed') === '1';
+
+    if (isStandalone || wasInstalled) {
       setIsInstalled(true);
+      localStorage.setItem('maluz_installed', '1');
       return;
+    }
+
+    // Check via getInstalledRelatedApps (Chrome 80+)
+    if ('getInstalledRelatedApps' in navigator) {
+      (navigator as any).getInstalledRelatedApps().then((apps: any[]) => {
+        if (apps && apps.length > 0) {
+          setIsInstalled(true);
+          localStorage.setItem('maluz_installed', '1');
+        }
+      }).catch(() => {});
     }
 
     // Check if banner was dismissed this session
@@ -107,8 +122,18 @@ export default function Landing() {
     };
     window.addEventListener('beforeinstallprompt', handler);
 
+    // Listen for successful installation
+    const installedHandler = () => {
+      setIsInstalled(true);
+      setShowInstallBanner(false);
+      setDeferredPrompt(null);
+      localStorage.setItem('maluz_installed', '1');
+    };
+    window.addEventListener('appinstalled', installedHandler);
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener('appinstalled', installedHandler);
       clearTimeout(timer);
     };
   }, []);
