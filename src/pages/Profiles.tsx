@@ -496,6 +496,11 @@ export default function Profiles() {
             </CardContent>
           </Card>
 
+          {/* Study session history */}
+          <div className="mb-5 animate-fade-in" style={{ animationDelay: '250ms' }}>
+            <ChildSessionHistory profileId={viewingChild.id} />
+          </div>
+
           {/* Explicit profile switch button - only for own profiles */}
           {isOwnProfile && !isActive && (
             <Button className="w-full gap-2 font-display font-bold animate-fade-in" style={{ animationDelay: '300ms' }}
