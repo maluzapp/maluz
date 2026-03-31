@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { ChildSessionHistory } from '@/components/ChildSessionHistory';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { FriendsTab } from '@/components/FriendsTab';
 import { useNavigate } from 'react-router-dom';
@@ -494,6 +495,11 @@ export default function Profiles() {
               <p className="text-xs text-muted-foreground mt-1">{viewingChild.total_correct} acertos</p>
             </CardContent>
           </Card>
+
+          {/* Study session history */}
+          <div className="mb-5 animate-fade-in" style={{ animationDelay: '250ms' }}>
+            <ChildSessionHistory profileId={viewingChild.id} />
+          </div>
 
           {/* Explicit profile switch button - only for own profiles */}
           {isOwnProfile && !isActive && (

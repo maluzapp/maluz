@@ -7,11 +7,18 @@ interface Props {
   exercise: CompleteSentenceExercise;
   index: number;
   onAnswer: (answer: ExerciseAnswer) => void;
+  readOnly?: boolean;
+  savedAnswer?: ExerciseAnswer;
 }
 
-export function CompleteSentence({ exercise, index, onAnswer }: Props) {
-  const [selected, setSelected] = useState<number | null>(null);
-  const [submitted, setSubmitted] = useState(false);
+export function CompleteSentence({ exercise, index, onAnswer, readOnly, savedAnswer }: Props) {
+  const [selected, setSelected] = useState<number | null>(() => {
+    if (readOnly && savedAnswer?.userAnswer) {
+      return exercise.options.indexOf(String(savedAnswer.userAnswer));
+    }
+    return null;
+  });
+  const [submitted, setSubmitted] = useState(!!readOnly);
 
   const handleSelect = (optIdx: number) => {
     if (submitted) return;

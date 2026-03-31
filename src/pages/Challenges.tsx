@@ -335,7 +335,7 @@ export default function Challenges() {
                   const pct = c.score && c.total ? Math.round((c.score / c.total) * 100) : 0;
                   return (
                     <Card key={c.id} className="border-primary/10 animate-fade-in cursor-pointer hover:border-primary/20 transition-colors"
-                      onClick={() => setSelectedChallenge(c)}>
+                      onClick={() => navigate(`/desafio/${c.id}/revisao`)}>
                       <CardContent className="p-4">
                         <div className="flex items-center gap-3">
                           <div className={cn(
@@ -358,7 +358,7 @@ export default function Challenges() {
                             )}
                           </div>
                           <div className="flex gap-1.5 shrink-0">
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); setSelectedChallenge(c); }}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); navigate(`/desafio/${c.id}/revisao`); }}>
                               <Eye className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); resendChallenge(c); }}>
