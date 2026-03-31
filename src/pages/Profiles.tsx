@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { ChildSessionHistory } from '@/components/ChildSessionHistory';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { FriendsTab } from '@/components/FriendsTab';
 import { useNavigate } from 'react-router-dom';
