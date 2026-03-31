@@ -105,6 +105,7 @@ const App = () => (
             <Route path="/instalar" element={<Install />} />
             <Route path="/desafios" element={<RequireAuth><Challenges /></RequireAuth>} />
             <Route path="/desafio/:id" element={<RequireAuth><ChallengeExercise /></RequireAuth>} />
+            <Route path="/desafio/:id/revisao" element={<RequireAuth><ChallengeReview /></RequireAuth>} />
             <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/pagamento-sucesso" element={<RequireAuth><PaymentSuccess /></RequireAuth>} />
