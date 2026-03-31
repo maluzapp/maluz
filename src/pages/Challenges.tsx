@@ -335,7 +335,7 @@ export default function Challenges() {
                   const pct = c.score && c.total ? Math.round((c.score / c.total) * 100) : 0;
                   return (
                     <Card key={c.id} className="border-primary/10 animate-fade-in cursor-pointer hover:border-primary/20 transition-colors"
-                      onClick={() => setSelectedChallenge(c)}>
+                      onClick={() => navigate(`/desafio/${c.id}/revisao`)}>
                       <CardContent className="p-4">
                         <div className="flex items-center gap-3">
                           <div className={cn(
