@@ -27,6 +27,7 @@ import ResetPassword from "./pages/ResetPassword";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import Challenges from "./pages/Challenges";
 import ChallengeExercise from "./pages/ChallengeExercise";
+import ChallengeReview from "./pages/ChallengeReview";
 import NotFound from "./pages/NotFound";
 import type { ReactNode } from "react";
 
