@@ -358,7 +358,7 @@ export default function Challenges() {
                             )}
                           </div>
                           <div className="flex gap-1.5 shrink-0">
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); setSelectedChallenge(c); }}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); navigate(`/desafio/${c.id}/revisao`); }}>
                               <Eye className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); resendChallenge(c); }}>
