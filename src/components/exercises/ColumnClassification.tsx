@@ -8,14 +8,20 @@ interface Props {
   exercise: ColumnClassificationExercise;
   index: number;
   onAnswer: (answer: ExerciseAnswer) => void;
+  readOnly?: boolean;
+  savedAnswer?: ExerciseAnswer;
 }
 
-export function ColumnClassification({ exercise, index, onAnswer }: Props) {
-  const [assignments, setAssignments] = useState<Record<number, number | null>>(() =>
-    Object.fromEntries(exercise.items.map((_, i) => [i, null]))
-  );
-  const [submitted, setSubmitted] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
+export function ColumnClassification({ exercise, index, onAnswer, readOnly, savedAnswer }: Props) {
+  const [assignments, setAssignments] = useState<Record<number, number | null>>(() => {
+    if (readOnly) {
+      // In readOnly, show correct answers
+      return Object.fromEntries(exercise.items.map((item, i) => [i, item.column]));
+    }
+    return Object.fromEntries(exercise.items.map((_, i) => [i, null]));
+  });
+  const [submitted, setSubmitted] = useState(!!readOnly);
+  const [isCorrect, setIsCorrect] = useState(readOnly ? (savedAnswer?.isCorrect ?? false) : false);
 
   // Shuffled order of items
   const [shuffledIndices] = useState<number[]>(() => {

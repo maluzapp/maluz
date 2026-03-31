@@ -8,10 +8,15 @@ interface Props {
   exercise: OrderingExercise;
   index: number;
   onAnswer: (answer: ExerciseAnswer) => void;
+  readOnly?: boolean;
+  savedAnswer?: ExerciseAnswer;
 }
 
-export function Ordering({ exercise, index, onAnswer }: Props) {
+export function Ordering({ exercise, index, onAnswer, readOnly, savedAnswer }: Props) {
   const [order, setOrder] = useState<number[]>(() => {
+    if (readOnly && savedAnswer?.userAnswer) {
+      return String(savedAnswer.userAnswer).split(',').map(Number);
+    }
     const indices = exercise.items.map((_, i) => i);
     for (let i = indices.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -19,7 +24,7 @@ export function Ordering({ exercise, index, onAnswer }: Props) {
     }
     return indices;
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(!!readOnly);
   const [isCorrect, setIsCorrect] = useState(false);
 
   // Drag state
