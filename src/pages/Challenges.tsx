@@ -95,15 +95,16 @@ export default function Challenges() {
   const loadData = async () => {
     if (!profileId) return;
 
-    // Get profile type
+    // Get profile type and name
     const { data: profile } = await supabase
       .from('profiles')
-      .select('profile_type')
+      .select('profile_type, name')
       .eq('id', profileId)
       .single();
     
     const pType = profile?.profile_type || 'child';
     setProfileType(pType);
+    if (profile?.name) setParentName(profile.name);
 
     if (pType === 'parent') {
       // Get linked children
