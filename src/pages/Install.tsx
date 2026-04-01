@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Download, Share, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -10,20 +11,24 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export default function Install() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
 
+  // If running as installed PWA, skip install page entirely
+  const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches
+    || (navigator as any).standalone === true;
+
   useEffect(() => {
+    if (isStandaloneMode) return; // skip setup when redirecting
+
     const ua = navigator.userAgent;
     setIsIOS(/iPad|iPhone|iPod/.test(ua));
 
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-      || (navigator as any).standalone === true;
     const wasInstalled = localStorage.getItem('maluz_installed') === '1';
-
-    if (isStandalone || wasInstalled) {
+    if (isStandaloneMode || wasInstalled) {
       setIsInstalled(true);
       localStorage.setItem('maluz_installed', '1');
       return;
@@ -55,7 +60,11 @@ export default function Install() {
       window.removeEventListener('beforeinstallprompt', handler);
       window.removeEventListener('appinstalled', installedHandler);
     };
-  }, []);
+  }, [isStandaloneMode]);
+
+  if (isStandaloneMode) {
+    return user ? <Navigate to="/inicio" replace /> : <Navigate to="/login" replace />;
+  }
 
   const handleInstall = async () => {
     if (deferredPrompt) {
