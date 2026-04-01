@@ -244,7 +244,8 @@ export default function Results() {
     const appUrl = s.share_app_url || 'https://maluz.app';
 
     const text = `${header}\n\n📖 ${config.subject} — ${config.topic} (${config.year})\n🏆 Acertei *${score} de ${total}* (${pct}%)\n⭐ Ganhei ${xpEarned} XP!\n\n${getMessage(pct)}\n\n${cta}\n👉 ${appUrl.replace(/\/$/, '')}`;
-    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const url = isMobile ? `https://wa.me/?text=${encodeURIComponent(text)}` : `https://web.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
 

@@ -80,7 +80,8 @@ export default function SessionReview() {
     const appUrl = s.share_app_url || 'https://maluz.app';
 
     const text = `${header}\n\n📖 ${session.subject} — ${session.topic}\n🏆 Acertei *${session.score} de ${session.total}* (${pct}%)\n⭐ +${session.xp_earned} XP\n\n${cta}\n👉 ${appUrl}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    window.open(isMobile ? `https://wa.me/?text=${encodeURIComponent(text)}` : `https://web.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const renderExercise = (ex: Exercise, idx: number) => {
