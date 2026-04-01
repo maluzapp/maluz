@@ -71,6 +71,7 @@ export default function Challenges() {
   const [showCreate, setShowCreate] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [childNames, setChildNames] = useState<Record<string, string>>({});
+  const [parentName, setParentName] = useState('');
 
   useEffect(() => {
     if (!profileId || !user) return;
@@ -94,15 +95,16 @@ export default function Challenges() {
   const loadData = async () => {
     if (!profileId) return;
 
-    // Get profile type
+    // Get profile type and name
     const { data: profile } = await supabase
       .from('profiles')
-      .select('profile_type')
+      .select('profile_type, name')
       .eq('id', profileId)
       .single();
     
     const pType = profile?.profile_type || 'child';
     setProfileType(pType);
+    if (profile?.name) setParentName(profile.name);
 
     if (pType === 'parent') {
       // Get linked children
@@ -203,7 +205,8 @@ export default function Challenges() {
 
   const resendViaWhatsApp = (challenge: Challenge) => {
     const childName = childNames[challenge.child_profile_id] || 'Filho(a)';
-    const text = `\u{1F4A1} *Maluz \u2014 Novo Desafio!*\n\n\u{1F3AF} ${challenge.subject} \u2014 ${challenge.topic}\n\u{1F4DD} ${challenge.total} exerc\u00edcios\n${challenge.message ? `\u{1F4AC} "${challenge.message}"\n` : ''}\n\u{1F680} Abra o Maluz para resolver!\nhttps://maluz.app`;
+    const senderLabel = parentName || 'seu pai/mãe';
+    const text = `\u{1F4A1} *Maluz \u2014 Novo Desafio!*\n\n\u{1F3AF} ${childName}, ${senderLabel} mandou um desafio para voc\u00ea!\n\u{1F4D6} ${challenge.subject} \u2014 ${challenge.topic}\n${challenge.message ? `\u{1F4AC} "${challenge.message}"\n` : ''}\n\u{1F680} Abra o Maluz e mostre que voc\u00ea sabe!\nhttps://maluz.app`;
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     window.open(isMobile ? `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}` : `https://web.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   };

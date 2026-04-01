@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useProfileStore } from '@/hooks/useProfile';
 import { useAuth } from '@/hooks/useAuth';
 import { useStripeSubscription, useUserSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
-import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings, Crown, Lock, Mic, Camera } from 'lucide-react';
+import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings, Crown, Lock, Mic, Camera, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProfileData {
@@ -31,6 +32,14 @@ interface RecentSession {
   total: number;
   xp_earned: number;
   created_at: string;
+}
+interface PendingChallenge {
+  id: string;
+  subject: string;
+  topic: string;
+  message: string | null;
+  created_at: string;
+  parent_profile_id: string;
 }
 
 interface SubjectStat {
@@ -62,6 +71,8 @@ export default function Index() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [recentSessions, setRecentSessions] = useState<RecentSession[]>([]);
   const [subjectStats, setSubjectStats] = useState<SubjectStat[]>([]);
+  const [pendingChallenges, setPendingChallenges] = useState<PendingChallenge[]>([]);
+  const [parentNames, setParentNames] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const { data: stripeStatus } = useStripeSubscription();
   const { data: dbSub } = useUserSubscription();
@@ -71,9 +82,10 @@ export default function Index() {
     if (authLoading || !user || !profileId) return;
     let cancelled = false;
     const fetchData = async () => {
-      const [profileRes, sessionsRes] = await Promise.all([
+      const [profileRes, sessionsRes, challengesRes] = await Promise.all([
         supabase.from('profiles').select('name, avatar_emoji, xp, level, streak_days, total_exercises, total_correct, school_year, last_study_date').eq('id', profileId).single(),
         supabase.from('study_sessions').select('id, subject, topic, score, total, xp_earned, created_at').eq('profile_id', profileId).order('created_at', { ascending: false }).limit(20),
+        supabase.from('challenges').select('id, subject, topic, message, created_at, parent_profile_id').eq('child_profile_id', profileId).eq('status', 'pending').order('created_at', { ascending: false }).limit(5),
       ]);
       if (cancelled) return;
       if (profileRes.data) setProfile(profileRes.data as ProfileData);
@@ -89,6 +101,20 @@ export default function Index() {
         map[s.subject].totalQuestions += s.total;
       }
       setSubjectStats(Object.values(map).sort((a, b) => b.sessions - a.sessions));
+
+      // Pending challenges
+      const pending = (challengesRes.data as any[] as PendingChallenge[]) || [];
+      setPendingChallenges(pending);
+
+      // Fetch parent names for challenges
+      const parentIds = [...new Set(pending.map(c => c.parent_profile_id))];
+      if (parentIds.length > 0) {
+        const { data: parents } = await supabase.from('profiles').select('id, name').in('id', parentIds);
+        const nameMap: Record<string, string> = {};
+        for (const p of (parents || [])) nameMap[p.id] = p.name;
+        if (!cancelled) setParentNames(nameMap);
+      }
+
       setLoading(false);
     };
     fetchData();
@@ -179,6 +205,41 @@ export default function Index() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Pending challenges */}
+        {pendingChallenges.length > 0 && (
+          <div className="animate-fade-in space-y-2" style={{ animationDelay: '200ms' }}>
+            <h2 className="font-display font-bold text-foreground flex items-center gap-2">
+              <Swords className="h-4 w-4 text-primary" />
+              Desafios pendentes
+              <Badge className="bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0 border-0">
+                {pendingChallenges.length}
+              </Badge>
+            </h2>
+            {pendingChallenges.map((c) => (
+              <Card key={c.id} className="border-primary/20 bg-gradient-to-r from-primary/[0.06] to-card cursor-pointer hover:border-primary/30 transition-colors"
+                onClick={() => navigate(`/desafio/${c.id}`)}>
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+                    <Swords className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{c.subject} — {c.topic}</p>
+                    <p className="text-xs text-muted-foreground">
+                      De: {parentNames[c.parent_profile_id] || 'Pai/Mãe'}
+                    </p>
+                    {c.message && (
+                      <p className="text-xs text-muted-foreground italic truncate mt-0.5">"{c.message}"</p>
+                    )}
+                  </div>
+                  <Button size="sm" className="gap-1.5 shrink-0">
+                    <Swords className="h-3.5 w-3.5" /> Iniciar
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
         {/* Subject performance */}
         {subjectStats.length > 0 && (
