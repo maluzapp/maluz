@@ -82,9 +82,10 @@ export default function Index() {
     if (authLoading || !user || !profileId) return;
     let cancelled = false;
     const fetchData = async () => {
-      const [profileRes, sessionsRes] = await Promise.all([
+      const [profileRes, sessionsRes, challengesRes] = await Promise.all([
         supabase.from('profiles').select('name, avatar_emoji, xp, level, streak_days, total_exercises, total_correct, school_year, last_study_date').eq('id', profileId).single(),
         supabase.from('study_sessions').select('id, subject, topic, score, total, xp_earned, created_at').eq('profile_id', profileId).order('created_at', { ascending: false }).limit(20),
+        supabase.from('challenges').select('id, subject, topic, message, created_at, parent_profile_id').eq('child_profile_id', profileId).eq('status', 'pending').order('created_at', { ascending: false }).limit(5),
       ]);
       if (cancelled) return;
       if (profileRes.data) setProfile(profileRes.data as ProfileData);
