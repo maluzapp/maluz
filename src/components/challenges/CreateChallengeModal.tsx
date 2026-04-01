@@ -32,6 +32,15 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
   const [year, setYear] = useState<SchoolYear | ''>('');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [parentName, setParentName] = useState('');
+
+  // Fetch parent name
+  useState(() => {
+    if (!profileId) return;
+    supabase.from('profiles').select('name').eq('id', profileId).single().then(({ data }) => {
+      if (data) setParentName(data.name);
+    });
+  });
 
   // Auto-set year from child selection
   const handleChildChange = (id: string) => {
