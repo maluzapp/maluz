@@ -101,6 +101,20 @@ export default function Index() {
         map[s.subject].totalQuestions += s.total;
       }
       setSubjectStats(Object.values(map).sort((a, b) => b.sessions - a.sessions));
+
+      // Pending challenges
+      const pending = (challengesRes.data as any[] as PendingChallenge[]) || [];
+      setPendingChallenges(pending);
+
+      // Fetch parent names for challenges
+      const parentIds = [...new Set(pending.map(c => c.parent_profile_id))];
+      if (parentIds.length > 0) {
+        const { data: parents } = await supabase.from('profiles').select('id, name').in('id', parentIds);
+        const nameMap: Record<string, string> = {};
+        for (const p of (parents || [])) nameMap[p.id] = p.name;
+        if (!cancelled) setParentNames(nameMap);
+      }
+
       setLoading(false);
     };
     fetchData();
