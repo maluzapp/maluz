@@ -71,6 +71,7 @@ export default function Challenges() {
   const [showCreate, setShowCreate] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [childNames, setChildNames] = useState<Record<string, string>>({});
+  const [parentName, setParentName] = useState('');
 
   useEffect(() => {
     if (!profileId || !user) return;
