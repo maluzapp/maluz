@@ -23,9 +23,6 @@ serve(async (req) => {
       '7': { label: '7º ano', level: 'Ensino Fundamental II' },
       '8': { label: '8º ano', level: 'Ensino Fundamental II' },
       '9': { label: '9º ano', level: 'Ensino Fundamental II' },
-      '1M': { label: '1º ano', level: 'Ensino Médio' },
-      '2M': { label: '2º ano', level: 'Ensino Médio' },
-      '3M': { label: '3º ano', level: 'Ensino Médio' },
     };
     const yearInfo = yearMap[year] || { label: `${year}º ano`, level: 'Ensino Fundamental II' };
 

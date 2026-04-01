@@ -25,8 +25,8 @@ export default function Credits() {
             <CardContent className="p-5 space-y-3">
               <h2 className="font-display font-bold text-foreground">Sobre o Maluz</h2>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Maluz é uma plataforma educacional que gera exercícios personalizados para estudantes 
-                do 6º ano do Ensino Fundamental ao 3º ano do Ensino Médio, ajudando cada aluno a 
+Maluz é uma plataforma educacional que gera exercícios personalizados para estudantes 
+                do 2º ao 9º ano do Ensino Fundamental, ajudando cada aluno a 
                 aprender no seu próprio ritmo.
               </p>
             </CardContent>

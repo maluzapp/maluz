@@ -60,7 +60,6 @@ IMPORTANTE - ADEQUAÇÃO AO NÍVEL ESCOLAR:
 - A complexidade das questões DEVE corresponder ao nível escolar
 - Para Fundamental I (2º ao 5º ano): use frases curtas, vocabulário básico, conceitos introdutórios
 - Para Fundamental II (6º ao 9º ano): use linguagem intermediária, conceitos mais elaborados
-- Para Ensino Médio: use linguagem formal, conceitos avançados
 
 IMPORTANTE - VARIEDADE:
 - NUNCA repita a mesma pergunta ou conceito em exercícios diferentes
