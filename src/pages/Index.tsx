@@ -206,6 +206,41 @@ export default function Index() {
           </Card>
         </div>
 
+        {/* Pending challenges */}
+        {pendingChallenges.length > 0 && (
+          <div className="animate-fade-in space-y-2" style={{ animationDelay: '200ms' }}>
+            <h2 className="font-display font-bold text-foreground flex items-center gap-2">
+              <Swords className="h-4 w-4 text-primary" />
+              Desafios pendentes
+              <Badge className="bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0 border-0">
+                {pendingChallenges.length}
+              </Badge>
+            </h2>
+            {pendingChallenges.map((c) => (
+              <Card key={c.id} className="border-primary/20 bg-gradient-to-r from-primary/[0.06] to-card cursor-pointer hover:border-primary/30 transition-colors"
+                onClick={() => navigate(`/desafio/${c.id}`)}>
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+                    <Swords className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{c.subject} — {c.topic}</p>
+                    <p className="text-xs text-muted-foreground">
+                      De: {parentNames[c.parent_profile_id] || 'Pai/Mãe'}
+                    </p>
+                    {c.message && (
+                      <p className="text-xs text-muted-foreground italic truncate mt-0.5">"{c.message}"</p>
+                    )}
+                  </div>
+                  <Button size="sm" className="gap-1.5 shrink-0">
+                    <Swords className="h-3.5 w-3.5" /> Iniciar
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
         {/* Subject performance */}
         {subjectStats.length > 0 && (
           <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '240ms' }}>
