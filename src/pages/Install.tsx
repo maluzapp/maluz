@@ -11,7 +11,15 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export default function Install() {
+  const { user } = useAuth();
   const navigate = useNavigate();
+
+  // If running as installed PWA, skip install page entirely
+  const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches
+    || (navigator as any).standalone === true;
+  if (isStandaloneMode) {
+    return user ? <Navigate to="/inicio" replace /> : <Navigate to="/login" replace />;
+  }
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
