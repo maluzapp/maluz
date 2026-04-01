@@ -80,11 +80,27 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
 
       if (shareVia === 'whatsapp') {
         const childName = children.find(c => c.id === childId)?.name || '';
-        const text = `\u{1F4A1} *Maluz \u2014 Novo Desafio!*\n\n\u{1F3AF} ${childName}, seu pai/m\u00e3e mandou um desafio para voc\u00ea!\n\u{1F4D6} ${subject} \u2014 ${topic}${message ? `\n\u{1F4AC} "${message}"` : ''}\n\n\u{1F680} Abra o Maluz e mostre que voc\u00ea sabe!\nhttps://maluz.app`;
+        const e = {
+          bulb: String.fromCodePoint(0x1F4A1),
+          target: String.fromCodePoint(0x1F3AF),
+          book: String.fromCodePoint(0x1F4D6),
+          speech: String.fromCodePoint(0x1F4AC),
+          rocket: String.fromCodePoint(0x1F680),
+        };
+        const lines = [
+          e.bulb + ' *Maluz \u2014 Novo Desafio!*',
+          '',
+          e.target + ' ' + childName + ', seu pai/m\u00e3e mandou um desafio para voc\u00ea!',
+          e.book + ' ' + subject + ' \u2014 ' + topic,
+          message ? (e.speech + ' "' + message + '"') : '',
+          '',
+          e.rocket + ' Abra o Maluz e mostre que voc\u00ea sabe!',
+          'https://maluz.app',
+        ].filter(Boolean).join('\n');
         const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         const url = isMobile
-          ? `https://wa.me/?text=${encodeURIComponent(text)}`
-          : `https://web.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+          ? 'https://api.whatsapp.com/send?text=' + encodeURIComponent(lines)
+          : 'https://web.whatsapp.com/send?text=' + encodeURIComponent(lines);
         window.open(url, '_blank');
       }
 
