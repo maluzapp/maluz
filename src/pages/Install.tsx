@@ -20,19 +20,15 @@ export default function Install() {
   // If running as installed PWA, skip install page entirely
   const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches
     || (navigator as any).standalone === true;
-  if (isStandaloneMode) {
-    return user ? <Navigate to="/inicio" replace /> : <Navigate to="/login" replace />;
-  }
 
   useEffect(() => {
+    if (isStandaloneMode) return; // skip setup when redirecting
+
     const ua = navigator.userAgent;
     setIsIOS(/iPad|iPhone|iPod/.test(ua));
 
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-      || (navigator as any).standalone === true;
     const wasInstalled = localStorage.getItem('maluz_installed') === '1';
-
-    if (isStandalone || wasInstalled) {
+    if (isStandaloneMode || wasInstalled) {
       setIsInstalled(true);
       localStorage.setItem('maluz_installed', '1');
       return;
@@ -64,7 +60,11 @@ export default function Install() {
       window.removeEventListener('beforeinstallprompt', handler);
       window.removeEventListener('appinstalled', installedHandler);
     };
-  }, []);
+  }, [isStandaloneMode]);
+
+  if (isStandaloneMode) {
+    return user ? <Navigate to="/inicio" replace /> : <Navigate to="/login" replace />;
+  }
 
   const handleInstall = async () => {
     if (deferredPrompt) {
