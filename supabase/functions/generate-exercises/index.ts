@@ -24,9 +24,6 @@ serve(async (req) => {
         '7': { label: '7º ano', level: 'Ensino Fundamental II', ageRange: '12-13 anos' },
         '8': { label: '8º ano', level: 'Ensino Fundamental II', ageRange: '13-14 anos' },
         '9': { label: '9º ano', level: 'Ensino Fundamental II', ageRange: '14-15 anos' },
-        '1M': { label: '1º ano', level: 'Ensino Médio', ageRange: '15-16 anos' },
-        '2M': { label: '2º ano', level: 'Ensino Médio', ageRange: '16-17 anos' },
-        '3M': { label: '3º ano', level: 'Ensino Médio', ageRange: '17-18 anos' },
       };
       return map[y] || { label: `${y}º ano`, level: 'Ensino Fundamental II', ageRange: '10-15 anos' };
     }
@@ -63,7 +60,6 @@ IMPORTANTE - ADEQUAÇÃO AO NÍVEL ESCOLAR:
 - A complexidade das questões DEVE corresponder ao nível escolar
 - Para Fundamental I (2º ao 5º ano): use frases curtas, vocabulário básico, conceitos introdutórios
 - Para Fundamental II (6º ao 9º ano): use linguagem intermediária, conceitos mais elaborados
-- Para Ensino Médio: use linguagem formal, conceitos avançados
 
 IMPORTANTE - VARIEDADE:
 - NUNCA repita a mesma pergunta ou conceito em exercícios diferentes

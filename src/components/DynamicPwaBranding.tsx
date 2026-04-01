@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 const DEFAULT_NAME = 'Maluz';
-const DEFAULT_DESCRIPTION = 'Maluz: exercícios personalizados para crianças do 6º ano ao 3º médio. Acenda a luz do saber.';
+const DEFAULT_DESCRIPTION = 'Maluz: exercícios personalizados para crianças do 2º ao 9º ano. Acenda a luz do saber.';
 
 function upsertHeadLink(rel: string, href: string) {
   let link = document.head.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement | null;
