@@ -96,10 +96,11 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
           speech: String.fromCodePoint(0x1F4AC),
           rocket: String.fromCodePoint(0x1F680),
         };
+        const senderLabel = parentName || 'seu pai/mãe';
         const lines = [
           e.bulb + ' *Maluz \u2014 Novo Desafio!*',
           '',
-          e.target + ' ' + childName + ', seu pai/m\u00e3e mandou um desafio para voc\u00ea!',
+          e.target + ' ' + childName + ', ' + senderLabel + ' mandou um desafio para voc\u00ea!',
           e.book + ' ' + subject + ' \u2014 ' + topic,
           message ? (e.speech + ' "' + message + '"') : '',
           '',
