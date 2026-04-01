@@ -33,6 +33,14 @@ interface RecentSession {
   xp_earned: number;
   created_at: string;
 }
+interface PendingChallenge {
+  id: string;
+  subject: string;
+  topic: string;
+  message: string | null;
+  created_at: string;
+  parent_profile_id: string;
+}
 
 interface SubjectStat {
   subject: string;
