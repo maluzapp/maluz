@@ -35,12 +35,12 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
   const [parentName, setParentName] = useState('');
 
   // Fetch parent name
-  useState(() => {
+  useEffect(() => {
     if (!profileId) return;
     supabase.from('profiles').select('name').eq('id', profileId).single().then(({ data }) => {
       if (data) setParentName(data.name);
     });
-  });
+  }, [profileId]);
 
   // Auto-set year from child selection
   const handleChildChange = (id: string) => {
