@@ -71,6 +71,8 @@ export default function Index() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [recentSessions, setRecentSessions] = useState<RecentSession[]>([]);
   const [subjectStats, setSubjectStats] = useState<SubjectStat[]>([]);
+  const [pendingChallenges, setPendingChallenges] = useState<PendingChallenge[]>([]);
+  const [parentNames, setParentNames] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const { data: stripeStatus } = useStripeSubscription();
   const { data: dbSub } = useUserSubscription();
