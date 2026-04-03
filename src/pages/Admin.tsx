@@ -413,7 +413,68 @@ export default function Admin() {
     );
   };
 
-  // ─── USERS SECTION ──────────────────────────────────────────
+  // ─── SHARE SECTION ──────────────────────────────────────────
+  const ShareSection = () => {
+    const shareImageRef = useRef<HTMLInputElement | null>(null);
+    const ogImageUrl = getLogoUrl('share_og_image');
+    const ts = logoTimestamps['share_og_image'] || 0;
+    const imgSrc = `${ogImageUrl}?t=${ts}`;
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 mb-2">
+          <Share2 className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-xl font-bold text-foreground">Compartilhamento</h2>
+        </div>
+
+        {/* OG Image upload */}
+        <div className="rounded-xl border border-primary/15 bg-card/50 p-4 space-y-3">
+          <div>
+            <Label className="text-sm font-semibold text-foreground">Imagem de Preview (OG Image)</Label>
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              Aparece no preview de links no WhatsApp, email e redes sociais. Recomendado: 1200×630px
+            </p>
+          </div>
+          <div className="flex items-center justify-center p-4 rounded-lg border border-primary/10 bg-background min-h-[120px]">
+            <img
+              src={imgSrc}
+              alt="OG Image Preview"
+              style={{ maxHeight: '160px' }}
+              className="object-contain max-w-full rounded"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+                const parent = (e.target as HTMLImageElement).parentElement;
+                if (parent && !parent.querySelector('.placeholder-text')) {
+                  const span = document.createElement('span');
+                  span.className = 'placeholder-text text-xs text-foreground/30 italic';
+                  span.textContent = 'Nenhuma imagem enviada';
+                  parent.appendChild(span);
+                }
+              }}
+            />
+          </div>
+          <div className="flex gap-2">
+            <input type="file" accept="image/*" className="hidden" ref={shareImageRef} onChange={e => {
+              const file = e.target.files?.[0];
+              if (file) handleLogoUpload('share_og_image', file);
+              e.target.value = '';
+            }} />
+            <Button variant="outline" size="sm" className="flex-1 gap-1.5 text-xs" onClick={() => shareImageRef.current?.click()}>
+              <Upload className="h-3.5 w-3.5" /> Enviar imagem
+            </Button>
+            <Button variant="outline" size="sm" className="gap-1.5 text-xs text-destructive hover:text-destructive" onClick={() => handleLogoDelete('share_og_image')}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Text fields */}
+        <SectionPanel fields={SHARE_FIELDS} icon={<Share2 className="h-5 w-5 text-primary" />} title="Textos de Compartilhamento" />
+      </div>
+    );
+  };
+
+
   const UsersSection = () => {
     const [users, setUsers] = useState<any[]>([]);
     const [loadingUsers, setLoadingUsers] = useState(true);
