@@ -573,7 +573,7 @@ export default function Landing() {
         <p className="text-xs tracking-widest uppercase text-foreground/40 mb-4">{t('app_tagline', 'O conhecimento que ilumina')}</p>
         <a
           href={(() => {
-            const text = encodeURIComponent('Conhece o Maluz? Exercícios personalizados por IA para crianças do 2º ao 9º ano! ✨📚 Confira: https://maluz.app');
+            const text = encodeURIComponent(t('share_whatsapp_text', 'Conhece o Maluz? Exercícios personalizados por IA para crianças do 2º ao 9º ano! ✨📚 Confira: https://maluz.app'));
             const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
             return isMobile ? `https://api.whatsapp.com/send?text=${text}` : `https://web.whatsapp.com/send?text=${text}`;
           })()}
