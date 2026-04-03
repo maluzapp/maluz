@@ -39,6 +39,21 @@ function getStorageIconUrl() {
   return `${data.publicUrl}?v=${Date.now()}`;
 }
 
+function getStorageOgImageUrl() {
+  const { data } = supabase.storage.from('logos').getPublicUrl('share_og_image.png');
+  return `${data.publicUrl}?v=${Date.now()}`;
+}
+
+function upsertHeadMeta(property: string, content: string, attr = 'property') {
+  let meta = document.head.querySelector(`meta[${attr}="${property}"]`) as HTMLMetaElement | null;
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute(attr, property);
+    document.head.appendChild(meta);
+  }
+  meta.content = content;
+}
+
 export function DynamicPwaBranding() {
   useEffect(() => {
     let mounted = true;
