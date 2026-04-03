@@ -39,6 +39,21 @@ function getStorageIconUrl() {
   return `${data.publicUrl}?v=${Date.now()}`;
 }
 
+function getStorageOgImageUrl() {
+  const { data } = supabase.storage.from('logos').getPublicUrl('share_og_image.png');
+  return `${data.publicUrl}?v=${Date.now()}`;
+}
+
+function upsertHeadMeta(property: string, content: string, attr = 'property') {
+  let meta = document.head.querySelector(`meta[${attr}="${property}"]`) as HTMLMetaElement | null;
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute(attr, property);
+    document.head.appendChild(meta);
+  }
+  meta.content = content;
+}
+
 export function DynamicPwaBranding() {
   useEffect(() => {
     let mounted = true;
@@ -47,7 +62,7 @@ export function DynamicPwaBranding() {
       const { data } = await supabase
         .from('branding_settings')
         .select('key, value')
-        .in('key', ['app_name', 'app_tagline']);
+        .in('key', ['app_name', 'app_tagline', 'share_whatsapp_text']);
 
       if (!mounted) return;
 
@@ -55,6 +70,15 @@ export function DynamicPwaBranding() {
       const appName = settings.app_name || DEFAULT_NAME;
       const description = settings.app_tagline || DEFAULT_DESCRIPTION;
       const iconUrl = getStorageIconUrl();
+      const ogImageUrl = getStorageOgImageUrl();
+
+      // Update OG meta tags dynamically
+      upsertHeadMeta('og:title', `${appName} — ${description.slice(0, 60)}`);
+      upsertHeadMeta('og:description', description);
+      upsertHeadMeta('og:image', ogImageUrl);
+      upsertHeadMeta('twitter:title', appName, 'name');
+      upsertHeadMeta('twitter:description', description, 'name');
+      upsertHeadMeta('twitter:image', ogImageUrl, 'name');
 
       upsertHeadLink('icon', iconUrl);
       upsertHeadLink('apple-touch-icon', iconUrl);
