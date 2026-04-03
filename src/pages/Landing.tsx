@@ -6,7 +6,8 @@ import lampadaIcon from '@/assets/lampada-2.png';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import PricingSection from '@/components/PricingSection';
 import { Button } from '@/components/ui/button';
-import { Download, X, Share, ChevronUp } from 'lucide-react';
+import { Download, X, Share, ChevronUp, Menu } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -83,6 +84,7 @@ export default function Landing() {
   const [showInstallBanner, setShowInstallBanner] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setShowScrollTop(window.scrollY > 400);
@@ -168,6 +170,28 @@ export default function Landing() {
     sessionStorage.setItem('install_banner_dismissed', '1');
   };
 
+  const shareText = t('share_whatsapp_text', 'Conheça o Maluz: exercícios personalizados para crianças do 2º ao 9º ano. https://maluz.app');
+
+  const handleShare = async () => {
+    const message = shareText.includes('https://maluz.app') ? shareText : `${shareText} https://maluz.app`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Maluz', text: message });
+        return;
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(message);
+      toast.success('Mensagem copiada para compartilhar');
+    } catch {
+      window.location.href = `mailto:?subject=${encodeURIComponent('Conheça o Maluz')}&body=${encodeURIComponent(message)}`;
+    }
+  };
+
   const showBanner = showInstallBanner && !isInstalled && !bannerDismissed;
 
   // Scroll-reveal observer
@@ -194,54 +218,111 @@ export default function Landing() {
   return (
     <div ref={containerRef} className="min-h-screen bg-background text-foreground">
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-3 bg-background/95 backdrop-blur-xl border-b border-primary/15">
-        <a href="#" className="font-display text-xl font-bold text-foreground">Ma<span className="text-primary italic">luz</span></a>
-        <div className="hidden md:flex items-center gap-6">
-          <a href="#diferenciais" className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/50 hover:text-primary transition-colors">Diferenciais</a>
-          <a href="#experiencia" className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/50 hover:text-primary transition-colors">Experiência</a>
-          <a href="#planos" className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/50 hover:text-primary transition-colors">Planos</a>
-        </div>
-        <div className="flex items-center gap-3">
-          {!isInstalled && (
-            <Link to="/instalar" className="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono tracking-[0.1em] uppercase text-primary hover:text-primary/80 transition-colors">
-              <Download className="h-3.5 w-3.5" /> Instalar
-            </Link>
-          )}
-          <Link to="/login" className="text-xs font-mono tracking-[0.12em] uppercase bg-primary text-primary-foreground px-4 py-1.5 rounded-full hover:opacity-90 transition-all">
-            Entrar
-          </Link>
-        </div>
-      </nav>
+      <nav className="fixed top-0 left-0 right-0 z-50 px-5 py-3 bg-background/95 backdrop-blur-xl border-b border-primary/15">
+        <div className="flex items-center justify-between gap-3">
+          <a href="#" className="font-display text-xl font-bold text-foreground">Ma<span className="text-primary italic">luz</span></a>
 
-      {/* Install banner */}
-      {showBanner && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-fade-in">
-          <div className="max-w-lg mx-auto bg-card border border-primary/30 rounded-2xl p-4 shadow-2xl shadow-primary/10 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-              <img src={lampadaIcon} alt="Maluz" className="h-8 w-8 object-contain" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-display font-bold text-foreground text-sm">Instale o Maluz!</p>
-              <p className="text-xs text-muted-foreground">
-                {isIOS
-                  ? 'Toque em Compartilhar → Adicionar à Tela de Início'
-                  : 'Acesse como um app direto do celular'}
-              </p>
-            </div>
-            {deferredPrompt ? (
-              <Button size="sm" onClick={handleInstall} className="shrink-0 gap-1.5 rounded-full font-display font-bold">
+          <div className="hidden md:flex items-center gap-6">
+            <a href="#diferenciais" className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/50 hover:text-primary transition-colors">Diferenciais</a>
+            <a href="#experiencia" className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/50 hover:text-primary transition-colors">Experiência</a>
+            <a href="#planos" className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/50 hover:text-primary transition-colors">Planos</a>
+          </div>
+
+          <div className="flex items-center gap-2 md:gap-3">
+            {!isInstalled && (
+              <Link to="/instalar" className="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono tracking-[0.1em] uppercase text-primary hover:text-primary/80 transition-colors">
                 <Download className="h-3.5 w-3.5" /> Instalar
-              </Button>
-            ) : (
-              <Link to="/instalar">
-                <Button size="sm" className="shrink-0 gap-1.5 rounded-full font-display font-bold">
-                  <Download className="h-3.5 w-3.5" /> Como instalar
-                </Button>
               </Link>
             )}
-            <button onClick={dismissBanner} className="shrink-0 text-muted-foreground hover:text-foreground p-1">
-              <X className="h-4 w-4" />
+            <Link to="/login" className="text-xs font-mono tracking-[0.12em] uppercase bg-primary text-primary-foreground px-4 py-1.5 rounded-full hover:opacity-90 transition-all">
+              Entrar
+            </Link>
+            <button
+              type="button"
+              onClick={() => setShowMobileMenu((open) => !open)}
+              className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-full border border-primary/20 bg-card text-foreground hover:text-primary transition-colors"
+              aria-label="Abrir menu"
+              aria-expanded={showMobileMenu}
+            >
+              {showMobileMenu ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
+          </div>
+        </div>
+
+        {showMobileMenu && (
+          <div className="md:hidden mt-3 rounded-2xl border border-primary/15 bg-card shadow-xl shadow-primary/10 p-4">
+            <div className="flex flex-col gap-3">
+              <a href="#diferenciais" onClick={() => setShowMobileMenu(false)} className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/60 hover:text-primary transition-colors">Diferenciais</a>
+              <a href="#experiencia" onClick={() => setShowMobileMenu(false)} className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/60 hover:text-primary transition-colors">Experiência</a>
+              <a href="#planos" onClick={() => setShowMobileMenu(false)} className="text-xs font-mono tracking-[0.1em] uppercase text-foreground/60 hover:text-primary transition-colors">Planos</a>
+
+              {!isInstalled && (
+                deferredPrompt ? (
+                  <Button
+                    size="sm"
+                    onClick={async () => {
+                      setShowMobileMenu(false);
+                      await handleInstall();
+                    }}
+                    className="w-full justify-center gap-2 rounded-full font-display font-bold"
+                  >
+                    <Download className="h-4 w-4" /> Instalar app
+                  </Button>
+                ) : (
+                  <Link to="/instalar" onClick={() => setShowMobileMenu(false)}>
+                    <Button size="sm" className="w-full justify-center gap-2 rounded-full font-display font-bold">
+                      <Download className="h-4 w-4" /> Como instalar
+                    </Button>
+                  </Link>
+                )
+              )}
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* Install modal */}
+      {showBanner && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-background/70 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md rounded-3xl border border-primary/25 bg-card p-5 shadow-2xl shadow-primary/15">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 rounded-2xl bg-primary/15 flex items-center justify-center shrink-0">
+                  <img src={lampadaIcon} alt="Maluz" className="h-9 w-9 object-contain" />
+                </div>
+                <div>
+                  <p className="font-display font-bold text-foreground text-lg">Instale o Maluz</p>
+                  <p className="text-xs text-primary font-mono tracking-[0.12em] uppercase">Abra como app no celular</p>
+                </div>
+              </div>
+              <button type="button" onClick={dismissBanner} className="text-muted-foreground hover:text-foreground p-1" aria-label="Fechar modal de instalação">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+              {isIOS
+                ? 'No iPhone, toque em Compartilhar e depois em Adicionar à Tela de Início.'
+                : 'Instale o Maluz para abrir direto como aplicativo e voltar rápido aos estudos.'}
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              {deferredPrompt ? (
+                <Button onClick={handleInstall} className="sm:flex-1 gap-2 rounded-full font-display font-bold">
+                  <Download className="h-4 w-4" /> Instalar agora
+                </Button>
+              ) : (
+                <Link to="/instalar" className="sm:flex-1">
+                  <Button className="w-full gap-2 rounded-full font-display font-bold">
+                    <Download className="h-4 w-4" /> Ver como instalar
+                  </Button>
+                </Link>
+              )}
+
+              <Link to="/login" onClick={dismissBanner} className="sm:flex-1">
+                <Button variant="outline" className="w-full rounded-full">Entrar agora</Button>
+              </Link>
+            </div>
           </div>
         </div>
       )}
@@ -571,19 +652,14 @@ export default function Landing() {
       <footer className="py-10 border-t border-primary/10 text-center">
         <img src={logoMaluz} alt="Maluz" className="mx-auto mb-3" style={{ height: footerLogoHeight }} />
         <p className="text-xs tracking-widest uppercase text-foreground/40 mb-4">{t('app_tagline', 'O conhecimento que ilumina')}</p>
-        <a
-          href={`https://wa.me/?text=${encodeURIComponent(
-            t('share_whatsapp_text', 'Conhece o Maluz? Exercícios personalizados por IA para crianças do 2º ao 9º ano! \u2728\uD83D\uDCDA Confira: https://maluz.app')
-          )}`}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          type="button"
+          onClick={handleShare}
           className="inline-flex items-center gap-2 text-xs text-foreground/40 hover:text-foreground/70 transition-colors mb-4"
         >
-          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-          </svg>
-          Compartilhar via WhatsApp
-        </a>
+          <Share className="h-4 w-4" />
+          Compartilhar Maluz
+        </button>
         <div className="w-8 h-px bg-primary mx-auto mb-4 opacity-40" />
         <p className="text-[0.65rem] text-foreground/25 tracking-wide">
           {t('footer_text', `© ${new Date().getFullYear()} Maluz · Iluminando mentes, um exercício por vez`)}
