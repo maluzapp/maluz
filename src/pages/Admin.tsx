@@ -83,7 +83,13 @@ const SHARE_FIELDS: FieldConfig[] = [
   { key: 'share_header', label: 'Cabeçalho do compartilhamento', type: 'text', category: 'share' },
   { key: 'share_cta', label: 'CTA para amigos experimentarem', type: 'textarea', category: 'share' },
   { key: 'share_app_url', label: 'Link do app no compartilhamento', type: 'text', category: 'share' },
+  { key: 'share_whatsapp_text', label: 'Texto do WhatsApp (landing page)', type: 'textarea', category: 'share' },
 ];
+
+const SHARE_LOGO_FIELD: LogoFieldConfig = {
+  key: 'share_og_image', label: 'Imagem de Compartilhamento (OG)', sizeKey: '', min: 0, max: 0,
+  hint: 'Imagem que aparece no preview de links (WhatsApp, email, redes sociais). Recomendado: 1200×630px',
+};
 
 const EMAIL_FIELDS: FieldConfig[] = [
   { key: 'email_sender_name', label: 'Nome do remetente', type: 'text', category: 'email' },
