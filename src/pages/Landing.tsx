@@ -75,7 +75,7 @@ function SmallAppleIcon({ className }: { className?: string }) {
 
 export default function Landing() {
   const { data: settings } = useBrandingByCategory();
-  const t = (key: string, fallback: string) => settings?.landing?.[key]?.value ?? settings?.general?.[key]?.value ?? fallback;
+  const t = (key: string, fallback: string) => settings?.landing?.[key]?.value ?? settings?.general?.[key]?.value ?? settings?.share?.[key]?.value ?? fallback;
 
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
