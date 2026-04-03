@@ -896,7 +896,7 @@ export default function Admin() {
           {activeSection === 'logos' && <LogoSizeSection />}
           {activeSection === 'voice' && <SectionPanel fields={VOICE_FIELDS} icon={<MessageCircle className="h-5 w-5 text-primary" />} title="Tom de Voz" />}
           {activeSection === 'landing' && <SectionPanel fields={LANDING_FIELDS} icon={<FileText className="h-5 w-5 text-primary" />} title="Textos da Landing Page" />}
-          {activeSection === 'share' && <SectionPanel fields={SHARE_FIELDS} icon={<Share2 className="h-5 w-5 text-primary" />} title="Mensagem de Compartilhamento" />}
+          {activeSection === 'share' && <ShareSection />}
           {activeSection === 'email' && <SectionPanel fields={EMAIL_FIELDS} icon={<Mail className="h-5 w-5 text-primary" />} title="Configuração de Emails" />}
           {activeSection === 'users' && <UsersSection />}
           {activeSection === 'plans' && <PlansSection />}
