@@ -220,6 +220,83 @@ export type Database = {
           },
         ]
       }
+      notification_log: {
+        Row: {
+          channel: string
+          created_at: string
+          id: string
+          status: string
+          template_id: string | null
+          user_id: string
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          id?: string
+          status?: string
+          template_id?: string | null
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          id?: string
+          status?: string
+          template_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_log_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "notification_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_templates: {
+        Row: {
+          body: string
+          category: string
+          channel: string
+          created_at: string
+          icon_emoji: string
+          id: string
+          inactive_days: number | null
+          is_active: boolean
+          title: string
+          trigger_type: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          category?: string
+          channel?: string
+          created_at?: string
+          icon_emoji?: string
+          id?: string
+          inactive_days?: number | null
+          is_active?: boolean
+          title: string
+          trigger_type?: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          category?: string
+          channel?: string
+          created_at?: string
+          icon_emoji?: string
+          id?: string
+          inactive_days?: number | null
+          is_active?: boolean
+          title?: string
+          trigger_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       parent_child_links: {
         Row: {
           child_profile_id: string
@@ -304,6 +381,33 @@ export type Database = {
           total_exercises?: number
           user_id?: string
           xp?: number
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
         }
         Relationships: []
       }
