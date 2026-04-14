@@ -25,7 +25,7 @@ const FEATURES = [
 
 const PERSONAS = [
   { badge: 'Primário', icon: '👧', name: 'A Estudante', sub: 'Criança · 1º ao 9º ano do EF · 6 a 15 anos', desc: 'Curiosa, ativa e digital nativa. Aprende melhor quando o conteúdo é personalizado e divertido. Quer ser reconhecida pelo esforço.', tags: ['Exercícios do seu livro', 'Feedback imediato', 'Conquistas visíveis'] },
-  { badge: 'Secundário', icon: '👨‍👩‍👧', name: 'Os Responsáveis', sub: 'Pais & Mães · 30 a 50 anos', desc: 'Preocupados com o aprendizado e sem tempo para ajudar diariamente. Querem solução prática, segura e alinhada à escola.', tags: ['Acompanhar progresso', 'Conteúdo da escola', 'Segurança digital'] },
+  { badge: 'Secundário', icon: '👨‍👩‍👧', name: 'Os Responsáveis', sub: 'Pais & Mães · Crianças 6 a 15 anos', desc: 'Preocupados com o aprendizado e sem tempo para ajudar diariamente. Querem solução prática, segura e alinhada à escola.', tags: ['Acompanhar progresso', 'Conteúdo da escola', 'Segurança digital'] },
   { badge: 'Terciário', icon: '👩‍🏫', name: 'Os Professores', sub: 'Educadores do EF · Todas as matérias', desc: 'Buscam ferramentas que complementem suas aulas. Valorizam tecnologia que respeita o currículo e o ritmo da turma.', tags: ['Alinhamento curricular', 'Atividade complementar', 'Fácil de usar'] },
 ];
 
