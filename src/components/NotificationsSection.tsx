@@ -282,7 +282,7 @@ export default function NotificationsSection() {
                   )}
                   <Button size="sm" variant="outline" onClick={() => startEdit(t)} className="text-xs">Editar</Button>
                   <Button size="sm" variant="ghost" onClick={() => handleToggleActive(t.id, t.is_active)} className="text-xs gap-1">
-                    {t.is_active ? <ToggleRight className="h-3.5 w-3.5 text-green-500" /> : <ToggleLeft className="h-3.5 w-3.5 text-foreground/40" />}
+                    {t.is_active ? <ToggleRight className="h-3.5 w-3.5 text-primary" /> : <ToggleLeft className="h-3.5 w-3.5 text-foreground/40" />}
                     {t.is_active ? 'Ativo' : 'Inativo'}
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => handleDelete(t.id)} className="text-xs text-destructive hover:text-destructive gap-1 ml-auto">
