@@ -10,8 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   ArrowLeft, Save, Palette, Type, Maximize, MessageCircle, FileText, Settings, Upload, Trash2,
   Share2, Users, Mail, Calendar, Shield, UserCheck, CreditCard, Crown, Star, Filter, X, Plus,
-  ChevronRight, Zap, LayoutDashboard, Menu
+  ChevronRight, Zap, LayoutDashboard, Menu, Bell
 } from 'lucide-react';
+import NotificationsSection from '@/components/NotificationsSection';
 import { useBrandingByCategory, useUpdateBranding, useIsAdmin } from '@/hooks/useBrandingSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -125,6 +126,7 @@ const NAV_ITEMS = [
   { id: 'landing', label: 'Landing', icon: FileText },
   { id: 'share', label: 'Compartilhar', icon: Share2 },
   { id: 'email', label: 'Emails', icon: Mail },
+  { id: 'notifications', label: 'Notificações', icon: Bell },
   { id: 'users', label: 'Usuários', icon: Users },
   { id: 'plans', label: 'Planos', icon: CreditCard },
 ];
@@ -959,6 +961,7 @@ export default function Admin() {
           {activeSection === 'landing' && <SectionPanel fields={LANDING_FIELDS} icon={<FileText className="h-5 w-5 text-primary" />} title="Textos da Landing Page" />}
           {activeSection === 'share' && <ShareSection />}
           {activeSection === 'email' && <SectionPanel fields={EMAIL_FIELDS} icon={<Mail className="h-5 w-5 text-primary" />} title="Configuração de Emails" />}
+          {activeSection === 'notifications' && <NotificationsSection />}
           {activeSection === 'users' && <UsersSection />}
           {activeSection === 'plans' && <PlansSection />}
         </div>
