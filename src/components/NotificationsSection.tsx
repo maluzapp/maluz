@@ -246,6 +246,26 @@ export default function NotificationsSection() {
         </div>
       </div>
 
+      {/* VAPID Key config */}
+      <div className="rounded-xl border border-primary/15 bg-card/50 p-4 space-y-2">
+        <Label className="text-xs text-foreground/70">VAPID Public Key (necessária para push notifications)</Label>
+        <div className="flex gap-2">
+          <Input
+            value={vapidKey}
+            onChange={e => setVapidKey(e.target.value)}
+            placeholder="BNK4Z..."
+            className="bg-card border-primary/20 text-foreground font-mono text-xs flex-1"
+          />
+          <Button size="sm" onClick={async () => {
+            await supabase.from('branding_settings').upsert({ key: 'vapid_public_key', value: vapidKey, category: 'push' }, { onConflict: 'key' });
+            toast.success('VAPID key salva!');
+          }} className="bg-primary text-primary-foreground shrink-0">
+            <Save className="h-3.5 w-3.5 mr-1" /> Salvar
+          </Button>
+        </div>
+        <p className="text-[10px] text-foreground/40">Cole aqui a chave pública VAPID gerada. Essa chave é usada pelo navegador para receber push notifications.</p>
+      </div>
+
       {/* New template */}
       <Button onClick={() => setShowNew(!showNew)} variant="outline" className="gap-2">
         <Plus className="h-4 w-4" /> Novo template
