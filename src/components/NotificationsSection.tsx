@@ -51,6 +51,10 @@ export default function NotificationsSection() {
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const { count: weekLogs } = await supabase.from('notification_log').select('*', { count: 'exact', head: true }).gte('created_at', weekAgo);
     setLogStats({ total: totalLogs || 0, last7d: weekLogs || 0 });
+
+    // Fetch VAPID key
+    const { data: vapidSetting } = await supabase.from('branding_settings').select('value').eq('key', 'vapid_public_key').single();
+    if (vapidSetting?.value) setVapidKey(vapidSetting.value);
   };
 
   useEffect(() => { fetchTemplates(); fetchStats(); }, []);
