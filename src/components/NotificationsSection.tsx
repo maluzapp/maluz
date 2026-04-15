@@ -26,7 +26,7 @@ export default function NotificationsSection() {
   const [templates, setTemplates] = useState<NotificationTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [vapidKey, setVapidKey] = useState('');
   const [editValues, setEditValues] = useState<Partial<NotificationTemplate>>({});
   const [showNew, setShowNew] = useState(false);
   const [newTemplate, setNewTemplate] = useState<Partial<NotificationTemplate>>({
