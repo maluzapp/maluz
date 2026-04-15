@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
-const VAPID_PUBLIC_KEY = "BNK4Z..."; // Will be replaced with actual key
-
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -31,7 +29,6 @@ export function usePushSubscription() {
 
   useEffect(() => {
     if (!user || !isSupported) return;
-    // Check if already subscribed
     navigator.serviceWorker.ready.then(async (reg) => {
       const sub = await reg.pushManager.getSubscription();
       setIsSubscribed(!!sub);
@@ -48,23 +45,25 @@ export function usePushSubscription() {
 
       const reg = await navigator.serviceWorker.ready;
 
-      // Get VAPID key from edge function config or use the one stored
+      // Get VAPID public key from branding_settings
       const { data: vapidSetting } = await supabase
         .from("branding_settings")
         .select("value")
         .eq("key", "vapid_public_key")
         .single();
 
-      const vapidKey = vapidSetting?.value || VAPID_PUBLIC_KEY;
+      if (!vapidSetting?.value) {
+        console.error("VAPID public key not found in branding_settings");
+        return false;
+      }
 
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidKey),
+        applicationServerKey: urlBase64ToUint8Array(vapidSetting.value),
       });
 
       const subJson = sub.toJSON();
 
-      // Save to DB
       await supabase.from("push_subscriptions").upsert(
         {
           user_id: user.id,
