@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useStripeSubscription, useUserSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
+import { getSubjectEmoji } from '@/constants/subjects';
 import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings, Crown, Lock, Mic, Camera, Swords } from 'lucide-react';
 import { StatBar } from '@/components/ui/stat-bar';
 import { cn } from '@/lib/utils';
