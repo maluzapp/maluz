@@ -725,9 +725,36 @@ export default function Admin() {
                       );
                     })}
                   </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="ml-auto text-destructive hover:bg-destructive/10 text-[10px] gap-1 h-7"
+                    onClick={() => setConfirmDeleteUser({ id: user.id, email: user.email || 'Sem email' })}
+                    disabled={deletingUserId === user.id || user.roles?.includes('admin')}
+                    title={user.roles?.includes('admin') ? 'Não é possível excluir admin' : 'Excluir usuário'}
+                  >
+                    <Trash2 className="h-3 w-3" /> {deletingUserId === user.id ? 'Excluindo...' : 'Excluir'}
+                  </Button>
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {confirmDeleteUser && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setConfirmDeleteUser(null)}>
+            <div className="bg-card border border-destructive/30 rounded-xl p-6 max-w-md w-full space-y-4" onClick={e => e.stopPropagation()}>
+              <h3 className="font-display font-bold text-foreground">Excluir usuário permanentemente?</h3>
+              <p className="text-sm text-foreground/70">
+                <strong>{confirmDeleteUser.email}</strong> e todos os perfis, sessões, desafios, assinaturas e dados associados serão removidos. Esta ação <strong>não pode ser desfeita</strong>.
+              </p>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" size="sm" onClick={() => setConfirmDeleteUser(null)}>Cancelar</Button>
+                <Button variant="destructive" size="sm" onClick={() => handleDeleteUser(confirmDeleteUser.id)} disabled={deletingUserId === confirmDeleteUser.id}>
+                  <Trash2 className="h-3.5 w-3.5 mr-1" /> Excluir definitivamente
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </div>
