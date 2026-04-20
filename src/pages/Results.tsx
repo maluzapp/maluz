@@ -349,9 +349,10 @@ export default function Results() {
           </>
         ) : (
           <>
-            {/* Header */}
-            <div className="mb-6 animate-fade-in">
-              <h1 className="font-display text-2xl font-bold text-foreground">📊 Seus Resultados</h1>
+            {/* Header gamer — coerente com dashboard */}
+            <div className="text-center mb-6 animate-fade-in">
+              <span className="text-6xl block mb-2 emoji-3d animate-float">📊</span>
+              <h1 className="font-display text-2xl font-bold text-foreground">Seus Resultados</h1>
               <p className="text-sm text-muted-foreground">Acompanhe seu progresso de estudos</p>
             </div>
 
