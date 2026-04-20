@@ -74,10 +74,6 @@ function SmartHome() {
   return <Landing />;
 }
 
-function AppUpdateChecker() {
-  useAppUpdateToast();
-  return null;
-}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
