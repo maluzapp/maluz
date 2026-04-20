@@ -109,6 +109,8 @@ export default function NotificationsSection() {
       setTesting(false);
     }
   };
+
+  const handleToggleActive = async (id: string, currentActive: boolean) => {
     await supabase.from('notification_templates').update({ is_active: !currentActive }).eq('id', id);
     setTemplates(prev => prev.map(t => t.id === id ? { ...t, is_active: !currentActive } : t));
     toast.success(currentActive ? 'Desativado' : 'Ativado');
