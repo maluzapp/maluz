@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import webpush from "npm:web-push@3.6.7";
+import * as webpush from "https://deno.land/x/webpush@1.0.2/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,29 +10,41 @@ const corsHeaders = {
 const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY") ?? "";
 const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY") ?? "";
 
-if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
-  try {
-    webpush.setVapidDetails("mailto:hello@maluz.app", VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
-  } catch (e) {
-    console.error("Failed to set VAPID details:", e);
+let vapidAppServer: webpush.ApplicationServer | null = null;
+async function getAppServer() {
+  if (vapidAppServer) return vapidAppServer;
+  if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+    throw new Error("VAPID keys not configured in secrets");
   }
+  vapidAppServer = await webpush.ApplicationServer.new({
+    contactInformation: "mailto:hello@maluz.app",
+    vapidKeys: await webpush.importVapidKeys(
+      {
+        publicKey: VAPID_PUBLIC_KEY,
+        privateKey: VAPID_PRIVATE_KEY,
+      },
+      { jwkImportParams: { name: "ECDSA", namedCurve: "P-256" } },
+    ),
+  });
+  return vapidAppServer;
 }
 
 async function sendWebPush(
   subscription: { endpoint: string; p256dh: string; auth: string },
-  payload: string
+  payload: string,
 ) {
-  if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-    throw new Error("VAPID keys not configured in secrets");
+  const appServer = await getAppServer();
+  const pushSubscriber = appServer.subscribe({
+    endpoint: subscription.endpoint,
+    keys: { p256dh: subscription.p256dh, auth: subscription.auth },
+  });
+  const res = await pushSubscriber.pushTextMessage(payload, {});
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    const err: any = new Error(`Push service returned ${res.status}: ${text.slice(0, 200)}`);
+    err.statusCode = res.status;
+    throw err;
   }
-  await webpush.sendNotification(
-    {
-      endpoint: subscription.endpoint,
-      keys: { p256dh: subscription.p256dh, auth: subscription.auth },
-    },
-    payload,
-    { TTL: 60 * 60 * 24 }
-  );
 }
 
 function buildEmailHtml(template: { icon_emoji: string; title: string; body: string }) {
