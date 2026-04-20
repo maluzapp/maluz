@@ -249,7 +249,15 @@ export default function Profiles() {
     if (current === id) {
       setActiveProfile(null);
     }
-    await supabase.from('profiles').delete().eq('id', id);
+    const { data, error } = await supabase.functions.invoke('delete-child-profile', {
+      body: { profile_id: id },
+    });
+    if (error || (data as any)?.error) {
+      const msg = (data as any)?.error || error?.message || 'Erro ao excluir perfil';
+      toast.error(msg);
+      return;
+    }
+    toast.success('Perfil excluído');
     await loadPageData();
   };
 
