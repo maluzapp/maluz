@@ -80,7 +80,35 @@ export default function NotificationsSection() {
     }
   };
 
-  const handleToggleActive = async (id: string, currentActive: boolean) => {
+  const handleTestPush = async () => {
+    if (!isSubscribed) {
+      const ok = await subscribe();
+      if (!ok) {
+        toast.error('Não foi possível ativar push neste dispositivo. Verifique as permissões do navegador.');
+        return;
+      }
+    }
+    setTesting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke('send-notification', {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+        body: { action: 'send_test' },
+      });
+      if (error) throw error;
+      if (data?.ok) {
+        toast.success(`Teste enviado! ${data.sent}/${data.total} dispositivo(s). Você deve recebê-lo em segundos.`);
+      } else {
+        toast.error(`Falha no teste: ${data?.error || 'erro desconhecido'}`);
+        if (data?.errors) console.error('Push errors:', data.errors);
+      }
+      console.log('Test push response:', data);
+    } catch (err: any) {
+      toast.error('Erro ao testar push: ' + (err.message || 'desconhecido'));
+    } finally {
+      setTesting(false);
+    }
+  };
     await supabase.from('notification_templates').update({ is_active: !currentActive }).eq('id', id);
     setTemplates(prev => prev.map(t => t.id === id ? { ...t, is_active: !currentActive } : t));
     toast.success(currentActive ? 'Desativado' : 'Ativado');
