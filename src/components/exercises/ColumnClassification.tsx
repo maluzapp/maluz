@@ -134,6 +134,7 @@ export function ColumnClassification({ exercise, index, onAnswer, readOnly, save
           <p className="text-sm text-muted-foreground">{exercise.explanation}</p>
         </Card>
       )}
+      </div>
     </div>
   );
 }
