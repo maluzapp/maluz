@@ -7,7 +7,8 @@
 @layer base {
   :root {
     /* Maluz Brand — Dark Navy (default) */
-    --background: 213 50% 11%;
+    --background: 213 50% 9%;
+    --background-deep: 213 55% 6%;
     --foreground: 43 87% 94%;
 
     --card: 214 40% 14%;
@@ -16,8 +17,12 @@
     --popover: 214 40% 14%;
     --popover-foreground: 43 87% 94%;
 
+    /* Gold system */
     --primary: 42 91% 61%;
     --primary-foreground: 213 50% 11%;
+    --gold-light: 48 100% 72%;
+    --gold-deep: 30 80% 38%;
+    --gold-shadow: 28 70% 22%;
 
     --secondary: 214 30% 18%;
     --secondary-foreground: 43 87% 94%;
@@ -33,6 +38,17 @@
 
     --success: 160 94% 58%;
     --success-foreground: 213 50% 11%;
+
+    /* Game palette extensions */
+    --royal-purple: 268 70% 58%;
+    --royal-purple-deep: 268 65% 38%;
+    --royal-purple-foreground: 43 87% 94%;
+    --xp-green: 142 76% 50%;
+    --xp-green-deep: 142 70% 30%;
+    --coral: 8 88% 62%;
+    --coral-deep: 8 80% 42%;
+    --info-blue: 210 90% 60%;
+    --info-blue-deep: 210 80% 38%;
 
     --border: 214 30% 22%;
     --input: 214 30% 22%;
