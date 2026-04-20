@@ -9,7 +9,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { DynamicPwaBranding } from "@/components/DynamicPwaBranding";
 import { UpdateModal } from "@/components/UpdateModal";
-import { useAppUpdateToast } from "@/hooks/useAppUpdateToast";
+import { NewVersionModal } from "@/components/NewVersionModal";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import Profiles from "./pages/Profiles";
@@ -74,10 +74,6 @@ function SmartHome() {
   return <Landing />;
 }
 
-function AppUpdateChecker() {
-  useAppUpdateToast();
-  return null;
-}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -89,7 +85,7 @@ const App = () => (
           <ScrollToTop />
           <DynamicPwaBranding />
           <UpdateModal />
-          <AppUpdateChecker />
+          <NewVersionModal />
           <Routes>
             <Route path="/" element={<SmartHome />} />
             <Route path="/login" element={<Login />} />

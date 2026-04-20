@@ -138,24 +138,31 @@ export function BottomNav() {
       <div className="mx-auto flex max-w-lg items-stretch justify-around relative">
         {NAV_ITEMS_LEFT.map(renderItem)}
 
-        {/* Center lamp button — INTACTO conforme solicitado */}
-        <div className="flex items-center justify-center" style={{ width: '88px' }}>
+        {/* Center lamp button — bigger & always glowing (PRINCIPAL do sistema) */}
+        <div className="flex items-center justify-center" style={{ width: '104px' }}>
           <button
             onClick={handleLampClick}
+            aria-label="Gerar exercícios"
             className={cn(
-              'absolute -top-10 flex items-center justify-center w-[72px] h-[72px] rounded-full border-4 border-card/95 transition-all duration-300',
-              isGeneratePage || lampLit
-                ? 'bg-primary shadow-[0_0_24px_hsl(var(--primary)/0.5)] scale-110'
-                : 'bg-card hover:bg-primary/20 shadow-lg'
+              'absolute -top-12 flex items-center justify-center w-[84px] h-[84px] rounded-full border-4 border-card/95 transition-all duration-300',
+              'bg-gradient-to-br from-primary via-primary to-primary/80',
+              'shadow-[0_0_32px_hsl(var(--primary)/0.65),0_8px_24px_hsl(var(--primary)/0.45),inset_0_-6px_12px_rgba(0,0,0,0.25),inset_0_3px_8px_rgba(255,255,255,0.35)]',
+              'hover:scale-105 active:scale-95',
+              (isGeneratePage || lampLit) && 'scale-110 shadow-[0_0_48px_hsl(var(--primary)/0.9),0_8px_28px_hsl(var(--primary)/0.55),inset_0_-6px_12px_rgba(0,0,0,0.25),inset_0_3px_10px_rgba(255,255,255,0.5)]',
             )}
           >
+            {/* Brilho interno em camadas */}
+            <span className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.55),transparent_55%)]" />
+            <span className="pointer-events-none absolute -inset-1 rounded-full bg-[radial-gradient(circle,hsl(var(--primary)/0.45),transparent_70%)] blur-md animate-pulse" />
             <img
               src={useRemoteLogo ? centralButtonUrl : lampadaFallback}
-              alt="Gerar exercícios"
+              alt=""
+              aria-hidden="true"
               onError={() => setUseRemoteLogo(false)}
               className={cn(
-                'h-12 w-12 object-contain transition-all duration-300',
-                (isGeneratePage || lampLit) ? 'brightness-150 drop-shadow-[0_0_10px_rgba(245,200,66,0.8)]' : 'opacity-70'
+                'relative h-16 w-16 object-contain transition-all duration-300',
+                'brightness-125 drop-shadow-[0_2px_0_rgba(0,0,0,0.35)] drop-shadow-[0_0_14px_rgba(255,220,120,0.95)]',
+                (isGeneratePage || lampLit) && 'brightness-150 drop-shadow-[0_2px_0_rgba(0,0,0,0.35)] drop-shadow-[0_0_22px_rgba(255,230,140,1)]'
               )}
             />
           </button>
