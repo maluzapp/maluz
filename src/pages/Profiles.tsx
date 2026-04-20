@@ -638,85 +638,66 @@ export default function Profiles() {
               : null;
 
           return (
-            <Card className={`mb-4 border-primary/20 ${isPro ? 'bg-primary/5' : ''}`}>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <Crown className={`h-5 w-5 ${isPro ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <h3 className="font-display font-bold text-foreground">Meu Plano</h3>
+            <div className={cn(
+              'mb-4 rounded-2xl p-4 relative overflow-hidden',
+              isPro
+                ? 'bg-gradient-purple-gold shadow-bevel-purple'
+                : 'bg-gradient-gold-soft shadow-card-game'
+            )}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <div className={cn(
+                    'w-9 h-9 rounded-xl flex items-center justify-center',
+                    isPro ? 'bg-gradient-gold shadow-bevel-gold-sm animate-glow-breathe' : 'bg-card border border-primary/30'
+                  )}>
+                    <Crown className={cn('h-5 w-5', isPro ? 'text-primary-foreground' : 'text-muted-foreground')} />
                   </div>
-                  <Badge className={isPro
-                    ? 'bg-primary text-primary-foreground border-0'
-                    : 'bg-muted text-muted-foreground border-0'
-                  }>
-                    {planName}
-                  </Badge>
+                  <h3 className={cn('font-display font-black', isPro ? 'text-stroke-navy text-foreground' : 'text-foreground')}>Meu Plano</h3>
                 </div>
+                <span className={cn(
+                  'inline-flex items-center px-2.5 py-1 rounded-full font-mono font-black text-[10px] uppercase tracking-wider text-stroke-navy',
+                  isPro ? 'bg-gradient-gold shadow-bevel-gold-sm text-primary-foreground' : 'bg-card border border-border text-muted-foreground'
+                )}>
+                  {planName}
+                </span>
+              </div>
 
-                {isPro && endDate && (
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Válido até {endDate}
-                  </p>
-                )}
+              {isPro && endDate && (
+                <p className="text-xs text-foreground/80 font-mono mb-3">Válido até <span className="font-bold">{endDate}</span></p>
+              )}
+              {!isPro && (
+                <p className="text-xs text-muted-foreground mb-3">3 sessões/dia · 1 perfil · Correções básicas</p>
+              )}
 
-                {!isPro && (
-                  <p className="text-xs text-muted-foreground mb-3">
-                    3 sessões por dia · 1 perfil · Correções básicas
-                  </p>
-                )}
-
-                <div className="flex gap-2">
-                  {isPro ? (
-                    hasStripePortal ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1.5 flex-1"
-                        onClick={async () => {
-                          try {
-                            const result = await openCustomerPortal();
-                            if (!result?.url) {
-                              toast.error('Não foi possível abrir o portal agora.');
-                            }
-                          } catch {
-                            toast.error('Não foi possível abrir o portal agora.');
-                          }
-                        }}
-                      >
-                        <CreditCard className="h-3.5 w-3.5" /> Gerenciar assinatura
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1.5 flex-1"
-                        onClick={() => navigate('/#planos')}
-                      >
-                        <ArrowUpRight className="h-3.5 w-3.5" /> Ver planos
-                      </Button>
-                    )
+              <div className="flex gap-2">
+                {isPro ? (
+                  hasStripePortal ? (
+                    <GameButton variant="ghostGold" size="sm" className="flex-1"
+                      onClick={async () => {
+                        try {
+                          const result = await openCustomerPortal();
+                          if (!result?.url) toast.error('Não foi possível abrir o portal agora.');
+                        } catch { toast.error('Não foi possível abrir o portal agora.'); }
+                      }}>
+                      <CreditCard className="h-3.5 w-3.5" /> Gerenciar
+                    </GameButton>
                   ) : (
-                    <>
-                      <Button
-                        size="sm"
-                        className="gap-1.5 flex-1"
-                        onClick={() => startCheckout('pro', 'yearly')}
-                      >
-                        <ArrowUpRight className="h-3.5 w-3.5" /> Upgrade Pro
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1.5"
-                        onClick={() => navigate('/#planos')}
-                      >
-                        Ver planos
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                    <GameButton variant="ghostGold" size="sm" className="flex-1" onClick={() => navigate('/#planos')}>
+                      <ArrowUpRight className="h-3.5 w-3.5" /> Ver planos
+                    </GameButton>
+                  )
+                ) : (
+                  <>
+                    <GameButton variant="purple" size="sm" shine className="flex-1" onClick={() => startCheckout('pro', 'yearly')}>
+                      <Crown className="h-3.5 w-3.5" /> Upgrade Pro
+                    </GameButton>
+                    <GameButton variant="ghostGold" size="sm" onClick={() => navigate('/#planos')}>
+                      Ver planos
+                    </GameButton>
+                  </>
+                )}
+              </div>
+            </div>
           );
         })()}
 

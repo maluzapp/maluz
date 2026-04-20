@@ -12,6 +12,8 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { CreateChallengeModal } from '@/components/challenges/CreateChallengeModal';
 import { ChallengeResultModal } from '@/components/challenges/ChallengeResultModal';
+import { TrophyPodium, type PodiumEntry } from '@/components/game/TrophyPodium';
+import { GameCard } from '@/components/game/GameCard';
 import type { Exercise, ExerciseAnswer } from '@/types/study';
 
 interface ChildProfile {
