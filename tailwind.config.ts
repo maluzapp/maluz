@@ -23,10 +23,36 @@ export default {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
+        "background-deep": "hsl(var(--background-deep))",
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          light: "hsl(var(--gold-light))",
+          deep: "hsl(var(--gold-deep))",
+        },
+        gold: {
+          DEFAULT: "hsl(var(--primary))",
+          light: "hsl(var(--gold-light))",
+          deep: "hsl(var(--gold-deep))",
+          shadow: "hsl(var(--gold-shadow))",
+        },
+        royal: {
+          DEFAULT: "hsl(var(--royal-purple))",
+          deep: "hsl(var(--royal-purple-deep))",
+          foreground: "hsl(var(--royal-purple-foreground))",
+        },
+        xp: {
+          DEFAULT: "hsl(var(--xp-green))",
+          deep: "hsl(var(--xp-green-deep))",
+        },
+        coral: {
+          DEFAULT: "hsl(var(--coral))",
+          deep: "hsl(var(--coral-deep))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info-blue))",
+          deep: "hsl(var(--info-blue-deep))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
