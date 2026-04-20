@@ -53,10 +53,10 @@ function formatDate(dateStr: string) {
 
 function getStatusInfo(status: string) {
   switch (status) {
-    case 'pending': return { label: 'Pendente', icon: Clock, color: 'text-amber-400 bg-amber-400/15' };
-    case 'in_progress': return { label: 'Em andamento', icon: Swords, color: 'text-primary bg-primary/15' };
-    case 'completed': return { label: 'Concluído', icon: CheckCircle, color: 'text-accent bg-accent/15' };
-    default: return { label: status, icon: Clock, color: 'text-muted-foreground bg-muted' };
+    case 'pending': return { label: 'Pendente', icon: Clock, color: 'text-amber-300 bg-amber-400/15 border-amber-400/30', emoji: '⏳' };
+    case 'in_progress': return { label: 'Em andamento', icon: Swords, color: 'text-primary bg-primary/15 border-primary/30', emoji: '⚔️' };
+    case 'completed': return { label: 'Concluído', icon: CheckCircle, color: 'text-accent bg-accent/15 border-accent/30', emoji: '✅' };
+    default: return { label: status, icon: Clock, color: 'text-muted-foreground bg-muted border-border', emoji: '•' };
   }
 }
 
@@ -286,32 +286,33 @@ export default function Challenges() {
               ) : (
                 pendingChallenges.map((c) => {
                   const status = getStatusInfo(c.status);
-                  const StatusIcon = status.icon;
                   return (
-                    <Card key={c.id} className="border-primary/10 animate-fade-in">
-                      <CardContent className="p-4">
+                    <Card key={c.id} className="border-primary/15 bg-gradient-to-br from-card to-[hsl(214,40%,12%)] hover:border-primary/30 transition-all animate-fade-in overflow-hidden relative">
+                      <div className="absolute -right-6 -top-6 w-20 h-20 bg-primary/10 blur-3xl rounded-full pointer-events-none" />
+                      <CardContent className="p-4 relative">
                         <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <p className="font-display font-bold text-foreground truncate">{c.subject}</p>
-                            <p className="text-sm text-muted-foreground truncate">{c.topic}</p>
-                            {c.message && (
-                              <p className="text-xs text-muted-foreground mt-1 italic">"{c.message}"</p>
-                            )}
-                            <div className="flex items-center gap-2 mt-2">
-                              <Badge variant="outline" className={cn('text-[10px] gap-1', status.color)}>
-                                <StatusIcon className="h-3 w-3" /> {status.label}
-                              </Badge>
-                              <span className="text-[10px] text-muted-foreground">{formatDate(c.created_at)}</span>
+                          <div className="flex items-start gap-3 flex-1 min-w-0">
+                            <span className="text-3xl emoji-3d shrink-0 mt-0.5">⚔️</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-display font-bold text-foreground truncate">{c.subject}</p>
+                              <p className="text-sm text-muted-foreground truncate">{c.topic}</p>
+                              {c.message && (
+                                <p className="text-xs text-muted-foreground mt-1 italic truncate">"{c.message}"</p>
+                              )}
+                              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                <Badge variant="outline" className={cn('text-[10px] gap-1 font-mono uppercase tracking-wider border', status.color)}>
+                                  <span className="text-xs leading-none">{status.emoji}</span> {status.label}
+                                </Badge>
+                                <span className="text-[10px] text-muted-foreground font-mono">{formatDate(c.created_at)}</span>
+                                {profileType === 'parent' && (
+                                  <span className="text-[10px] text-muted-foreground">→ {childNames[c.child_profile_id] || 'Filho'}</span>
+                                )}
+                              </div>
                             </div>
-                            {profileType === 'parent' && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Para: {childNames[c.child_profile_id] || 'Filho'}
-                              </p>
-                            )}
                           </div>
                           <div className="flex gap-1.5 shrink-0">
                             {profileType === 'child' && c.status === 'pending' && (
-                              <Button size="sm" onClick={() => startChallenge(c)} className="gap-1.5 shrink-0">
+                              <Button size="sm" onClick={() => startChallenge(c)} className="gap-1.5 shrink-0 shadow-lg shadow-primary/20">
                                 <Swords className="h-3.5 w-3.5" /> Iniciar
                               </Button>
                             )}
@@ -343,29 +344,33 @@ export default function Challenges() {
               ) : (
                 completedChallenges.map((c) => {
                   const pct = c.score && c.total ? Math.round((c.score / c.total) * 100) : 0;
+                  const trophyEmoji = pct >= 90 ? '🏆' : pct >= 70 ? '🥇' : pct >= 50 ? '🥈' : '🥉';
                   return (
-                    <Card key={c.id} className="border-primary/10 animate-fade-in cursor-pointer hover:border-primary/20 transition-colors"
+                    <Card key={c.id} className="border-primary/10 animate-fade-in cursor-pointer hover:border-primary/30 transition-all overflow-hidden relative"
                       onClick={() => navigate(`/desafio/${c.id}/revisao`)}>
-                      <CardContent className="p-4">
+                      <CardContent className="p-4 relative">
                         <div className="flex items-center gap-3">
                           <div className={cn(
-                            'w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold shrink-0',
-                            pct >= 70 ? 'bg-accent/15 text-accent' : pct >= 50 ? 'bg-primary/15 text-primary' : 'bg-destructive/15 text-destructive'
+                            'w-14 h-14 rounded-xl flex flex-col items-center justify-center font-bold shrink-0 border',
+                            pct >= 70
+                              ? 'bg-accent/10 text-accent border-accent/30 shadow-[0_0_16px_-4px_hsl(160_94%_58%/0.5)]'
+                              : pct >= 50
+                                ? 'bg-primary/10 text-primary border-primary/30 shadow-[0_0_16px_-4px_hsl(42_91%_61%/0.5)]'
+                                : 'bg-destructive/10 text-destructive border-destructive/30'
                           )}>
-                            {pct}%
+                            <span className="text-base leading-none emoji-3d">{trophyEmoji}</span>
+                            <span className="text-[11px] font-mono font-black mt-0.5">{pct}%</span>
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="font-display font-bold text-foreground truncate">{c.subject}</p>
                             <p className="text-sm text-muted-foreground truncate">{c.topic}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-xs text-muted-foreground">{c.score}/{c.total} acertos</span>
+                            <div className="flex items-center gap-2 mt-1 flex-wrap">
+                              <span className="text-xs font-mono text-foreground">{c.score}/{c.total}</span>
                               <span className="text-[10px] text-muted-foreground">{formatDate(c.completed_at || c.created_at)}</span>
+                              {profileType === 'parent' && (
+                                <span className="text-[10px] text-muted-foreground">→ {childNames[c.child_profile_id] || 'Filho'}</span>
+                              )}
                             </div>
-                            {profileType === 'parent' && (
-                              <p className="text-xs text-muted-foreground mt-0.5">
-                                {childNames[c.child_profile_id] || 'Filho'}
-                              </p>
-                            )}
                           </div>
                           <div className="flex gap-1.5 shrink-0">
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); navigate(`/desafio/${c.id}/revisao`); }}>
