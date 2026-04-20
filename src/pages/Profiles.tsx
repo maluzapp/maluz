@@ -521,38 +521,53 @@ export default function Profiles() {
   const ProfileCard = ({ p, idx }: { p: Profile; idx: number }) => {
     const isActive = activeProfileId === p.id;
     return (
-      <Card
+      <div
         key={p.id}
         className={cn(
-          'cursor-pointer hover:border-primary/50 transition-all duration-300',
-          isActive && 'border-primary/40 ring-1 ring-primary/20'
+          'relative rounded-2xl bg-gradient-gold-soft p-4 transition-all duration-300 cursor-pointer press-down',
+          'shadow-card-game',
+          isActive && 'ring-2 ring-primary shadow-bevel-gold-sm'
         )}
       >
-        <CardContent className="p-4 flex items-center gap-4">
-          <button onClick={() => setViewingChild(p)} className="flex-1 flex items-center gap-4 text-left">
-            <div className="relative">
-              <span className="text-4xl">{p.avatar_emoji}</span>
+        <div className="flex items-center gap-4">
+          <button onClick={() => setViewingChild(p)} className="flex-1 flex items-center gap-3 text-left min-w-0">
+            {/* Gold-framed avatar */}
+            <div className="relative shrink-0">
+              <div className="w-14 h-14 rounded-full bg-gradient-gold p-[2.5px] shadow-bevel-gold-sm">
+                <div className="w-full h-full rounded-full bg-card flex items-center justify-center text-3xl">
+                  {p.avatar_emoji}
+                </div>
+              </div>
+              {/* Level badge */}
+              <div className="absolute -bottom-1 -right-1 min-w-[22px] h-[22px] px-1 rounded-full bg-gradient-purple shadow-bevel-purple flex items-center justify-center ring-2 ring-card">
+                <span className="font-display font-black text-[10px] text-stroke-navy text-royal-foreground leading-none">
+                  {p.level}
+                </span>
+              </div>
               {isActive && (
-                <span className="absolute -bottom-1 -right-2 bg-primary text-primary-foreground text-[8px] font-bold px-1 py-0.5 rounded-full leading-none">ATIVO</span>
+                <span className="absolute -top-1 -left-2 bg-gradient-coral shadow-bevel-coral text-white text-[8px] font-mono font-black px-1.5 py-0.5 rounded-full leading-none ring-2 ring-card">
+                  ATIVO
+                </span>
               )}
             </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <p className="font-display font-bold text-foreground">{p.name}</p>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="font-display font-black text-foreground truncate">{p.name}</p>
                 {p.profile_type === 'parent' && (
-                  <span className="bg-primary/15 text-primary text-[10px] px-1.5 py-0.5 rounded-full font-mono">Pai/Mãe</span>
+                  <span className="bg-card border border-primary/40 text-primary text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold uppercase">Pai/Mãe</span>
                 )}
                 {isPro && (
-                  <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-1.5 py-0 h-4"><Crown className="h-3 w-3 mr-0.5" /> PRO</Badge>
+                  <span className="inline-flex items-center gap-0.5 bg-gradient-purple shadow-bevel-purple text-royal-foreground text-[9px] px-1.5 py-0.5 rounded-full font-mono font-black text-stroke-navy">
+                    <Crown className="h-2.5 w-2.5" /> PRO
+                  </span>
                 )}
               </div>
               {p.school_year && (
-                <p className="text-xs text-primary font-medium">{getYearLabel(p.school_year)}</p>
+                <p className="text-[11px] text-primary font-mono font-bold uppercase tracking-wider">{getYearLabel(p.school_year)}</p>
               )}
-              <div className="flex gap-3 text-xs text-muted-foreground mt-1">
-                <span>⭐ {p.xp} XP</span>
-                <span>📊 Nível {p.level}</span>
-                <span>🔥 {p.streak_days} dias</span>
+              <div className="flex gap-3 text-[11px] text-muted-foreground font-mono mt-1">
+                <span className="text-primary font-bold">⭐ {p.xp}</span>
+                <span className="text-coral font-bold">🔥 {p.streak_days}d</span>
               </div>
             </div>
           </button>
