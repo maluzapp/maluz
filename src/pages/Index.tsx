@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useStripeSubscription, useUserSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
+import { getSubjectEmoji } from '@/constants/subjects';
 import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings, Crown, Lock, Mic, Camera, Swords } from 'lucide-react';
 import { StatBar } from '@/components/ui/stat-bar';
 import { cn } from '@/lib/utils';
@@ -225,7 +226,7 @@ export default function Index() {
               <Card key={c.id} className="border-primary/20 bg-gradient-to-r from-primary/[0.06] to-card cursor-pointer hover:border-primary/30 transition-colors"
                 onClick={() => navigate(`/desafio/${c.id}`)}>
                 <CardContent className="p-4 flex items-center gap-3">
-                  <span className="text-4xl emoji-3d-frost shrink-0">⚔️</span>
+                  <span className="text-4xl emoji-3d-frost shrink-0">{getSubjectEmoji(c.subject)}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-foreground truncate">{c.subject} — {c.topic}</p>
                     <p className="text-xs text-muted-foreground">
@@ -258,7 +259,10 @@ export default function Index() {
                   return (
                     <div key={stat.subject}>
                       <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-foreground font-medium truncate">{stat.subject}</span>
+                        <span className="text-foreground font-medium truncate flex items-center gap-1.5">
+                          <span className="text-base leading-none emoji-3d">{getSubjectEmoji(stat.subject)}</span>
+                          {stat.subject}
+                        </span>
                         <span className={cn(
                           'text-xs font-mono font-bold',
                           pct >= 70 ? 'text-accent' : pct >= 50 ? 'text-primary' : 'text-destructive'

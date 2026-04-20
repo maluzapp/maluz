@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { CreateChallengeModal } from '@/components/challenges/CreateChallengeModal';
 import { ChallengeResultModal } from '@/components/challenges/ChallengeResultModal';
 import type { Exercise, ExerciseAnswer } from '@/types/study';
+import { getSubjectEmoji } from '@/constants/subjects';
 
 interface ChildProfile {
   id: string;
@@ -292,7 +293,7 @@ export default function Challenges() {
                       <CardContent className="p-4 relative">
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-start gap-3 flex-1 min-w-0">
-                            <span className="text-3xl emoji-3d shrink-0 mt-0.5">⚔️</span>
+                            <span className="text-3xl emoji-3d shrink-0 mt-0.5">{getSubjectEmoji(c.subject)}</span>
                             <div className="flex-1 min-w-0">
                               <p className="font-display font-bold text-foreground truncate">{c.subject}</p>
                               <p className="text-sm text-muted-foreground truncate">{c.topic}</p>

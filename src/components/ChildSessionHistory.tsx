@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { History, Calendar, BookOpen } from 'lucide-react';
 import { getYearLabel } from '@/constants/years';
+import { getSubjectEmoji } from '@/constants/subjects';
 import { cn } from '@/lib/utils';
 
 interface SessionRecord {
@@ -85,6 +86,7 @@ export function ChildSessionHistory({ profileId }: Props) {
           >
             <CardContent className="p-3">
               <div className="flex items-center justify-between gap-3">
+                <span className="text-2xl emoji-3d shrink-0">{getSubjectEmoji(s.subject)}</span>
                 <div className="flex-1 min-w-0">
                   <p className="font-display font-bold text-sm text-foreground truncate">{s.subject}</p>
                   <p className="text-xs text-muted-foreground truncate">{s.topic}</p>

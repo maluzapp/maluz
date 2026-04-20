@@ -11,12 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useProfileStore } from '@/hooks/useProfile';
 import { YEAR_OPTIONS } from '@/constants/years';
 import type { SchoolYear, Subject } from '@/types/study';
-
-const SUBJECTS: Subject[] = ['Matemática', 'Português', 'Ciências', 'História', 'Geografia', 'Inglês', 'Artes', 'Educação Física'];
-const SUBJECT_EMOJIS: Record<Subject, string> = {
-  'Matemática': '🔢', 'Português': '📝', 'Ciências': '🔬', 'História': '🏛️',
-  'Geografia': '🌍', 'Inglês': '🇬🇧', 'Artes': '🎨', 'Educação Física': '⚽',
-};
+import { SUBJECTS, SUBJECT_EMOJIS } from '@/constants/subjects';
 
 interface Props {
   children: { id: string; name: string; avatar_emoji: string; school_year: string | null }[];

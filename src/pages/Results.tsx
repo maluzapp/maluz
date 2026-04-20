@@ -7,6 +7,7 @@ import { useStudyStore } from '@/store/study-store';
 import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
+import { getSubjectEmoji } from '@/constants/subjects';
 import { cn } from '@/lib/utils';
 import { PerfectScoreConfetti, firePerfectScoreConfetti } from '@/components/exercises/Confetti';
 import { awardStudyProgress, calculateXp } from '@/lib/studyProgress';
@@ -134,19 +135,22 @@ function SessionHistory() {
               >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-display font-bold text-foreground truncate">
-                        {s.subject}
-                      </p>
-                      <p className="text-sm text-muted-foreground truncate">{s.topic}</p>
-                      <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {formatDate(s.created_at)}
-                        </span>
-                        {s.year && (
-                          <span>{getYearLabel(s.year) || s.year}</span>
-                        )}
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <span className="text-3xl emoji-3d shrink-0 mt-0.5">{getSubjectEmoji(s.subject)}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-display font-bold text-foreground truncate">
+                          {s.subject}
+                        </p>
+                        <p className="text-sm text-muted-foreground truncate">{s.topic}</p>
+                        <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {formatDate(s.created_at)}
+                          </span>
+                          {s.year && (
+                            <span>{getYearLabel(s.year) || s.year}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="text-right shrink-0">
@@ -243,7 +247,7 @@ export default function Results() {
     const cta = s.share_cta || `🚀 Que tal tentar também? Baixe o ${appName} e descubra o seu resultado!`;
     const appUrl = s.share_app_url || 'https://maluz.app';
 
-    const text = `${header}\n\n📖 ${config.subject} — ${config.topic} (${config.year})\n🏆 Acertei *${score} de ${total}* (${pct}%)\n⭐ Ganhei ${xpEarned} XP!\n\n${getMessage(pct)}\n\n${cta}\n👉 ${appUrl.replace(/\/$/, '')}`;
+    const text = `${header}\n\n${getSubjectEmoji(config.subject)} ${config.subject} — ${config.topic} (${config.year})\n🏆 Acertei *${score} de ${total}* (${pct}%)\n⭐ Ganhei ${xpEarned} XP!\n\n${getMessage(pct)}\n\n${cta}\n👉 ${appUrl.replace(/\/$/, '')}`;
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     const url = isMobile
       ? `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`

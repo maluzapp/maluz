@@ -13,6 +13,7 @@ import { CompleteSentence } from '@/components/exercises/CompleteSentence';
 import { ColumnClassification } from '@/components/exercises/ColumnClassification';
 import type { Exercise, ExerciseAnswer } from '@/types/study';
 import { cn } from '@/lib/utils';
+import { getSubjectEmoji } from '@/constants/subjects';
 
 interface ChallengeData {
   id: string;
@@ -113,11 +114,16 @@ export default function ChallengeReview() {
               <Swords className="h-5 w-5 text-primary" />
               <span className="text-xs font-display font-bold text-primary">Desafio</span>
             </div>
-            <h1 className="font-display text-xl font-bold text-foreground">{challenge.subject}</h1>
-            <p className="text-sm text-muted-foreground">{challenge.topic}</p>
-            {childName && (
-              <p className="text-sm text-muted-foreground mt-1">Aluno: {childName}</p>
-            )}
+            <div className="flex items-center gap-3">
+              <span className="text-4xl emoji-3d shrink-0">{getSubjectEmoji(challenge.subject)}</span>
+              <div className="min-w-0">
+                <h1 className="font-display text-xl font-bold text-foreground">{challenge.subject}</h1>
+                <p className="text-sm text-muted-foreground">{challenge.topic}</p>
+                {childName && (
+                  <p className="text-sm text-muted-foreground mt-1">Aluno: {childName}</p>
+                )}
+              </div>
+            </div>
             <div className="mt-3 flex items-center gap-4">
               <span className={cn(
                 'text-2xl font-display font-bold',

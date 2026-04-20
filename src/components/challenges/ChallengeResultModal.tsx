@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle, XCircle, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getSubjectEmoji } from '@/constants/subjects';
 import type { Challenge } from '@/pages/Challenges';
 
 interface Props {
@@ -27,6 +28,7 @@ export function ChallengeResultModal({ challenge, childName, onClose }: Props) {
         <div className="space-y-4">
           {/* Score summary */}
           <div className="text-center py-4">
+            <span className="text-5xl block mb-2 emoji-3d animate-float">{getSubjectEmoji(challenge.subject)}</span>
             <p className="text-sm text-muted-foreground mb-1">{childName}</p>
             <p className="text-4xl font-display font-bold text-foreground">{pct}%</p>
             <p className="text-sm text-muted-foreground">
