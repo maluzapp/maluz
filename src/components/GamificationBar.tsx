@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useProfileStore } from '@/hooks/useProfile';
 import { Progress } from '@/components/ui/progress';
 import { Flame, Star, TrendingUp } from 'lucide-react';
+import { GameIcon } from '@/components/ui/game-icon';
 
 interface ProfileStats {
   name: string;
@@ -46,18 +47,18 @@ export function GamificationBar() {
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between text-sm">
           <span className="font-display font-bold text-foreground truncate">{stats.name}</span>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0 ml-2">
-            <span className="flex items-center gap-0.5">
-              <TrendingUp className="h-3 w-3" />
-              Nv. {stats.level}
+          <div className="flex items-center gap-2.5 text-xs text-muted-foreground shrink-0 ml-2">
+            <span className="flex items-center gap-1">
+              <GameIcon icon={TrendingUp} variant="frost" size="sm" className="!h-7 !w-7" />
+              <span className="font-mono font-bold text-foreground">Nv.{stats.level}</span>
             </span>
-            <span className="flex items-center gap-0.5">
-              <Star className="h-3 w-3 text-accent" />
-              {stats.xp}
+            <span className="flex items-center gap-1">
+              <GameIcon icon={Star} variant="gold" size="sm" className="!h-7 !w-7" />
+              <span className="font-mono font-bold text-foreground">{stats.xp}</span>
             </span>
-            <span className="flex items-center gap-0.5">
-              <Flame className="h-3 w-3 text-destructive" />
-              {stats.streak_days}
+            <span className="flex items-center gap-1">
+              <GameIcon icon={Flame} variant="flame" size="sm" className="!h-7 !w-7" />
+              <span className="font-mono font-bold text-foreground">{stats.streak_days}</span>
             </span>
           </div>
         </div>
