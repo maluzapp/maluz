@@ -182,10 +182,12 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
   const allCorrect = answered && Array.from(matches.entries()).every(([l, r]) => shuffledRight[r].originalIndex === l);
 
   return (
-    <Card className="animate-slide-up overflow-hidden">
-      <CardContent className="p-5">
-        <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">
-          Associação
+    <div className="stage-card animate-slide-up rounded-2xl">
+      <div className="relative p-5">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="inline-flex h-6 items-center gap-1 rounded-full bg-primary/15 px-2.5 text-[10px] font-bold uppercase tracking-widest text-primary ring-1 ring-primary/30">
+            🔗 Associação
+          </span>
         </div>
         <h2 className="mb-2 text-xl font-bold text-foreground">
           Conecte os conceitos relacionados
