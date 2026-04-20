@@ -5,9 +5,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Bell, Send, Plus, Save, Trash2, ToggleLeft, ToggleRight, Clock, Users, Mail, Smartphone } from 'lucide-react';
+import { Bell, Send, Plus, Save, Trash2, ToggleLeft, ToggleRight, Clock, Users, Mail, Smartphone, Zap, BellRing, BellOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { usePushSubscription } from '@/hooks/usePushSubscription';
 
 interface NotificationTemplate {
   id: string;
@@ -23,9 +24,11 @@ interface NotificationTemplate {
 }
 
 export default function NotificationsSection() {
+  const { isSubscribed, isSupported, permission, subscribe, unsubscribe } = usePushSubscription();
   const [templates, setTemplates] = useState<NotificationTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [vapidKey, setVapidKey] = useState('');
   const [editValues, setEditValues] = useState<Partial<NotificationTemplate>>({});
