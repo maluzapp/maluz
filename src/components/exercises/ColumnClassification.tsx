@@ -53,9 +53,15 @@ export function ColumnClassification({ exercise, index, onAnswer, readOnly, save
   };
 
   return (
-    <div className="animate-fade-in">
-      <h2 className="font-display text-xl font-bold text-foreground mb-1">Classifique os itens</h2>
-      <p className="text-sm text-muted-foreground mb-3">{exercise.question}</p>
+    <div className="stage-card animate-slide-up rounded-2xl">
+      <div className="relative p-5">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="inline-flex h-6 items-center gap-1 rounded-full bg-primary/15 px-2.5 text-[10px] font-bold uppercase tracking-widest text-primary ring-1 ring-primary/30">
+            📊 Classificação
+          </span>
+        </div>
+        <h2 className="font-display text-xl font-bold text-foreground mb-1">Classifique os itens</h2>
+        <p className="text-sm text-muted-foreground mb-3">{exercise.question}</p>
 
       {/* Column headers */}
       <div className="grid gap-2 mb-3" style={{ gridTemplateColumns: `repeat(${exercise.columns.length}, 1fr)` }}>
@@ -128,6 +134,7 @@ export function ColumnClassification({ exercise, index, onAnswer, readOnly, save
           <p className="text-sm text-muted-foreground">{exercise.explanation}</p>
         </Card>
       )}
+      </div>
     </div>
   );
 }

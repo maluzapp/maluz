@@ -125,9 +125,15 @@ export function Ordering({ exercise, index, onAnswer, readOnly, savedAnswer }: P
   };
 
   return (
-    <div className="animate-fade-in">
-      <h2 className="font-display text-xl font-bold text-foreground mb-1">Ordene corretamente</h2>
-      <p className="text-sm text-muted-foreground mb-4">{exercise.question}</p>
+    <div className="stage-card animate-slide-up rounded-2xl">
+      <div className="relative p-5">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="inline-flex h-6 items-center gap-1 rounded-full bg-primary/15 px-2.5 text-[10px] font-bold uppercase tracking-widest text-primary ring-1 ring-primary/30">
+            🔢 Ordenação
+          </span>
+        </div>
+        <h2 className="font-display text-xl font-bold text-foreground mb-1">Ordene corretamente</h2>
+        <p className="text-sm text-muted-foreground mb-4">{exercise.question}</p>
 
       <div className="space-y-2 mb-4">
         {order.map((itemIdx, pos) => {
@@ -205,6 +211,7 @@ export function Ordering({ exercise, index, onAnswer, readOnly, savedAnswer }: P
           )}
         </Card>
       )}
+      </div>
     </div>
   );
 }

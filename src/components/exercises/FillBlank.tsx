@@ -58,10 +58,12 @@ export function FillBlank({ exercise, index, onAnswer, readOnly, savedAnswer }: 
   const parts = exercise.sentence.split('___');
 
   return (
-    <Card className="animate-slide-up overflow-hidden">
-      <CardContent className="p-5">
-        <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary animate-fade-in">
-          Preencher lacuna
+    <div className="stage-card animate-slide-up rounded-2xl">
+      <div className="relative p-5">
+        <div className="mb-2 flex items-center gap-2 animate-fade-in">
+          <span className="inline-flex h-6 items-center gap-1 rounded-full bg-primary/15 px-2.5 text-[10px] font-bold uppercase tracking-widest text-primary ring-1 ring-primary/30">
+            ✍️ Preencher lacuna
+          </span>
         </div>
         <div className="mb-5 text-xl font-bold text-foreground animate-fade-in" style={{ animationDelay: '100ms' }}>
           {parts[0]}
@@ -84,17 +86,19 @@ export function FillBlank({ exercise, index, onAnswer, readOnly, savedAnswer }: 
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
               autoFocus
-              className="rounded-xl"
+              className="rounded-xl h-12 text-base"
               disabled={validating}
             />
-            <Button onClick={handleSubmit} disabled={!value.trim() || validating} className="rounded-xl">
+            <Button onClick={handleSubmit} disabled={!value.trim() || validating} className="rounded-xl h-12 px-5 bg-gradient-to-r from-primary to-[hsl(38,92%,55%)] shadow-[0_0_18px_hsl(var(--primary)/0.4)]">
               {validating ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Enviar'}
             </Button>
           </div>
         ) : (
           <div className={cn(
-            'rounded-xl px-4 py-3 text-sm animate-slide-up',
-            isCorrect ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'
+            'rounded-xl px-4 py-3 text-sm animate-slide-up ring-1',
+            isCorrect
+              ? 'bg-success/10 text-success ring-success/30 shadow-[0_0_18px_hsl(var(--success)/0.25)]'
+              : 'bg-destructive/10 text-destructive ring-destructive/30'
           )}>
             <p className="font-semibold text-base">
               {isCorrect ? '🎉 Correto!' : `😔 Incorreto — Resposta: ${exercise.answer}`}
@@ -106,7 +110,7 @@ export function FillBlank({ exercise, index, onAnswer, readOnly, savedAnswer }: 
             <p className="mt-1 opacity-80">{exercise.explanation}</p>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

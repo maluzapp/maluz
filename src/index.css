@@ -256,3 +256,58 @@
 .podium-gold { box-shadow: 0 0 30px hsl(42 91% 61% / 0.6), inset 0 0 20px hsl(42 91% 61% / 0.2); }
 .podium-silver { box-shadow: 0 0 24px rgba(203,213,225,0.5), inset 0 0 16px rgba(203,213,225,0.15); }
 .podium-bronze { box-shadow: 0 0 24px rgba(217,119,6,0.5), inset 0 0 16px rgba(217,119,6,0.15); }
+
+/* === Exercise Stage Card (gamer fase) === */
+.stage-card {
+  position: relative;
+  background:
+    linear-gradient(180deg, hsl(214 40% 17%) 0%, hsl(214 40% 12%) 100%);
+  border: 1px solid hsl(42 91% 61% / 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    inset 0 0 60px hsl(42 91% 61% / 0.04),
+    0 12px 40px -16px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+.stage-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 30% at 50% 0%, hsl(42 91% 61% / 0.12), transparent 70%),
+    radial-gradient(ellipse 40% 30% at 100% 100%, hsl(160 94% 58% / 0.08), transparent 70%);
+  border-radius: inherit;
+}
+.stage-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, hsl(42 91% 61% / 0.6), transparent);
+  pointer-events: none;
+}
+
+/* Botão de opção gamer */
+.option-btn {
+  position: relative;
+  background: linear-gradient(180deg, hsl(214 40% 18%) 0%, hsl(214 40% 14%) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 4px 12px -6px rgba(0,0,0,0.4);
+}
+.option-btn-correct {
+  background: linear-gradient(180deg, hsl(160 94% 58% / 0.18) 0%, hsl(160 94% 30% / 0.12) 100%);
+  box-shadow:
+    inset 0 1px 0 hsl(160 94% 58% / 0.4),
+    0 0 24px hsl(160 94% 58% / 0.5),
+    0 4px 12px -4px hsl(160 94% 58% / 0.4);
+}
+.option-btn-wrong {
+  background: linear-gradient(180deg, hsl(14 100% 55% / 0.18) 0%, hsl(14 100% 35% / 0.12) 100%);
+  box-shadow:
+    inset 0 1px 0 hsl(14 100% 55% / 0.4),
+    0 0 20px hsl(14 100% 55% / 0.4),
+    0 4px 12px -4px hsl(14 100% 55% / 0.3);
+}
