@@ -345,7 +345,7 @@ export function Matching({ exercise, index, onAnswer, readOnly, savedAnswer }: P
             <p className="text-sm text-muted-foreground">{exercise.explanation}</p>
           </Card>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
