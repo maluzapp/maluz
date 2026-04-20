@@ -534,6 +534,25 @@ export default function Admin() {
       }
     };
 
+    const handleDeleteUser = async (userId: string) => {
+      setDeletingUserId(userId);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const { data, error } = await supabase.functions.invoke('admin-delete-user', {
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+          body: { user_id: userId },
+        });
+        if (error || data?.error) throw new Error(error?.message || data?.error);
+        toast.success('Usuário excluído permanentemente');
+        await fetchUsers();
+      } catch (err: any) {
+        toast.error('Erro ao excluir: ' + (err.message || 'desconhecido'));
+      } finally {
+        setDeletingUserId(null);
+        setConfirmDeleteUser(null);
+      }
+    };
+
     const filtered = users.filter(u => {
       const matchesSearch = (u.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.profiles?.some((p: any) => p.name?.toLowerCase().includes(searchTerm.toLowerCase()));
