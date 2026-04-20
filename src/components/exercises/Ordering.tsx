@@ -211,6 +211,7 @@ export function Ordering({ exercise, index, onAnswer, readOnly, savedAnswer }: P
           )}
         </Card>
       )}
+      </div>
     </div>
   );
 }
