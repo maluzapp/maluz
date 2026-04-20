@@ -22,7 +22,6 @@ import {
 import { YEAR_OPTIONS, getYearLabel } from '@/constants/years';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { GameButton } from '@/components/game/GameButton';
 
 const AVATARS = ['🧑‍🎓', '👧', '👦', '🦸', '🧙', '🦊', '🐱', '🦄', '🚀', '⭐', '🐶', '🐼', '🦁', '🐸', '🦋', '🌟', '🎨', '🎮', '🏀', '🎸', '🧑‍🚀', '🧑‍💻', '👩‍🔬', '🧑‍🏫', '🦸‍♀️', '🧚', '🐉', '🌈', '🎯', '🏆'];
 
@@ -522,53 +521,38 @@ export default function Profiles() {
   const ProfileCard = ({ p, idx }: { p: Profile; idx: number }) => {
     const isActive = activeProfileId === p.id;
     return (
-      <div
+      <Card
         key={p.id}
         className={cn(
-          'relative rounded-2xl bg-gradient-gold-soft p-4 transition-all duration-300 cursor-pointer press-down',
-          'shadow-card-game',
-          isActive && 'ring-2 ring-primary shadow-bevel-gold-sm'
+          'cursor-pointer hover:border-primary/50 transition-all duration-300',
+          isActive && 'border-primary/40 ring-1 ring-primary/20'
         )}
       >
-        <div className="flex items-center gap-4">
-          <button onClick={() => setViewingChild(p)} className="flex-1 flex items-center gap-3 text-left min-w-0">
-            {/* Gold-framed avatar */}
-            <div className="relative shrink-0">
-              <div className="w-14 h-14 rounded-full bg-gradient-gold p-[2.5px] shadow-bevel-gold-sm">
-                <div className="w-full h-full rounded-full bg-card flex items-center justify-center text-3xl">
-                  {p.avatar_emoji}
-                </div>
-              </div>
-              {/* Level badge */}
-              <div className="absolute -bottom-1 -right-1 min-w-[22px] h-[22px] px-1 rounded-full bg-gradient-purple shadow-bevel-purple flex items-center justify-center ring-2 ring-card">
-                <span className="font-display font-black text-[10px] text-stroke-navy text-royal-foreground leading-none">
-                  {p.level}
-                </span>
-              </div>
+        <CardContent className="p-4 flex items-center gap-4">
+          <button onClick={() => setViewingChild(p)} className="flex-1 flex items-center gap-4 text-left">
+            <div className="relative">
+              <span className="text-4xl">{p.avatar_emoji}</span>
               {isActive && (
-                <span className="absolute -top-1 -left-2 bg-gradient-coral shadow-bevel-coral text-white text-[8px] font-mono font-black px-1.5 py-0.5 rounded-full leading-none ring-2 ring-card">
-                  ATIVO
-                </span>
+                <span className="absolute -bottom-1 -right-2 bg-primary text-primary-foreground text-[8px] font-bold px-1 py-0.5 rounded-full leading-none">ATIVO</span>
               )}
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <p className="font-display font-black text-foreground truncate">{p.name}</p>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <p className="font-display font-bold text-foreground">{p.name}</p>
                 {p.profile_type === 'parent' && (
-                  <span className="bg-card border border-primary/40 text-primary text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold uppercase">Pai/Mãe</span>
+                  <span className="bg-primary/15 text-primary text-[10px] px-1.5 py-0.5 rounded-full font-mono">Pai/Mãe</span>
                 )}
                 {isPro && (
-                  <span className="inline-flex items-center gap-0.5 bg-gradient-purple shadow-bevel-purple text-royal-foreground text-[9px] px-1.5 py-0.5 rounded-full font-mono font-black text-stroke-navy">
-                    <Crown className="h-2.5 w-2.5" /> PRO
-                  </span>
+                  <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-1.5 py-0 h-4"><Crown className="h-3 w-3 mr-0.5" /> PRO</Badge>
                 )}
               </div>
               {p.school_year && (
-                <p className="text-[11px] text-primary font-mono font-bold uppercase tracking-wider">{getYearLabel(p.school_year)}</p>
+                <p className="text-xs text-primary font-medium">{getYearLabel(p.school_year)}</p>
               )}
-              <div className="flex gap-3 text-[11px] text-muted-foreground font-mono mt-1">
-                <span className="text-primary font-bold">⭐ {p.xp}</span>
-                <span className="text-coral font-bold">🔥 {p.streak_days}d</span>
+              <div className="flex gap-3 text-xs text-muted-foreground mt-1">
+                <span>⭐ {p.xp} XP</span>
+                <span>📊 Nível {p.level}</span>
+                <span>🔥 {p.streak_days} dias</span>
               </div>
             </div>
           </button>
@@ -589,8 +573,8 @@ export default function Profiles() {
               <Trash2 className="h-3.5 w-3.5" />
             </Button>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   };
 
@@ -639,66 +623,85 @@ export default function Profiles() {
               : null;
 
           return (
-            <div className={cn(
-              'mb-4 rounded-2xl p-4 relative overflow-hidden',
-              isPro
-                ? 'bg-gradient-purple-gold shadow-bevel-purple'
-                : 'bg-gradient-gold-soft shadow-card-game'
-            )}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <div className={cn(
-                    'w-9 h-9 rounded-xl flex items-center justify-center',
-                    isPro ? 'bg-gradient-gold shadow-bevel-gold-sm animate-glow-breathe' : 'bg-card border border-primary/30'
-                  )}>
-                    <Crown className={cn('h-5 w-5', isPro ? 'text-primary-foreground' : 'text-muted-foreground')} />
+            <Card className={`mb-4 border-primary/20 ${isPro ? 'bg-primary/5' : ''}`}>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Crown className={`h-5 w-5 ${isPro ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <h3 className="font-display font-bold text-foreground">Meu Plano</h3>
                   </div>
-                  <h3 className={cn('font-display font-black', isPro ? 'text-stroke-navy text-foreground' : 'text-foreground')}>Meu Plano</h3>
+                  <Badge className={isPro
+                    ? 'bg-primary text-primary-foreground border-0'
+                    : 'bg-muted text-muted-foreground border-0'
+                  }>
+                    {planName}
+                  </Badge>
                 </div>
-                <span className={cn(
-                  'inline-flex items-center px-2.5 py-1 rounded-full font-mono font-black text-[10px] uppercase tracking-wider text-stroke-navy',
-                  isPro ? 'bg-gradient-gold shadow-bevel-gold-sm text-primary-foreground' : 'bg-card border border-border text-muted-foreground'
-                )}>
-                  {planName}
-                </span>
-              </div>
 
-              {isPro && endDate && (
-                <p className="text-xs text-foreground/80 font-mono mb-3">Válido até <span className="font-bold">{endDate}</span></p>
-              )}
-              {!isPro && (
-                <p className="text-xs text-muted-foreground mb-3">3 sessões/dia · 1 perfil · Correções básicas</p>
-              )}
-
-              <div className="flex gap-2">
-                {isPro ? (
-                  hasStripePortal ? (
-                    <GameButton variant="ghostGold" size="sm" className="flex-1"
-                      onClick={async () => {
-                        try {
-                          const result = await openCustomerPortal();
-                          if (!result?.url) toast.error('Não foi possível abrir o portal agora.');
-                        } catch { toast.error('Não foi possível abrir o portal agora.'); }
-                      }}>
-                      <CreditCard className="h-3.5 w-3.5" /> Gerenciar
-                    </GameButton>
-                  ) : (
-                    <GameButton variant="ghostGold" size="sm" className="flex-1" onClick={() => navigate('/#planos')}>
-                      <ArrowUpRight className="h-3.5 w-3.5" /> Ver planos
-                    </GameButton>
-                  )
-                ) : (
-                  <>
-                    <GameButton variant="purple" size="sm" shine className="flex-1" onClick={() => startCheckout('pro', 'yearly')}>
-                      <Crown className="h-3.5 w-3.5" /> Upgrade Pro
-                    </GameButton>
-                    <GameButton variant="ghostGold" size="sm" onClick={() => navigate('/#planos')}>
-                      Ver planos
-                    </GameButton>
-                  </>
+                {isPro && endDate && (
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Válido até {endDate}
+                  </p>
                 )}
-              </div>
-            </div>
+
+                {!isPro && (
+                  <p className="text-xs text-muted-foreground mb-3">
+                    3 sessões por dia · 1 perfil · Correções básicas
+                  </p>
+                )}
+
+                <div className="flex gap-2">
+                  {isPro ? (
+                    hasStripePortal ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5 flex-1"
+                        onClick={async () => {
+                          try {
+                            const result = await openCustomerPortal();
+                            if (!result?.url) {
+                              toast.error('Não foi possível abrir o portal agora.');
+                            }
+                          } catch {
+                            toast.error('Não foi possível abrir o portal agora.');
+                          }
+                        }}
+                      >
+                        <CreditCard className="h-3.5 w-3.5" /> Gerenciar assinatura
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5 flex-1"
+                        onClick={() => navigate('/#planos')}
+                      >
+                        <ArrowUpRight className="h-3.5 w-3.5" /> Ver planos
+                      </Button>
+                    )
+                  ) : (
+                    <>
+                      <Button
+                        size="sm"
+                        className="gap-1.5 flex-1"
+                        onClick={() => startCheckout('pro', 'yearly')}
+                      >
+                        <ArrowUpRight className="h-3.5 w-3.5" /> Upgrade Pro
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => navigate('/#planos')}
+                      >
+                        Ver planos
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           );
         })()}
 

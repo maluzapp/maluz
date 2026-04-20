@@ -12,8 +12,6 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { CreateChallengeModal } from '@/components/challenges/CreateChallengeModal';
 import { ChallengeResultModal } from '@/components/challenges/ChallengeResultModal';
-import { TrophyPodium, type PodiumEntry } from '@/components/game/TrophyPodium';
-import { GameCard } from '@/components/game/GameCard';
 import type { Exercise, ExerciseAnswer } from '@/types/study';
 
 interface ChildProfile {
@@ -74,7 +72,6 @@ export default function Challenges() {
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [childNames, setChildNames] = useState<Record<string, string>>({});
   const [parentName, setParentName] = useState('');
-  const [topFriends, setTopFriends] = useState<PodiumEntry[]>([]);
 
   useEffect(() => {
     if (!profileId || !user) return;
@@ -153,27 +150,6 @@ export default function Challenges() {
         await supabase.from('challenges').delete().in('id', broken.map(b => b.id));
       }
       setChallenges(list.filter(c => !(c.status === 'pending' && !c.exercises_data)));
-    }
-
-    // Top 3 friends ranking by XP (includes self for context)
-    const { data: friends } = await supabase
-      .from('friendships')
-      .select('requester_profile_id, target_profile_id')
-      .or(`requester_profile_id.eq.${profileId},target_profile_id.eq.${profileId}`)
-      .eq('status', 'accepted');
-
-    const friendIds = new Set<string>([profileId]);
-    for (const f of (friends as any[] || [])) {
-      friendIds.add(f.requester_profile_id);
-      friendIds.add(f.target_profile_id);
-    }
-    if (friendIds.size > 0) {
-      const { data: ranked } = await supabase.rpc('get_profiles_by_ids', { _ids: Array.from(friendIds) });
-      const top = ((ranked as any[]) || [])
-        .sort((a, b) => (b.xp ?? 0) - (a.xp ?? 0))
-        .slice(0, 3)
-        .map((p: any) => ({ id: p.id, name: p.name, avatar: p.avatar_emoji, xp: p.xp ?? 0 }));
-      setTopFriends(top);
     }
 
     setLoading(false);
@@ -271,17 +247,6 @@ export default function Challenges() {
             </Button>
           )}
         </div>
-
-        {/* Top 3 ranking podium */}
-        {topFriends.length > 0 && (
-          <GameCard tone="gold" className="overflow-hidden animate-fade-in">
-            <div className="px-4 pt-3 flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-primary" />
-              <h2 className="font-display font-black text-foreground text-sm uppercase tracking-wider">Top 3 — Ranking</h2>
-            </div>
-            <TrophyPodium entries={topFriends} onEntryClick={() => navigate('/resultado')} />
-          </GameCard>
-        )}
 
         {profileType === 'parent' && childProfiles.length === 0 && (
           <Card className="border-primary/10">

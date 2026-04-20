@@ -1,20 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Card, CardContent } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useProfileStore } from '@/hooks/useProfile';
 import { useAuth } from '@/hooks/useAuth';
 import { useStripeSubscription, useUserSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
-import {
-  Flame, BookOpen, Target, Calendar, Zap, BarChart3, Settings, Crown, Lock, Mic, Camera, Swords, ChevronRight, Sparkles,
-} from 'lucide-react';
+import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings, Crown, Lock, Mic, Camera, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { GameCard } from '@/components/game/GameCard';
-import { GameButton } from '@/components/game/GameButton';
-import { StatBadge } from '@/components/game/StatBadge';
-import { ProgressBarGame } from '@/components/game/ProgressBarGame';
-import xpCoin from '@/assets/icons-game/xp-coin.png';
-import centralLamp from '@/assets/icons-game/central-lamp-glow.png';
 
 interface ProfileData {
   name: string;
@@ -96,6 +92,7 @@ export default function Index() {
       const sessions = (sessionsRes.data as RecentSession[]) || [];
       setRecentSessions(sessions);
 
+      // Compute subject stats
       const map: Record<string, SubjectStat> = {};
       for (const s of sessions) {
         if (!map[s.subject]) map[s.subject] = { subject: s.subject, sessions: 0, totalScore: 0, totalQuestions: 0 };
@@ -105,9 +102,11 @@ export default function Index() {
       }
       setSubjectStats(Object.values(map).sort((a, b) => b.sessions - a.sessions));
 
+      // Pending challenges
       const pending = (challengesRes.data as any[] as PendingChallenge[]) || [];
       setPendingChallenges(pending);
 
+      // Fetch parent names for challenges
       const parentIds = [...new Set(pending.map(c => c.parent_profile_id))];
       if (parentIds.length > 0) {
         const { data: parents } = await supabase.from('profiles').select('id, name').in('id', parentIds);
@@ -139,276 +138,240 @@ export default function Index() {
   const accuracy = profile.total_exercises > 0 ? Math.round((profile.total_correct / profile.total_exercises) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-navy-deep px-4 py-5 pb-28 md:pb-36 animate-fade-in">
-      <div className="mx-auto max-w-lg space-y-4">
+    <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36 animate-fade-in">
+      <div className="mx-auto max-w-lg space-y-5">
 
-        {/* HERO HEADER — Royal Match style */}
-        <GameCard tone="gold" className="p-4 animate-fade-in">
-          <div className="flex items-center gap-4">
-            {/* Avatar in gold frame */}
-            <div className="relative shrink-0">
-              <div className="w-[68px] h-[68px] rounded-full bg-gradient-gold p-[3px] shadow-bevel-gold-sm">
-                <div className="w-full h-full rounded-full bg-card flex items-center justify-center text-4xl ring-2 ring-card">
-                  {profile.avatar_emoji}
-                </div>
-              </div>
-              {/* Level badge */}
-              <div className="absolute -bottom-1 -right-1 min-w-[28px] h-7 px-1.5 rounded-full bg-gradient-purple shadow-bevel-purple flex items-center justify-center ring-2 ring-card">
-                <span className="font-display font-black text-xs text-stroke-navy text-royal-foreground leading-none">
-                  {profile.level}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <h1 className="font-display text-xl font-black text-foreground truncate">
-                  {profile.name}
-                </h1>
-                {isPro && (
-                  <span className="shrink-0 inline-flex items-center gap-0.5 px-1.5 h-5 rounded-md bg-gradient-purple shadow-bevel-purple text-[9px] font-mono font-black text-stroke-navy text-royal-foreground">
-                    <Crown className="h-2.5 w-2.5" /> PRO
-                  </span>
-                )}
-              </div>
-              {profile.school_year && (
-                <p className="text-xs font-mono font-bold text-primary uppercase tracking-wider mt-0.5">
-                  {getYearLabel(profile.school_year)}
-                </p>
-              )}
-              {/* XP bar */}
-              <div className="mt-2.5">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1">
-                    <img src={xpCoin} alt="" width={24} height={24} className="h-4 w-4 object-contain" loading="lazy" />
-                    <span className="font-display font-black text-sm text-gold-shine">
-                      {profile.xp.toLocaleString('pt-BR')}
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-mono font-bold text-muted-foreground">
-                    {xpInLevel}/{xpNeeded} → Nv.{profile.level + 1}
-                  </span>
-                </div>
-                <ProgressBarGame value={progressPct} height={12} />
-              </div>
-            </div>
-
-            <button
-              onClick={() => navigate('/creditos')}
-              className="shrink-0 w-9 h-9 rounded-full bg-card/60 border border-primary/30 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors press-down"
-              aria-label="Configurações"
-            >
+        {/* Profile hero */}
+        <div className="text-center animate-fade-in">
+          <div className="relative inline-block mb-3">
+            <span className="text-6xl block">{profile.avatar_emoji}</span>
+            <span className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full font-mono">
+              Nv.{profile.level}
+            </span>
+            {isPro && (
+              <Badge className="absolute -top-1 -left-2 bg-primary text-primary-foreground text-[9px] px-1.5 py-0 border-0 shadow-lg shadow-primary/30">
+                PRO ⭐
+              </Badge>
+            )}
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <h1 className="font-display text-2xl font-bold text-foreground">Olá, {profile.name}! 👋</h1>
+            <button onClick={() => navigate('/creditos')} className="text-muted-foreground hover:text-foreground transition-colors">
               <Settings className="h-4 w-4" />
             </button>
           </div>
-        </GameCard>
-
-        {/* STAT COINS row */}
-        <div className="flex items-start justify-around py-1 animate-fade-in" style={{ animationDelay: '80ms' }}>
-          <StatBadge
-            tone="coral"
-            icon={<Flame className="h-3.5 w-3.5" />}
-            value={profile.streak_days}
-            label="Streak"
-          />
-          <StatBadge
-            tone="green"
-            icon={<Target className="h-3.5 w-3.5" />}
-            value={`${accuracy}%`}
-            label="Precisão"
-          />
-          <StatBadge
-            tone="info"
-            icon={<BookOpen className="h-3.5 w-3.5" />}
-            value={profile.total_exercises}
-            label="Exercícios"
-          />
+          {profile.school_year && (
+            <p className="text-sm text-primary font-medium mt-0.5">{getYearLabel(profile.school_year)}</p>
+          )}
         </div>
 
-        {/* CONTINUE STUDYING CTA */}
-        <GameCard tone="gold" className="p-4 animate-fade-in relative" style={{ animationDelay: '120ms' }}>
-          <div className="flex items-center gap-4">
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-primary mb-1">
-                Pronto para mais XP?
-              </p>
-              <h2 className="font-display text-lg font-black text-foreground leading-tight mb-3">
-                Continue estudando<br />e ganhe recompensas!
-              </h2>
-              <GameButton variant="gold" size="md" shine onClick={() => navigate('/gerar')}>
-                <Sparkles className="h-4 w-4" /> Gerar exercícios
-              </GameButton>
-            </div>
-            <img
-              src={centralLamp}
-              alt=""
-              width={140}
-              height={140}
-              loading="lazy"
-              className="h-24 w-24 object-contain animate-trophy-bounce drop-shadow-[0_8px_16px_hsl(var(--primary)/0.4)] shrink-0"
-            />
-          </div>
-        </GameCard>
-
-        {/* PENDING CHALLENGES */}
-        {pendingChallenges.length > 0 && (
-          <div className="animate-fade-in space-y-2" style={{ animationDelay: '160ms' }}>
-            <h2 className="font-display font-black text-foreground flex items-center gap-2 px-1">
-              <Swords className="h-4 w-4 text-coral" />
-              Desafios pendentes
-              <span className="ml-auto inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-gradient-coral shadow-bevel-coral text-white text-[11px] font-mono font-black animate-badge-pop">
-                {pendingChallenges.length}
+        {/* XP Progress */}
+        <Card className="animate-fade-in border-primary/20 overflow-hidden" style={{ animationDelay: '80ms' }}>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5 text-sm font-display font-bold text-foreground">
+                <Star className="h-4 w-4 text-primary" />
+                {profile.xp} XP
+              </div>
+              <span className="text-xs text-muted-foreground font-mono">
+                {xpInLevel}/{xpNeeded} para Nv.{profile.level + 1}
               </span>
+            </div>
+            <Progress value={progressPct} className="h-2.5" />
+          </CardContent>
+        </Card>
+
+        {/* Stats grid */}
+        <div className="grid grid-cols-3 gap-3 animate-fade-in" style={{ animationDelay: '160ms' }}>
+          <Card className="border-primary/10">
+            <CardContent className="p-3 text-center">
+              <Flame className="h-5 w-5 text-destructive mx-auto mb-1" />
+              <p className="font-display font-bold text-xl text-foreground">{profile.streak_days}</p>
+              <p className="text-[10px] text-muted-foreground font-mono uppercase">Dias seguidos</p>
+            </CardContent>
+          </Card>
+          <Card className="border-primary/10">
+            <CardContent className="p-3 text-center">
+              <Target className="h-5 w-5 text-primary mx-auto mb-1" />
+              <p className="font-display font-bold text-xl text-foreground">{accuracy}%</p>
+              <p className="text-[10px] text-muted-foreground font-mono uppercase">Precisão</p>
+            </CardContent>
+          </Card>
+          <Card className="border-primary/10">
+            <CardContent className="p-3 text-center">
+              <BookOpen className="h-5 w-5 text-accent mx-auto mb-1" />
+              <p className="font-display font-bold text-xl text-foreground">{profile.total_exercises}</p>
+              <p className="text-[10px] text-muted-foreground font-mono uppercase">Exercícios</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Pending challenges */}
+        {pendingChallenges.length > 0 && (
+          <div className="animate-fade-in space-y-2" style={{ animationDelay: '200ms' }}>
+            <h2 className="font-display font-bold text-foreground flex items-center gap-2">
+              <Swords className="h-4 w-4 text-primary" />
+              Desafios pendentes
+              <Badge className="bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0 border-0">
+                {pendingChallenges.length}
+              </Badge>
             </h2>
             {pendingChallenges.map((c) => (
-              <GameCard
-                key={c.id}
-                tone="coral"
-                interactive
-                className="p-3.5"
-                onClick={() => navigate(`/desafio/${c.id}`)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-coral shadow-bevel-coral flex items-center justify-center shrink-0">
-                    <Swords className="h-5 w-5 text-white" />
+              <Card key={c.id} className="border-primary/20 bg-gradient-to-r from-primary/[0.06] to-card cursor-pointer hover:border-primary/30 transition-colors"
+                onClick={() => navigate(`/desafio/${c.id}`)}>
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+                    <Swords className="h-5 w-5 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-display font-bold text-foreground truncate">{c.subject} — {c.topic}</p>
-                    <p className="text-xs text-muted-foreground font-mono">
-                      De: <span className="text-foreground/80 font-bold">{parentNames[c.parent_profile_id] || 'Pai/Mãe'}</span>
+                    <p className="text-sm font-semibold text-foreground truncate">{c.subject} — {c.topic}</p>
+                    <p className="text-xs text-muted-foreground">
+                      De: {parentNames[c.parent_profile_id] || 'Pai/Mãe'}
                     </p>
                     {c.message && (
                       <p className="text-xs text-muted-foreground italic truncate mt-0.5">"{c.message}"</p>
                     )}
                   </div>
-                  <GameButton variant="coral" size="sm" className="shrink-0">
-                    Iniciar
-                  </GameButton>
-                </div>
-              </GameCard>
+                  <Button size="sm" className="gap-1.5 shrink-0">
+                    <Swords className="h-3.5 w-3.5" /> Iniciar
+                  </Button>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}
 
-        {/* SUBJECT PERFORMANCE */}
+        {/* Subject performance */}
         {subjectStats.length > 0 && (
-          <GameCard tone="navy" className="p-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <h2 className="font-display font-black text-foreground mb-3 flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-primary" />
-              Desempenho por matéria
-            </h2>
-            <div className="space-y-3">
-              {subjectStats.slice(0, 5).map((stat) => {
-                const pct = stat.totalQuestions > 0 ? Math.round((stat.totalScore / stat.totalQuestions) * 100) : 0;
-                return (
-                  <div key={stat.subject}>
-                    <div className="flex items-center justify-between text-sm mb-1.5">
-                      <span className="text-foreground font-display font-bold truncate">{stat.subject}</span>
-                      <span className={cn(
-                        'text-xs font-mono font-black',
-                        pct >= 70 ? 'text-xp' : pct >= 50 ? 'text-primary' : 'text-coral'
-                      )}>{pct}%</span>
+          <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '240ms' }}>
+            <CardContent className="p-4">
+              <h2 className="font-display font-bold text-foreground mb-3 flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-primary" />
+                Desempenho por matéria
+              </h2>
+              <div className="space-y-3">
+                {subjectStats.slice(0, 5).map((stat) => {
+                  const pct = stat.totalQuestions > 0 ? Math.round((stat.totalScore / stat.totalQuestions) * 100) : 0;
+                  return (
+                    <div key={stat.subject}>
+                      <div className="flex items-center justify-between text-sm mb-1">
+                        <span className="text-foreground font-medium truncate">{stat.subject}</span>
+                        <span className={cn(
+                          'text-xs font-mono font-bold',
+                          pct >= 70 ? 'text-accent' : pct >= 50 ? 'text-primary' : 'text-destructive'
+                        )}>{pct}%</span>
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+                        <div
+                          className={cn(
+                            'h-full rounded-full transition-all duration-500',
+                            pct >= 70 ? 'bg-accent' : pct >= 50 ? 'bg-primary' : 'bg-destructive'
+                          )}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{stat.sessions} sessões</p>
                     </div>
-                    <ProgressBarGame value={pct} height={10} showShine={false} />
-                    <p className="text-[10px] text-muted-foreground font-mono mt-1">{stat.sessions} sessões</p>
-                  </div>
-                );
-              })}
-            </div>
-          </GameCard>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
-        {/* PRO UPSELL — purple/gold gradient */}
+        {/* PRO upsell for free users */}
         {!isPro && (
-          <GameCard tone="purple" className="p-4 animate-fade-in relative overflow-hidden" style={{ animationDelay: '240ms' }}>
-            <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-gradient-radial opacity-30 pointer-events-none" style={{ background: 'radial-gradient(circle, hsl(var(--royal-purple) / 0.4), transparent 70%)' }} />
-            <div className="relative">
+          <Card className="animate-fade-in border-primary/20 bg-gradient-to-br from-primary/[0.06] to-card overflow-hidden" style={{ animationDelay: '280ms' }}>
+            <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-purple shadow-bevel-purple flex items-center justify-center animate-glow-breathe">
-                  <Crown className="h-5 w-5 text-royal-foreground" />
-                </div>
-                <h2 className="font-display font-black text-foreground text-lg">Recursos PRO</h2>
-                <span className="ml-auto bg-gradient-purple shadow-bevel-purple text-royal-foreground text-[9px] font-black px-2 py-1 rounded-full font-mono uppercase tracking-wider text-stroke-navy">PRO</span>
+                <Crown className="h-5 w-5 text-primary" />
+                <h2 className="font-display font-bold text-foreground">Recursos PRO</h2>
+                <span className="ml-auto bg-primary text-primary-foreground text-[9px] font-bold px-2 py-0.5 rounded-full font-mono uppercase tracking-wider">PRO</span>
               </div>
-              <div className="space-y-2.5 mb-4">
-                {[
-                  { icon: Camera, title: 'Fotos ilimitadas', desc: 'Envie quantas fotos do livro quiser' },
-                  { icon: Mic, title: 'Áudio de resumo', desc: 'Grave e envie áudio com a matéria' },
-                  { icon: BarChart3, title: 'Sessões ilimitadas', desc: 'Estude sem limite diário' },
-                ].map((item) => (
-                  <div key={item.title} className="flex items-center gap-3 opacity-85">
-                    <div className="w-9 h-9 rounded-lg bg-card/70 border border-royal/30 flex items-center justify-center shrink-0">
-                      <item.icon className="h-4 w-4 text-royal" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-display font-bold text-foreground">{item.title}</p>
-                      <p className="text-[11px] text-muted-foreground">{item.desc}</p>
-                    </div>
-                    <Lock className="h-3.5 w-3.5 text-royal/60 shrink-0" />
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-3 opacity-70">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Camera className="h-4 w-4 text-primary" />
                   </div>
-                ))}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground">Fotos ilimitadas</p>
+                    <p className="text-[10px] text-muted-foreground">Envie quantas fotos do livro quiser</p>
+                  </div>
+                  <Lock className="h-3.5 w-3.5 text-primary/50 shrink-0" />
+                </div>
+                <div className="flex items-center gap-3 opacity-70">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Mic className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground">Áudio de resumo</p>
+                    <p className="text-[10px] text-muted-foreground">Grave e envie áudio com a matéria</p>
+                  </div>
+                  <Lock className="h-3.5 w-3.5 text-primary/50 shrink-0" />
+                </div>
+                <div className="flex items-center gap-3 opacity-70">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <BarChart3 className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground">Sessões ilimitadas</p>
+                    <p className="text-[10px] text-muted-foreground">Estude sem limite diário</p>
+                  </div>
+                  <Lock className="h-3.5 w-3.5 text-primary/50 shrink-0" />
+                </div>
               </div>
-              <GameButton variant="purple" size="md" shine className="w-full" onClick={() => navigate('/#planos')}>
+              <button
+                onClick={() => navigate('/#planos')}
+                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-primary text-primary-foreground font-display font-bold text-sm hover:opacity-90 transition-all hover:scale-[1.02]"
+              >
                 <Crown className="h-4 w-4" /> Desbloquear PRO
-              </GameButton>
-            </div>
-          </GameCard>
+              </button>
+            </CardContent>
+          </Card>
         )}
 
-        {/* RECENT ACTIVITY */}
         {recentSessions.length > 0 ? (
-          <div className="animate-fade-in" style={{ animationDelay: '280ms' }}>
-            <h2 className="font-display font-black text-foreground mb-3 flex items-center gap-2 px-1">
+          <div className="animate-fade-in" style={{ animationDelay: '320ms' }}>
+            <h2 className="font-display font-bold text-foreground mb-3 flex items-center gap-2">
               <Calendar className="h-4 w-4 text-primary" />
               Atividade recente
             </h2>
             <div className="space-y-2">
               {recentSessions.slice(0, 5).map((s) => {
                 const pct = Math.round((s.score / s.total) * 100);
-                const tone = pct >= 70 ? 'green' : pct >= 50 ? 'gold' : 'coral';
                 return (
-                  <GameCard
-                    key={s.id}
-                    tone={tone}
-                    interactive
-                    className="p-3"
-                    onClick={() => navigate(`/sessao/${s.id}`)}
-                  >
-                    <div className="flex items-center gap-3">
+                  <Card key={s.id} className="border-primary/5 cursor-pointer hover:border-primary/20 transition-colors" onClick={() => navigate(`/sessao/${s.id}`)}>
+                    <CardContent className="p-3 flex items-center gap-3">
                       <div className={cn(
-                        'w-12 h-12 rounded-xl flex items-center justify-center text-sm font-display font-black shrink-0 text-stroke-navy',
-                        pct >= 70 ? 'bg-gradient-to-b from-xp to-xp-deep shadow-bevel-green text-primary-foreground'
-                          : pct >= 50 ? 'bg-gradient-gold shadow-bevel-gold-sm text-primary-foreground'
-                          : 'bg-gradient-coral shadow-bevel-coral text-white'
+                        'w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold shrink-0',
+                        pct >= 70 ? 'bg-accent/15 text-accent' : pct >= 50 ? 'bg-primary/15 text-primary' : 'bg-destructive/15 text-destructive'
                       )}>
                         {pct}%
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-display font-bold text-foreground truncate">{s.subject}</p>
+                        <p className="text-sm font-semibold text-foreground truncate">{s.subject}</p>
                         <p className="text-xs text-muted-foreground truncate">{s.topic}</p>
                       </div>
-                      <div className="text-right shrink-0 flex flex-col items-end gap-0.5">
-                        <span className="inline-flex items-center gap-0.5 text-xs font-mono font-black text-primary">
-                          <img src={xpCoin} alt="" width={20} height={20} className="h-3.5 w-3.5 object-contain" loading="lazy" />
-                          +{s.xp_earned}
-                        </span>
-                        <p className="text-[10px] text-muted-foreground font-mono">{formatRelativeDate(s.created_at)}</p>
+                      <div className="text-right shrink-0">
+                        <p className="text-xs text-primary font-mono">+{s.xp_earned} XP</p>
+                        <p className="text-[10px] text-muted-foreground">{formatRelativeDate(s.created_at)}</p>
                       </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                    </div>
-                  </GameCard>
+                    </CardContent>
+                  </Card>
                 );
               })}
             </div>
           </div>
         ) : (
-          <GameCard tone="gold" className="p-8 text-center animate-fade-in" style={{ animationDelay: '280ms' }}>
-            <Zap className="h-10 w-10 text-primary/60 mx-auto mb-3" />
-            <h3 className="font-display font-black text-foreground mb-1">Comece a estudar!</h3>
-            <p className="text-sm text-muted-foreground">
-              Toque na 💡 para gerar seus primeiros exercícios
-            </p>
-          </GameCard>
+          <Card className="animate-fade-in border-primary/10" style={{ animationDelay: '320ms' }}>
+            <CardContent className="p-8 text-center">
+              <Zap className="h-10 w-10 text-primary/40 mx-auto mb-3" />
+              <h3 className="font-display font-bold text-foreground mb-1">Comece a estudar!</h3>
+              <p className="text-sm text-muted-foreground">
+                Toque na 💡 para gerar seus primeiros exercícios
+              </p>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>
