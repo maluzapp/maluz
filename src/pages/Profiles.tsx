@@ -22,6 +22,7 @@ import {
 import { YEAR_OPTIONS, getYearLabel } from '@/constants/years';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { GameButton } from '@/components/game/GameButton';
 
 const AVATARS = ['🧑‍🎓', '👧', '👦', '🦸', '🧙', '🦊', '🐱', '🦄', '🚀', '⭐', '🐶', '🐼', '🦁', '🐸', '🦋', '🌟', '🎨', '🎮', '🏀', '🎸', '🧑‍🚀', '🧑‍💻', '👩‍🔬', '🧑‍🏫', '🦸‍♀️', '🧚', '🐉', '🌈', '🎯', '🏆'];
 
