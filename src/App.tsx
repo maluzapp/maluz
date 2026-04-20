@@ -85,7 +85,7 @@ const App = () => (
           <ScrollToTop />
           <DynamicPwaBranding />
           <UpdateModal />
-          <AppUpdateChecker />
+          <NewVersionModal />
           <Routes>
             <Route path="/" element={<SmartHome />} />
             <Route path="/login" element={<Login />} />
