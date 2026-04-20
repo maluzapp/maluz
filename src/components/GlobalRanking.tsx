@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useProfileStore } from '@/hooks/useProfile';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { YEARS, getYearLabel } from '@/constants/years';
+import { YEAR_OPTIONS, getYearLabel } from '@/constants/years';
 import { cn } from '@/lib/utils';
 
 interface RankingEntry {
@@ -68,9 +68,9 @@ export function GlobalRanking() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">🌍 Todos os anos</SelectItem>
-            {YEARS.map((y) => (
+            {YEAR_OPTIONS.map((y) => (
               <SelectItem key={y.value} value={y.value}>
-                {getYearLabel(y.value)}
+                {y.label}
               </SelectItem>
             ))}
           </SelectContent>

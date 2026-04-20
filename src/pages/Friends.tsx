@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UserPlus, Search, Copy, Users, Trophy, Star, Flame, Check, X, Clock, Crown } from 'lucide-react';
+import { UserPlus, Search, Copy, Users, Trophy, Star, Flame, Check, X, Clock, Crown, Globe } from 'lucide-react';
 import { ReactionBar } from '@/components/ReactionBar';
+import { GlobalRanking } from '@/components/GlobalRanking';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -351,17 +352,25 @@ export default function Friends() {
         )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full grid grid-cols-3 h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl">
+          <TabsList className="w-full grid grid-cols-4 h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl">
             <TabsTrigger value="feed" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
               Feed
             </TabsTrigger>
             <TabsTrigger value="ranking" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
-              Ranking
+              Amigos
+            </TabsTrigger>
+            <TabsTrigger value="global" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 gap-1">
+              🌍 Global
             </TabsTrigger>
             <TabsTrigger value="adicionar" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
               Adicionar
             </TabsTrigger>
           </TabsList>
+
+          {/* Global ranking tab */}
+          <TabsContent value="global" className="mt-4">
+            <GlobalRanking />
+          </TabsContent>
 
           {/* Feed tab */}
           <TabsContent value="feed" className="mt-4 space-y-2">
