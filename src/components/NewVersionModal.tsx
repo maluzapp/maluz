@@ -68,12 +68,11 @@ export function NewVersionModal() {
       localStorage.setItem(VERSION_KEY, newHashRef.current);
     }
     // limpa caches do SW (se houver) antes de recarregar
+    const reload = () => window.location.reload();
     if ('caches' in window) {
-      caches.keys().then((keys) => keys.forEach((k) => caches.delete(k))).finally(() => {
-        window.location.reload();
-      });
+      caches.keys().then((keys) => keys.forEach((k) => caches.delete(k))).finally(reload);
     } else {
-      window.location.reload();
+      reload();
     }
   };
 
