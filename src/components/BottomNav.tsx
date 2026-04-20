@@ -138,31 +138,44 @@ export function BottomNav() {
       <div className="mx-auto flex max-w-lg items-stretch justify-around relative">
         {NAV_ITEMS_LEFT.map(renderItem)}
 
-        {/* Center lamp button — bigger & always glowing (PRINCIPAL do sistema) */}
+        {/* Center lamp button — vidro escuro, acende quando ativo */}
         <div className="flex items-center justify-center" style={{ width: '104px' }}>
           <button
             onClick={handleLampClick}
             aria-label="Gerar exercícios"
             className={cn(
-              'absolute -top-12 flex items-center justify-center w-[84px] h-[84px] rounded-full border-4 border-card/95 transition-all duration-300',
-              'bg-gradient-to-br from-primary via-primary to-primary/80',
-              'shadow-[0_0_32px_hsl(var(--primary)/0.65),0_8px_24px_hsl(var(--primary)/0.45),inset_0_-6px_12px_rgba(0,0,0,0.25),inset_0_3px_8px_rgba(255,255,255,0.35)]',
+              'absolute -top-12 flex items-center justify-center w-[84px] h-[84px] rounded-full transition-all duration-300',
+              // borda fina (metade da espessura anterior)
+              'border-2 border-card/80',
+              // estado padrão: fundo PRETO tipo vidro escuro
+              'bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.12),rgba(0,0,0,0.95)_70%)]',
+              'shadow-[0_8px_20px_rgba(0,0,0,0.5),inset_0_-4px_10px_rgba(0,0,0,0.6),inset_0_2px_6px_rgba(255,255,255,0.18)]',
               'hover:scale-105 active:scale-95',
-              (isGeneratePage || lampLit) && 'scale-110 shadow-[0_0_48px_hsl(var(--primary)/0.9),0_8px_28px_hsl(var(--primary)/0.55),inset_0_-6px_12px_rgba(0,0,0,0.25),inset_0_3px_10px_rgba(255,255,255,0.5)]',
+              // estado ATIVO: acende com gradiente primary + glow forte
+              (isGeneratePage || lampLit) && [
+                'scale-110 border-primary/40',
+                'bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.5),hsl(var(--primary))_55%,hsl(var(--primary)/0.85)_100%)]',
+                'shadow-[0_0_48px_hsl(var(--primary)/0.9),0_8px_28px_hsl(var(--primary)/0.55),inset_0_-4px_10px_rgba(0,0,0,0.25),inset_0_3px_10px_rgba(255,255,255,0.5)]',
+              ],
             )}
           >
-            {/* Brilho interno em camadas */}
-            <span className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.55),transparent_55%)]" />
-            <span className="pointer-events-none absolute -inset-1 rounded-full bg-[radial-gradient(circle,hsl(var(--primary)/0.45),transparent_70%)] blur-md animate-pulse" />
+            {/* Reflexo de vidro superior */}
+            <span className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(ellipse_at_50%_15%,rgba(255,255,255,0.22),transparent_45%)]" />
+            {/* Glow externo apenas quando ativo */}
+            {(isGeneratePage || lampLit) && (
+              <span className="pointer-events-none absolute -inset-1 rounded-full bg-[radial-gradient(circle,hsl(var(--primary)/0.5),transparent_70%)] blur-md animate-pulse" />
+            )}
             <img
               src={useRemoteLogo ? centralButtonUrl : lampadaFallback}
               alt=""
               aria-hidden="true"
               onError={() => setUseRemoteLogo(false)}
               className={cn(
-                'relative h-16 w-16 object-contain transition-all duration-300',
-                'brightness-125 drop-shadow-[0_2px_0_rgba(0,0,0,0.35)] drop-shadow-[0_0_14px_rgba(255,220,120,0.95)]',
-                (isGeneratePage || lampLit) && 'brightness-150 drop-shadow-[0_2px_0_rgba(0,0,0,0.35)] drop-shadow-[0_0_22px_rgba(255,230,140,1)]'
+                // ocupa praticamente todo o círculo (76 de 84 = ~90%)
+                'relative h-[76px] w-[76px] object-contain transition-all duration-300',
+                (isGeneratePage || lampLit)
+                  ? 'brightness-150 drop-shadow-[0_2px_0_rgba(0,0,0,0.35)] drop-shadow-[0_0_22px_rgba(255,230,140,1)]'
+                  : 'brightness-110 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] drop-shadow-[0_0_8px_rgba(255,220,120,0.4)]',
               )}
             />
           </button>
