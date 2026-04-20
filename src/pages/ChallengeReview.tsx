@@ -13,6 +13,7 @@ import { CompleteSentence } from '@/components/exercises/CompleteSentence';
 import { ColumnClassification } from '@/components/exercises/ColumnClassification';
 import type { Exercise, ExerciseAnswer } from '@/types/study';
 import { cn } from '@/lib/utils';
+import { getSubjectEmoji } from '@/constants/subjects';
 
 interface ChallengeData {
   id: string;
