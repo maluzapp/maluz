@@ -148,3 +148,61 @@
 .animate-sparkle-in {
   animation: sparkle-in 0.5s ease-out;
 }
+
+/* Stripes animadas para barras de progresso gamer */
+@keyframes stripes-move {
+  from { background-position: 0 0; }
+  to { background-position: 28px 0; }
+}
+
+.stat-stripes {
+  background-image: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.45) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255,255,255,0.45) 50%,
+    rgba(255,255,255,0.45) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 14px 14px;
+  animation: stripes-move 1.2s linear infinite;
+}
+
+/* Sombra 3D para emojis nas conquistas */
+.emoji-3d {
+  filter:
+    drop-shadow(0 2px 0 rgba(0,0,0,0.35))
+    drop-shadow(0 4px 8px rgba(0,0,0,0.5))
+    drop-shadow(0 0 12px hsl(42 91% 61% / 0.35));
+}
+.emoji-3d-flame {
+  filter:
+    drop-shadow(0 2px 0 rgba(0,0,0,0.35))
+    drop-shadow(0 4px 8px rgba(0,0,0,0.5))
+    drop-shadow(0 0 12px rgba(239,68,68,0.5));
+}
+.emoji-3d-mint {
+  filter:
+    drop-shadow(0 2px 0 rgba(0,0,0,0.35))
+    drop-shadow(0 4px 8px rgba(0,0,0,0.5))
+    drop-shadow(0 0 12px hsl(160 94% 58% / 0.5));
+}
+.emoji-3d-frost {
+  filter:
+    drop-shadow(0 2px 0 rgba(0,0,0,0.35))
+    drop-shadow(0 4px 8px rgba(0,0,0,0.5))
+    drop-shadow(0 0 12px rgba(6,182,212,0.5));
+}
+.emoji-3d-mystic {
+  filter:
+    drop-shadow(0 2px 0 rgba(0,0,0,0.35))
+    drop-shadow(0 4px 8px rgba(0,0,0,0.5))
+    drop-shadow(0 0 12px rgba(217,70,239,0.5));
+}
+
+/* Pódio glow */
+.podium-gold { box-shadow: 0 0 30px hsl(42 91% 61% / 0.6), inset 0 0 20px hsl(42 91% 61% / 0.2); }
+.podium-silver { box-shadow: 0 0 24px rgba(203,213,225,0.5), inset 0 0 16px rgba(203,213,225,0.15); }
+.podium-bronze { box-shadow: 0 0 24px rgba(217,119,6,0.5), inset 0 0 16px rgba(217,119,6,0.15); }
