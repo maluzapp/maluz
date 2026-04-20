@@ -101,7 +101,8 @@ const App = () => (
             <Route path="/resultado" element={<RequireAuth><Results /></RequireAuth>} />
             <Route path="/sessao/:id" element={<RequireAuth><SessionReview /></RequireAuth>} />
             <Route path="/creditos" element={<Credits />} />
-            <Route path="/amigos" element={<RequireAuth><Friends /></RequireAuth>} />
+            <Route path="/amigos" element={<Navigate to="/ranking" replace />} />
+            <Route path="/ranking" element={<RequireAuth><Friends /></RequireAuth>} />
             <Route path="/instalar" element={<Install />} />
             <Route path="/desafios" element={<RequireAuth><Challenges /></RequireAuth>} />
             <Route path="/desafio/:id" element={<RequireAuth><ChallengeExercise /></RequireAuth>} />

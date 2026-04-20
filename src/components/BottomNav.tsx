@@ -16,18 +16,20 @@ interface NavItem {
   path: string;
   label: string;
   emoji: string;
+  /** classes de cor para texto ativo */
   activeColor: string;
+  /** glow para o emoji ativo (CSS color) */
   glowColor: string;
 }
 
 const NAV_ITEMS_LEFT: NavItem[] = [
-  { path: '/inicio', label: 'Início', emoji: '🏠', activeColor: 'text-[hsl(160,94%,64%)]', glowColor: 'hsl(160 94% 58% / 0.65)' },
-  { path: '/perfis', label: 'Perfis', emoji: '👥', activeColor: 'text-[#e879f9]', glowColor: 'rgba(217,70,239,0.65)' },
+  { path: '/inicio', label: 'Início', emoji: '🏡', activeColor: 'text-[hsl(160,94%,64%)]', glowColor: 'hsl(160 94% 58% / 0.7)' },
+  { path: '/ranking', label: 'Ranking', emoji: '🌍', activeColor: 'text-[#22d3ee]', glowColor: 'rgba(6,182,212,0.7)' },
 ];
 
 const NAV_ITEMS_RIGHT: NavItem[] = [
-  { path: '/resultado', label: 'Resultado', emoji: '🏆', activeColor: 'text-[hsl(42,91%,68%)]', glowColor: 'hsl(42 91% 61% / 0.7)' },
-  { path: '/desafios', label: 'Desafios', emoji: '⚔️', activeColor: 'text-[#22d3ee]', glowColor: 'rgba(6,182,212,0.65)' },
+  { path: '/desafios', label: 'Desafios', emoji: '⚔️', activeColor: 'text-[hsl(42,91%,68%)]', glowColor: 'hsl(42 91% 61% / 0.7)' },
+  { path: '/perfis', label: 'Perfil', emoji: '🧑‍🚀', activeColor: 'text-[#e879f9]', glowColor: 'rgba(217,70,239,0.7)' },
 ];
 
 const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/', '/admin'];
@@ -55,8 +57,15 @@ export function BottomNav() {
   const isGeneratePage = pathname === '/gerar';
 
   const renderItem = (item: NavItem) => {
-    const active = pathname === item.path;
-    const badgeCount = item.path === '/desafios' ? pendingChallenges + pendingFriends : 0;
+    // Considera ativo: rota exata OU /resultado quando estiver no Início (resultados embutidos)
+    const active =
+      pathname === item.path ||
+      (item.path === '/inicio' && pathname === '/resultado') ||
+      (item.path === '/ranking' && pathname === '/amigos');
+
+    let badgeCount = 0;
+    if (item.path === '/desafios') badgeCount = pendingChallenges;
+    if (item.path === '/ranking') badgeCount = pendingFriends;
     const showBadge = badgeCount > 0;
 
     return (
@@ -64,19 +73,22 @@ export function BottomNav() {
         key={item.path}
         onClick={() => navigate(item.path)}
         className={cn(
-          'flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-bold transition-all font-mono relative',
+          // gap-1.5 = 6px conforme escolha do usuário
+          'flex flex-1 flex-col items-center gap-1.5 py-2 text-[10px] font-bold transition-all font-mono relative',
           active ? item.activeColor : 'text-muted-foreground/70 hover:text-foreground',
         )}
       >
         <div className="relative">
           <span
             className={cn(
-              'block text-[28px] leading-none transition-all duration-300',
+              'block text-[30px] leading-none transition-all duration-300',
               active ? 'scale-110' : 'grayscale opacity-60 hover:grayscale-0 hover:opacity-90',
             )}
             style={
               active
-                ? { filter: `drop-shadow(0 2px 0 rgba(0,0,0,0.4)) drop-shadow(0 0 10px ${item.glowColor})` }
+                ? {
+                    filter: `drop-shadow(0 2px 0 rgba(0,0,0,0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 14px ${item.glowColor})`,
+                  }
                 : undefined
             }
           >
