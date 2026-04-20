@@ -99,8 +99,10 @@ export default function NotificationsSection() {
       if (data?.ok) {
         toast.success(`Teste enviado! ${data.sent}/${data.total} dispositivo(s). Você deve recebê-lo em segundos.`);
       } else {
-        toast.error(`Falha no teste: ${data?.error || 'erro desconhecido'}`);
+        const errMsg = data?.error || (data?.errors ? data.errors[0] : null) || 'erro desconhecido';
+        toast.error(`Falha no teste: ${errMsg}`);
         if (data?.errors) console.error('Push errors:', data.errors);
+        console.error('Full test response:', data);
       }
       console.log('Test push response:', data);
     } catch (err: any) {

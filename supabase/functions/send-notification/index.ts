@@ -128,6 +128,7 @@ serve(async (req) => {
         ok: sent > 0,
         sent,
         total: subs.length,
+        error: sent === 0 && errors.length > 0 ? errors[0] : undefined,
         errors: errors.length > 0 ? errors : undefined,
         vapid_public_prefix: VAPID_PUBLIC_KEY.slice(0, 12) + "...",
       }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
