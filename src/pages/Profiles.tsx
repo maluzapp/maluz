@@ -520,39 +520,66 @@ export default function Profiles() {
 
   const ProfileCard = ({ p, idx }: { p: Profile; idx: number }) => {
     const isActive = activeProfileId === p.id;
+    const accuracy = p.total_exercises > 0 ? Math.round((p.total_correct / p.total_exercises) * 100) : 0;
     return (
       <Card
         key={p.id}
         className={cn(
-          'cursor-pointer hover:border-primary/50 transition-all duration-300',
-          isActive && 'border-primary/40 ring-1 ring-primary/20'
+          'cursor-pointer transition-all duration-300 overflow-hidden relative',
+          isActive
+            ? 'border-primary/50 ring-1 ring-primary/30 bg-gradient-to-br from-primary/[0.07] to-card shadow-[0_0_24px_-8px_hsl(42_91%_61%/0.4)]'
+            : 'border-primary/10 hover:border-primary/40'
         )}
       >
-        <CardContent className="p-4 flex items-center gap-4">
-          <button onClick={() => setViewingChild(p)} className="flex-1 flex items-center gap-4 text-left">
-            <div className="relative">
-              <span className="text-4xl">{p.avatar_emoji}</span>
+        {isActive && (
+          <div className="absolute -right-6 -top-6 w-24 h-24 bg-primary/15 blur-3xl rounded-full pointer-events-none" />
+        )}
+        <CardContent className="p-4 flex items-center gap-4 relative">
+          <button onClick={() => setViewingChild(p)} className="flex-1 flex items-center gap-4 text-left min-w-0">
+            <div className="relative shrink-0">
+              <span className={cn('text-5xl block', isActive ? 'emoji-3d' : 'emoji-3d opacity-90')}>
+                {p.avatar_emoji}
+              </span>
               {isActive && (
-                <span className="absolute -bottom-1 -right-2 bg-primary text-primary-foreground text-[8px] font-bold px-1 py-0.5 rounded-full leading-none">ATIVO</span>
+                <span className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground text-[8px] font-black px-1.5 py-0.5 rounded-full leading-none font-mono uppercase tracking-wider shadow-lg shadow-primary/40">
+                  Ativo
+                </span>
               )}
             </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <p className="font-display font-bold text-foreground">{p.name}</p>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="font-display font-bold text-foreground truncate">{p.name}</p>
                 {p.profile_type === 'parent' && (
-                  <span className="bg-primary/15 text-primary text-[10px] px-1.5 py-0.5 rounded-full font-mono">Pai/Mãe</span>
+                  <span className="bg-[#d946ef]/15 text-[#e879f9] text-[10px] px-1.5 py-0.5 rounded-full font-mono border border-[#d946ef]/20">Pai/Mãe</span>
                 )}
                 {isPro && (
-                  <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-1.5 py-0 h-4"><Crown className="h-3 w-3 mr-0.5" /> PRO</Badge>
+                  <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-1.5 py-0 h-4">
+                    <Crown className="h-3 w-3 mr-0.5" /> PRO
+                  </Badge>
                 )}
               </div>
               {p.school_year && (
-                <p className="text-xs text-primary font-medium">{getYearLabel(p.school_year)}</p>
+                <p className="text-[10px] text-primary font-mono uppercase tracking-wider mt-0.5">{getYearLabel(p.school_year)}</p>
               )}
-              <div className="flex gap-3 text-xs text-muted-foreground mt-1">
-                <span>⭐ {p.xp} XP</span>
-                <span>📊 Nível {p.level}</span>
-                <span>🔥 {p.streak_days} dias</span>
+              <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground mt-1.5">
+                <span className="flex items-center gap-1">
+                  <span className="text-sm emoji-3d leading-none">⭐</span>
+                  <span className="font-mono font-bold text-foreground">{p.xp}</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="text-sm emoji-3d-frost leading-none">📊</span>
+                  <span className="font-mono font-bold text-foreground">Nv.{p.level}</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="text-sm emoji-3d-flame leading-none">🔥</span>
+                  <span className="font-mono font-bold text-foreground">{p.streak_days}d</span>
+                </span>
+                {p.total_exercises > 0 && (
+                  <span className="flex items-center gap-1">
+                    <span className="text-sm emoji-3d-mint leading-none">🎯</span>
+                    <span className="font-mono font-bold text-foreground">{accuracy}%</span>
+                  </span>
+                )}
               </div>
             </div>
           </button>
@@ -579,14 +606,16 @@ export default function Profiles() {
   };
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36">
+    <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36 animate-fade-in">
       <div className="mx-auto max-w-md">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="font-display text-2xl font-bold text-foreground">👋 Quem vai estudar?</h1>
+        {/* Header gamer — coerente com dashboard */}
+        <div className="relative flex items-end justify-between gap-3 mb-6">
+          <div className="text-center flex-1">
+            <span className="text-6xl block mb-2 emoji-3d-mystic animate-float">👋</span>
+            <h1 className="font-display text-2xl font-bold text-foreground">Quem vai estudar?</h1>
             <p className="text-sm text-muted-foreground">Gerencie perfis e família</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={handleSignOut}>
+          <Button variant="ghost" size="icon" onClick={handleSignOut} className="shrink-0 mb-1" title="Sair">
             <LogOut className="h-5 w-5" />
           </Button>
         </div>

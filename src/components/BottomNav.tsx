@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useProfileStore } from '@/hooks/useProfile';
@@ -6,6 +6,8 @@ import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests';
 import { usePendingChallenges } from '@/hooks/usePendingChallenges';
 import { supabase } from '@/integrations/supabase/client';
 import lampadaFallback from '@/assets/lampada-logo.png';
+
+const DEFAULT_PROFILE_EMOJI = '👤';
 
 const centralButtonUrl = (() => {
   const { data } = supabase.storage.from('logos').getPublicUrl('icon_central_button.png');
@@ -27,9 +29,9 @@ const NAV_ITEMS_LEFT: NavItem[] = [
   { path: '/ranking', label: 'Ranking', emoji: '🌍', activeColor: 'text-[#22d3ee]', glowColor: 'rgba(6,182,212,0.7)' },
 ];
 
-const NAV_ITEMS_RIGHT: NavItem[] = [
+const NAV_ITEMS_RIGHT_BASE: NavItem[] = [
   { path: '/desafios', label: 'Desafios', emoji: '⚔️', activeColor: 'text-[hsl(42,91%,68%)]', glowColor: 'hsl(42 91% 61% / 0.7)' },
-  { path: '/perfis', label: 'Perfil', emoji: '🧑‍🚀', activeColor: 'text-[#e879f9]', glowColor: 'rgba(217,70,239,0.7)' },
+  { path: '/perfis', label: 'Perfil', emoji: DEFAULT_PROFILE_EMOJI, activeColor: 'text-[#e879f9]', glowColor: 'rgba(217,70,239,0.7)' },
 ];
 
 const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/', '/admin'];
@@ -43,6 +45,30 @@ export function BottomNav() {
   const profileId = useProfileStore((s) => s.activeProfileId);
   const pendingFriends = usePendingFriendRequests();
   const pendingChallenges = usePendingChallenges();
+  const [profileEmoji, setProfileEmoji] = useState<string>(DEFAULT_PROFILE_EMOJI);
+
+  useEffect(() => {
+    if (!profileId) {
+      setProfileEmoji(DEFAULT_PROFILE_EMOJI);
+      return;
+    }
+    let cancelled = false;
+    supabase
+      .from('profiles')
+      .select('avatar_emoji')
+      .eq('id', profileId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled) return;
+        setProfileEmoji(data?.avatar_emoji?.trim() || DEFAULT_PROFILE_EMOJI);
+      });
+    return () => { cancelled = true; };
+  }, [profileId]);
+
+  const NAV_ITEMS_RIGHT: NavItem[] = [
+    NAV_ITEMS_RIGHT_BASE[0],
+    { ...NAV_ITEMS_RIGHT_BASE[1], emoji: profileEmoji },
+  ];
 
   if (HIDDEN_ROUTES.includes(pathname) || HIDDEN_PREFIXES.some(p => pathname.startsWith(p)) || !profileId) return null;
 
