@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { useStudyStore } from '@/store/study-store';
+import { StageHeader } from '@/components/exercises/StageHeader';
 import { MultipleChoice } from '@/components/exercises/MultipleChoice';
 import { TrueFalse } from '@/components/exercises/TrueFalse';
 import { FillBlank } from '@/components/exercises/FillBlank';
