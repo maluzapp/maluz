@@ -1,6 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import * as webpush from "https://deno.land/x/webpush@1.0.2/mod.ts";
+import {
+  ApplicationServer,
+  importVapidKeys,
+  PushMessageError,
+} from "jsr:@negrel/webpush@0.5.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,23 +14,61 @@ const corsHeaders = {
 const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY") ?? "";
 const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY") ?? "";
 
-let vapidAppServer: webpush.ApplicationServer | null = null;
-async function getAppServer() {
-  if (vapidAppServer) return vapidAppServer;
-  if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-    throw new Error("VAPID keys not configured in secrets");
+function b64urlToBytes(b64url: string): Uint8Array {
+  const pad = "=".repeat((4 - (b64url.length % 4)) % 4);
+  const b64 = (b64url + pad).replace(/-/g, "+").replace(/_/g, "/");
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+function bytesToB64url(b: Uint8Array): string {
+  let s = "";
+  for (let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+// Convert raw VAPID base64url keys (web-push format) into JWK pair.
+// public: 65 bytes uncompressed EC point (0x04 || X(32) || Y(32))
+// private: 32 bytes scalar
+function vapidRawToJwk(publicB64u: string, privateB64u: string) {
+  const pub = b64urlToBytes(publicB64u);
+  const priv = b64urlToBytes(privateB64u);
+  if (pub.length !== 65 || pub[0] !== 0x04) {
+    throw new Error(`Invalid VAPID public key length=${pub.length} first=${pub[0]}`);
   }
-  vapidAppServer = await webpush.ApplicationServer.new({
-    contactInformation: "mailto:hello@maluz.app",
-    vapidKeys: await webpush.importVapidKeys(
-      {
-        publicKey: VAPID_PUBLIC_KEY,
-        privateKey: VAPID_PRIVATE_KEY,
-      },
-      { jwkImportParams: { name: "ECDSA", namedCurve: "P-256" } },
-    ),
-  });
-  return vapidAppServer;
+  if (priv.length !== 32) {
+    throw new Error(`Invalid VAPID private key length=${priv.length}`);
+  }
+  const x = bytesToB64url(pub.slice(1, 33));
+  const y = bytesToB64url(pub.slice(33, 65));
+  const d = bytesToB64url(priv);
+  return {
+    publicKey: { kty: "EC", crv: "P-256", x, y, ext: true, key_ops: ["verify"] } as JsonWebKey,
+    privateKey: { kty: "EC", crv: "P-256", x, y, d, ext: true, key_ops: ["sign"] } as JsonWebKey,
+  };
+}
+
+let appServerPromise: Promise<ApplicationServer> | null = null;
+function getAppServer(): Promise<ApplicationServer> {
+  if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+    return Promise.reject(new Error("VAPID keys not configured in secrets"));
+  }
+  if (!appServerPromise) {
+    appServerPromise = (async () => {
+      const exported = vapidRawToJwk(VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+      const vapidKeys = await importVapidKeys(exported, { extractable: false });
+      return await ApplicationServer.new({
+        contactInformation: "mailto:hello@maluz.app",
+        vapidKeys,
+      });
+    })().catch((e) => {
+      appServerPromise = null;
+      throw e;
+    });
+  }
+  return appServerPromise;
 }
 
 async function sendWebPush(
@@ -34,16 +76,19 @@ async function sendWebPush(
   payload: string,
 ) {
   const appServer = await getAppServer();
-  const pushSubscriber = appServer.subscribe({
+  const subscriber = appServer.subscribe({
     endpoint: subscription.endpoint,
     keys: { p256dh: subscription.p256dh, auth: subscription.auth },
   });
-  const res = await pushSubscriber.pushTextMessage(payload, {});
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    const err: any = new Error(`Push service returned ${res.status}: ${text.slice(0, 200)}`);
-    err.statusCode = res.status;
-    throw err;
+  try {
+    await subscriber.pushTextMessage(payload, { ttl: 60 * 60 * 24 });
+  } catch (e: any) {
+    if (e instanceof PushMessageError) {
+      const err: any = new Error(`Push service ${e.response.status}: ${e.toString().slice(0, 200)}`);
+      err.statusCode = e.response.status;
+      throw err;
+    }
+    throw e;
   }
 }
 
