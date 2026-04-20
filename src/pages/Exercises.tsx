@@ -77,28 +77,33 @@ export default function Exercises() {
         return <MultipleChoice key={key} exercise={ex as any} index={currentIndex} onAnswer={handleAnswer} />;
     }
   };
+  const correctCount = answers.filter(a => a.isCorrect).length;
+
   return (
-    <div className="min-h-screen bg-background px-4 py-6 pb-24 md:py-12">
-      <div className="mx-auto max-w-lg">
-        <div className="mb-6">
-          <div className="mb-2 flex items-center justify-between text-sm text-muted-foreground">
-            <span className="font-semibold">
-              Questão {currentIndex + 1} de {exercises.length}
-            </span>
-            <span>{Math.round(progress)}%</span>
-          </div>
-          <Progress value={progress} className="h-2" />
-        </div>
+    <div className="relative min-h-screen bg-background px-4 py-6 pb-24 md:py-12">
+      {/* Stars background ambient */}
+      <div className="pointer-events-none fixed inset-0 stars-bg opacity-30" aria-hidden="true" />
+      {/* Top glow */}
+      <div className="pointer-events-none fixed inset-x-0 top-0 h-48 bg-[radial-gradient(ellipse_60%_100%_at_50%_0%,hsl(var(--primary)/0.15),transparent_70%)]" aria-hidden="true" />
+
+      <div className="relative mx-auto max-w-lg">
+        <StageHeader
+          current={currentIndex}
+          total={exercises.length}
+          correctCount={correctCount}
+          exerciseType={exercise.type}
+        />
 
         {renderExercise(exercise)}
 
         {answered && (
           <Button
             size="lg"
-            className="mt-6 w-full gap-2 font-display font-bold"
+            className="mt-6 w-full gap-2 font-display font-bold h-14 text-base bg-gradient-to-r from-primary via-primary to-[hsl(38,92%,55%)] hover:brightness-110 shadow-[0_0_24px_hsl(var(--primary)/0.5),inset_0_1px_0_rgba(255,255,255,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all"
             onClick={handleNext}
           >
-            {currentIndex + 1 >= exercises.length ? 'Ver Resultado' : 'Próxima Questão'}
+            <Sparkles className="h-4 w-4" />
+            {currentIndex + 1 >= exercises.length ? 'Ver Resultado' : 'Próxima Fase'}
             <ArrowRight className="h-4 w-4" />
           </Button>
         )}
