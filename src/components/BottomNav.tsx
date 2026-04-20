@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Users, Trophy, Swords } from 'lucide-react';
-import { GameIcon } from '@/components/ui/game-icon';
 import { cn } from '@/lib/utils';
 import { useProfileStore } from '@/hooks/useProfile';
 import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests';
@@ -14,17 +12,23 @@ const centralButtonUrl = (() => {
   return data.publicUrl;
 })();
 
-const NAV_ITEMS_LEFT = [
-  { path: '/inicio', icon: Home, label: 'Início' },
-  { path: '/perfis', icon: Users, label: 'Perfis' },
+interface NavItem {
+  path: string;
+  label: string;
+  emoji: string;
+  activeColor: string;
+  glowColor: string;
+}
+
+const NAV_ITEMS_LEFT: NavItem[] = [
+  { path: '/inicio', label: 'Início', emoji: '🏠', activeColor: 'text-[hsl(160,94%,64%)]', glowColor: 'hsl(160 94% 58% / 0.65)' },
+  { path: '/perfis', label: 'Perfis', emoji: '👥', activeColor: 'text-[#e879f9]', glowColor: 'rgba(217,70,239,0.65)' },
 ];
 
-const NAV_ITEMS_RIGHT = [
-  { path: '/resultado', icon: Trophy, label: 'Resultado' },
-  { path: '/desafios', icon: Swords, label: 'Desafios' },
+const NAV_ITEMS_RIGHT: NavItem[] = [
+  { path: '/resultado', label: 'Resultado', emoji: '🏆', activeColor: 'text-[hsl(42,91%,68%)]', glowColor: 'hsl(42 91% 61% / 0.7)' },
+  { path: '/desafios', label: 'Desafios', emoji: '⚔️', activeColor: 'text-[#22d3ee]', glowColor: 'rgba(6,182,212,0.65)' },
 ];
-
-const FRIENDS_PATH = '/amigos';
 
 const HIDDEN_ROUTES = ['/exercicios', '/confirmacao', '/login', '/', '/admin'];
 const HIDDEN_PREFIXES = ['/desafio/'];
@@ -50,42 +54,43 @@ export function BottomNav() {
 
   const isGeneratePage = pathname === '/gerar';
 
-  const variantFor = (path: string): 'gold' | 'frost' | 'mystic' | 'mint' => {
-    if (path === '/inicio') return 'mint';
-    if (path === '/perfis') return 'mystic';
-    if (path === '/resultado') return 'gold';
-    if (path === '/desafios') return 'frost';
-    return 'gold';
-  };
-
-  const renderItem = ({ path, icon: Icon, label }: { path: string; icon: typeof Home; label: string }) => {
-    const active = pathname === path;
-    const badgeCount = path === '/desafios' ? pendingChallenges + pendingFriends : 0;
+  const renderItem = (item: NavItem) => {
+    const active = pathname === item.path;
+    const badgeCount = item.path === '/desafios' ? pendingChallenges + pendingFriends : 0;
     const showBadge = badgeCount > 0;
-    const variant = variantFor(path);
+
     return (
       <button
-        key={path}
-        onClick={() => navigate(path)}
+        key={item.path}
+        onClick={() => navigate(item.path)}
         className={cn(
-          'flex flex-1 flex-col items-center gap-1 py-2 text-[10px] font-medium transition-colors font-mono relative',
-          active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+          'flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-bold transition-all font-mono relative',
+          active ? item.activeColor : 'text-muted-foreground/70 hover:text-foreground',
         )}
       >
-        <div className={cn('relative transition-transform', active && 'scale-110')}>
-          {active ? (
-            <GameIcon icon={Icon} variant={variant} size="sm" />
-          ) : (
-            <Icon className="h-6 w-6" strokeWidth={2.2} />
-          )}
+        <div className="relative">
+          <span
+            className={cn(
+              'block text-[28px] leading-none transition-all duration-300',
+              active ? 'scale-110' : 'grayscale opacity-60 hover:grayscale-0 hover:opacity-90',
+            )}
+            style={
+              active
+                ? { filter: `drop-shadow(0 2px 0 rgba(0,0,0,0.4)) drop-shadow(0 0 10px ${item.glowColor})` }
+                : undefined
+            }
+          >
+            {item.emoji}
+          </span>
           {showBadge && (
-            <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold animate-pulse">
+            <span className="absolute -top-1.5 -right-2.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-black animate-pulse ring-2 ring-card">
               {badgeCount > 9 ? '9+' : badgeCount}
             </span>
           )}
         </div>
-        <span>{label}</span>
-        {active && <span className="absolute top-0 h-0.5 w-8 rounded-b-full bg-primary" />}
+        <span className={cn('uppercase tracking-wider', active && 'animate-pulse')}>
+          {item.label}
+        </span>
       </button>
     );
   };
@@ -95,7 +100,7 @@ export function BottomNav() {
       <div className="mx-auto flex max-w-lg items-stretch justify-around relative">
         {NAV_ITEMS_LEFT.map(renderItem)}
 
-        {/* Center lamp button */}
+        {/* Center lamp button — INTACTO conforme solicitado */}
         <div className="flex items-center justify-center" style={{ width: '88px' }}>
           <button
             onClick={handleLampClick}

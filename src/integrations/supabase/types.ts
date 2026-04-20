@@ -668,6 +668,26 @@ export type Database = {
         Args: { _user_id: string }
         Returns: string
       }
+      get_global_ranking: {
+        Args: { _limit?: number; _school_year?: string }
+        Returns: {
+          avatar_emoji: string
+          id: string
+          level: number
+          name: string
+          rank: number
+          school_year: string
+          streak_days: number
+          xp: number
+        }[]
+      }
+      get_my_global_rank: {
+        Args: { _profile_id: string }
+        Returns: {
+          rank: number
+          total: number
+        }[]
+      }
       get_profiles_by_ids: {
         Args: { _ids: string[] }
         Returns: {
