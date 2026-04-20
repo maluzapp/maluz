@@ -225,7 +225,7 @@ export default function Index() {
               <Card key={c.id} className="border-primary/20 bg-gradient-to-r from-primary/[0.06] to-card cursor-pointer hover:border-primary/30 transition-colors"
                 onClick={() => navigate(`/desafio/${c.id}`)}>
                 <CardContent className="p-4 flex items-center gap-3">
-                  <GameIcon icon={Swords} variant="frost" size="md" pulse />
+                  <span className="text-4xl emoji-3d-frost shrink-0">⚔️</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-foreground truncate">{c.subject} — {c.topic}</p>
                     <p className="text-xs text-muted-foreground">
@@ -264,15 +264,11 @@ export default function Index() {
                           pct >= 70 ? 'text-accent' : pct >= 50 ? 'text-primary' : 'text-destructive'
                         )}>{pct}%</span>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
-                        <div
-                          className={cn(
-                            'h-full rounded-full transition-all duration-500',
-                            pct >= 70 ? 'bg-accent' : pct >= 50 ? 'bg-primary' : 'bg-destructive'
-                          )}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
+                      <StatBar
+                        value={pct}
+                        variant={pct >= 70 ? 'mint' : pct >= 50 ? 'gold' : 'flame'}
+                        size="sm"
+                      />
                       <p className="text-[10px] text-muted-foreground mt-0.5">{stat.sessions} sessões</p>
                     </div>
                   );
