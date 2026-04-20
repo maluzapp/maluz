@@ -231,18 +231,17 @@ export default function Challenges() {
   return (
     <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36 animate-fade-in">
       <div className="mx-auto max-w-lg space-y-5">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-display text-2xl font-bold text-foreground flex items-center gap-2">
-              <Swords className="h-6 w-6 text-primary" /> Desafios
-            </h1>
+        {/* Header gamer — coerente com dashboard */}
+        <div className="flex items-end justify-between gap-3 animate-fade-in">
+          <div className="text-center flex-1">
+            <span className="text-6xl block mb-2 emoji-3d animate-float">⚔️</span>
+            <h1 className="font-display text-2xl font-bold text-foreground">Desafios</h1>
             <p className="text-sm text-muted-foreground">
               {profileType === 'parent' ? 'Envie desafios para seus filhos' : 'Desafios enviados por seus pais'}
             </p>
           </div>
           {profileType === 'parent' && childProfiles.length > 0 && (
-            <Button onClick={() => setShowCreate(true)} size="sm" className="gap-1.5">
+            <Button onClick={() => setShowCreate(true)} size="sm" className="gap-1.5 shrink-0 mb-1">
               <Plus className="h-4 w-4" /> Novo
             </Button>
           )}
@@ -251,7 +250,7 @@ export default function Challenges() {
         {profileType === 'parent' && childProfiles.length === 0 && (
           <Card className="border-primary/10">
             <CardContent className="p-8 text-center">
-              <Swords className="h-10 w-10 text-primary/30 mx-auto mb-3" />
+              <span className="text-5xl block mb-3 emoji-3d-mystic">👨‍👧</span>
               <h3 className="font-display font-bold text-foreground mb-1">Nenhum filho vinculado</h3>
               <p className="text-sm text-muted-foreground">Vincule um perfil de criança para enviar desafios</p>
             </CardContent>
@@ -261,7 +260,7 @@ export default function Challenges() {
         {challenges.length === 0 && (profileType === 'child' || childProfiles.length > 0) && (
           <Card className="border-primary/10">
             <CardContent className="p-8 text-center">
-              <Swords className="h-10 w-10 text-primary/30 mx-auto mb-3" />
+              <span className="text-5xl block mb-3 emoji-3d-frost">⚔️</span>
               <h3 className="font-display font-bold text-foreground mb-1">Nenhum desafio ainda</h3>
               <p className="text-sm text-muted-foreground">
                 {profileType === 'parent' ? 'Crie um desafio para seus filhos!' : 'Aguarde desafios dos seus pais!'}

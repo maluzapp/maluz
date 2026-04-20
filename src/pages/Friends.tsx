@@ -59,7 +59,7 @@ function formatRelativeDate(dateStr: string) {
 export default function Friends() {
   const { user } = useAuth();
   const profileId = useProfileStore((s) => s.activeProfileId);
-  const [activeTab, setActiveTab] = useState('feed');
+  const [activeTab, setActiveTab] = useState('global');
   const [friends, setFriends] = useState<Friendship[]>([]);
   const [pendingRequests, setPendingRequests] = useState<Friendship[]>([]);
   const [sentRequests, setSentRequests] = useState<Friendship[]>([]);
