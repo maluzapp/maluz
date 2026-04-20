@@ -483,6 +483,8 @@ export default function Admin() {
     const [searchTerm, setSearchTerm] = useState('');
     const [planFilter, setPlanFilter] = useState<string>('all');
     const [changingPlan, setChangingPlan] = useState<string | null>(null);
+    const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+    const [confirmDeleteUser, setConfirmDeleteUser] = useState<{ id: string; email: string } | null>(null);
 
     const fetchUsers = async () => {
       setLoadingUsers(true);
