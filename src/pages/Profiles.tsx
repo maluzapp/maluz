@@ -588,8 +588,8 @@ export default function Profiles() {
               <Trash2 className="h-3.5 w-3.5" />
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   };
 
