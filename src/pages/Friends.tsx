@@ -299,18 +299,20 @@ export default function Friends() {
   return (
     <div className="min-h-screen bg-background px-4 py-6 pb-28 md:pb-36 animate-fade-in">
       <div className="mx-auto max-w-lg space-y-5">
-        {/* Header */}
-        <div>
-          <h1 className="font-display text-2xl font-bold text-foreground flex items-center gap-2">
-            <Users className="h-6 w-6 text-primary" /> Amigos
-          </h1>
-          <p className="text-sm text-muted-foreground">Acompanhe seus amigos e compare resultados</p>
+        {/* Header gamer — coerente com dashboard */}
+        <div className="text-center animate-fade-in">
+          <span className="text-6xl block mb-2 emoji-3d-frost animate-float">🌍</span>
+          <h1 className="font-display text-2xl font-bold text-foreground">Ranking & Amigos</h1>
+          <p className="text-sm text-muted-foreground">Compita, conecte e suba no pódio global</p>
         </div>
 
         {/* My friend code */}
-        <Card className="border-primary/20">
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground mb-1.5 font-mono uppercase">Meu código de amigo</p>
+        <Card className="border-primary/20 bg-gradient-to-br from-primary/[0.06] to-card overflow-hidden relative animate-fade-in" style={{ animationDelay: '60ms' }}>
+          <div className="absolute -right-6 -top-6 w-24 h-24 bg-primary/10 blur-3xl rounded-full" />
+          <CardContent className="p-4 relative">
+            <p className="text-xs text-muted-foreground mb-1.5 font-mono uppercase tracking-wider flex items-center gap-1.5">
+              <span className="text-base">🪪</span> Meu código de amigo
+            </p>
             <div className="flex items-center gap-2">
               <span className="font-mono text-2xl font-bold text-primary tracking-[0.3em] flex-1">{myCode}</span>
               <Button variant="outline" size="sm" onClick={copyMyCode} className="gap-1.5">
@@ -322,16 +324,16 @@ export default function Friends() {
 
         {/* Pending requests */}
         {pendingRequests.length > 0 && (
-          <div>
+          <div className="animate-fade-in" style={{ animationDelay: '120ms' }}>
             <h2 className="text-sm font-bold text-foreground mb-2 flex items-center gap-1.5">
-              <UserPlus className="h-4 w-4 text-primary" />
+              <span className="text-lg emoji-3d-mystic">📨</span>
               Solicitações pendentes ({pendingRequests.length})
             </h2>
             <div className="space-y-2">
               {pendingRequests.map((req) => (
                 <Card key={req.id} className="border-primary/15">
                   <CardContent className="p-3 flex items-center gap-3">
-                    <span className="text-3xl">{req.friend.avatar_emoji}</span>
+                    <span className="text-3xl emoji-3d">{req.friend.avatar_emoji}</span>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-foreground text-sm">{req.friend.name}</p>
                       <p className="text-xs text-muted-foreground">Nv.{req.friend.level} · {req.friend.xp} XP</p>
@@ -353,17 +355,17 @@ export default function Friends() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full grid grid-cols-4 h-auto gap-1 bg-card border border-primary/15 p-1 rounded-xl">
-            <TabsTrigger value="feed" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
-              Feed
-            </TabsTrigger>
-            <TabsTrigger value="ranking" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
-              Amigos
-            </TabsTrigger>
             <TabsTrigger value="global" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 gap-1">
               🌍 Global
             </TabsTrigger>
-            <TabsTrigger value="adicionar" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2">
-              Adicionar
+            <TabsTrigger value="ranking" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 gap-1">
+              🏆 Amigos
+            </TabsTrigger>
+            <TabsTrigger value="feed" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 gap-1">
+              📰 Feed
+            </TabsTrigger>
+            <TabsTrigger value="adicionar" className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg py-2 gap-1">
+              ➕ Add
             </TabsTrigger>
           </TabsList>
 
