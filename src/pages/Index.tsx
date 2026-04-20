@@ -10,6 +10,7 @@ import { useStripeSubscription, useUserSubscription } from '@/hooks/useSubscript
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
 import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings, Crown, Lock, Mic, Camera, Swords } from 'lucide-react';
+import { GameIcon } from '@/components/ui/game-icon';
 import { cn } from '@/lib/utils';
 
 interface ProfileData {
@@ -168,13 +169,17 @@ export default function Index() {
         {/* XP Progress */}
         <Card className="animate-fade-in border-primary/20 overflow-hidden" style={{ animationDelay: '80ms' }}>
           <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-1.5 text-sm font-display font-bold text-foreground">
-                <Star className="h-4 w-4 text-primary" />
-                {profile.xp} XP
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <GameIcon icon={Star} variant="gold" size="md" pulse />
+                <div>
+                  <p className="font-display font-bold text-2xl text-foreground leading-none">{profile.xp}</p>
+                  <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider mt-1">XP Total</p>
+                </div>
               </div>
-              <span className="text-xs text-muted-foreground font-mono">
-                {xpInLevel}/{xpNeeded} para Nv.{profile.level + 1}
+              <span className="text-xs text-muted-foreground font-mono text-right">
+                {xpInLevel}/{xpNeeded}<br/>
+                <span className="text-primary">para Nv.{profile.level + 1}</span>
               </span>
             </div>
             <Progress value={progressPct} className="h-2.5" />
@@ -184,22 +189,22 @@ export default function Index() {
         {/* Stats grid */}
         <div className="grid grid-cols-3 gap-3 animate-fade-in" style={{ animationDelay: '160ms' }}>
           <Card className="border-primary/10">
-            <CardContent className="p-3 text-center">
-              <Flame className="h-5 w-5 text-destructive mx-auto mb-1" />
+            <CardContent className="p-3 text-center flex flex-col items-center">
+              <GameIcon icon={Flame} variant="flame" size="md" className="mb-2" />
               <p className="font-display font-bold text-xl text-foreground">{profile.streak_days}</p>
               <p className="text-[10px] text-muted-foreground font-mono uppercase">Dias seguidos</p>
             </CardContent>
           </Card>
           <Card className="border-primary/10">
-            <CardContent className="p-3 text-center">
-              <Target className="h-5 w-5 text-primary mx-auto mb-1" />
+            <CardContent className="p-3 text-center flex flex-col items-center">
+              <GameIcon icon={Target} variant="mint" size="md" className="mb-2" />
               <p className="font-display font-bold text-xl text-foreground">{accuracy}%</p>
               <p className="text-[10px] text-muted-foreground font-mono uppercase">Precisão</p>
             </CardContent>
           </Card>
           <Card className="border-primary/10">
-            <CardContent className="p-3 text-center">
-              <BookOpen className="h-5 w-5 text-accent mx-auto mb-1" />
+            <CardContent className="p-3 text-center flex flex-col items-center">
+              <GameIcon icon={BookOpen} variant="frost" size="md" className="mb-2" />
               <p className="font-display font-bold text-xl text-foreground">{profile.total_exercises}</p>
               <p className="text-[10px] text-muted-foreground font-mono uppercase">Exercícios</p>
             </CardContent>
@@ -220,9 +225,7 @@ export default function Index() {
               <Card key={c.id} className="border-primary/20 bg-gradient-to-r from-primary/[0.06] to-card cursor-pointer hover:border-primary/30 transition-colors"
                 onClick={() => navigate(`/desafio/${c.id}`)}>
                 <CardContent className="p-4 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-                    <Swords className="h-5 w-5 text-primary" />
-                  </div>
+                  <GameIcon icon={Swords} variant="frost" size="md" pulse />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-foreground truncate">{c.subject} — {c.topic}</p>
                     <p className="text-xs text-muted-foreground">

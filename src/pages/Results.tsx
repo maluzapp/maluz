@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, XCircle, CheckCircle, Share2, Star, History, BookOpen, Trophy, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { GameIcon } from '@/components/ui/game-icon';
 import { useStudyStore } from '@/store/study-store';
 import { useProfileStore } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
@@ -94,22 +95,22 @@ function SessionHistory() {
       {/* Stats cards */}
       <div className="grid grid-cols-3 gap-3">
         <Card className="animate-fade-in">
-          <CardContent className="p-3 text-center">
-            <Trophy className="h-5 w-5 text-primary mx-auto mb-1" />
+          <CardContent className="p-3 text-center flex flex-col items-center">
+            <GameIcon icon={Trophy} variant="gold" size="md" className="mb-2" />
             <p className="font-display font-bold text-lg text-foreground">{totalSessions}</p>
             <p className="text-[10px] text-muted-foreground">Sessões</p>
           </CardContent>
         </Card>
         <Card className="animate-fade-in" style={{ animationDelay: '100ms' }}>
-          <CardContent className="p-3 text-center">
-            <Star className="h-5 w-5 text-accent mx-auto mb-1" />
+          <CardContent className="p-3 text-center flex flex-col items-center">
+            <GameIcon icon={Star} variant="gold" size="md" pulse className="mb-2" />
             <p className="font-display font-bold text-lg text-foreground">{totalXP}</p>
             <p className="text-[10px] text-muted-foreground">XP Total</p>
           </CardContent>
         </Card>
         <Card className="animate-fade-in" style={{ animationDelay: '200ms' }}>
-          <CardContent className="p-3 text-center">
-            <CheckCircle className="h-5 w-5 text-success mx-auto mb-1" />
+          <CardContent className="p-3 text-center flex flex-col items-center">
+            <GameIcon icon={CheckCircle} variant="mint" size="md" className="mb-2" />
             <p className="font-display font-bold text-lg text-foreground">{avgScore}%</p>
             <p className="text-[10px] text-muted-foreground">Média</p>
           </CardContent>
