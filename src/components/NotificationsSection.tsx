@@ -5,9 +5,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Bell, Send, Plus, Save, Trash2, ToggleLeft, ToggleRight, Clock, Users, Mail, Smartphone } from 'lucide-react';
+import { Bell, Send, Plus, Save, Trash2, ToggleLeft, ToggleRight, Clock, Users, Mail, Smartphone, Zap, BellRing, BellOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { usePushSubscription } from '@/hooks/usePushSubscription';
 
 interface NotificationTemplate {
   id: string;
@@ -23,9 +24,11 @@ interface NotificationTemplate {
 }
 
 export default function NotificationsSection() {
+  const { isSubscribed, isSupported, permission, subscribe, unsubscribe } = usePushSubscription();
   const [templates, setTemplates] = useState<NotificationTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [vapidKey, setVapidKey] = useState('');
   const [editValues, setEditValues] = useState<Partial<NotificationTemplate>>({});
@@ -74,6 +77,36 @@ export default function NotificationsSection() {
       toast.error('Erro ao enviar: ' + (err.message || 'Desconhecido'));
     } finally {
       setSending(null);
+    }
+  };
+
+  const handleTestPush = async () => {
+    if (!isSubscribed) {
+      const ok = await subscribe();
+      if (!ok) {
+        toast.error('Não foi possível ativar push neste dispositivo. Verifique as permissões do navegador.');
+        return;
+      }
+    }
+    setTesting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke('send-notification', {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+        body: { action: 'send_test' },
+      });
+      if (error) throw error;
+      if (data?.ok) {
+        toast.success(`Teste enviado! ${data.sent}/${data.total} dispositivo(s). Você deve recebê-lo em segundos.`);
+      } else {
+        toast.error(`Falha no teste: ${data?.error || 'erro desconhecido'}`);
+        if (data?.errors) console.error('Push errors:', data.errors);
+      }
+      console.log('Test push response:', data);
+    } catch (err: any) {
+      toast.error('Erro ao testar push: ' + (err.message || 'desconhecido'));
+    } finally {
+      setTesting(false);
     }
   };
 
@@ -246,24 +279,70 @@ export default function NotificationsSection() {
         </div>
       </div>
 
-      {/* VAPID Key config */}
-      <div className="rounded-xl border border-primary/15 bg-card/50 p-4 space-y-2">
-        <Label className="text-xs text-foreground/70">VAPID Public Key (necessária para push notifications)</Label>
-        <div className="flex gap-2">
-          <Input
-            value={vapidKey}
-            onChange={e => setVapidKey(e.target.value)}
-            placeholder="BNK4Z..."
-            className="bg-card border-primary/20 text-foreground font-mono text-xs flex-1"
-          />
-          <Button size="sm" onClick={async () => {
-            await supabase.from('branding_settings').upsert({ key: 'vapid_public_key', value: vapidKey, category: 'push' }, { onConflict: 'key' });
-            toast.success('VAPID key salva!');
-          }} className="bg-primary text-primary-foreground shrink-0">
-            <Save className="h-3.5 w-3.5 mr-1" /> Salvar
+      {/* Push diagnostics & test */}
+      <div className="rounded-xl border border-primary/15 bg-card/50 p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Zap className="h-4 w-4 text-primary" />
+          <h3 className="font-display font-bold text-foreground text-sm">Diagnóstico de Push</h3>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <Badge variant={isSupported ? 'secondary' : 'destructive'} className="text-[10px]">
+            {isSupported ? '✓ Navegador suporta push' : '✗ Push não suportado'}
+          </Badge>
+          <Badge variant={permission === 'granted' ? 'secondary' : permission === 'denied' ? 'destructive' : 'outline'} className="text-[10px]">
+            Permissão: {permission}
+          </Badge>
+          <Badge variant={isSubscribed ? 'secondary' : 'outline'} className="text-[10px]">
+            {isSubscribed ? <BellRing className="h-2.5 w-2.5 mr-0.5" /> : <BellOff className="h-2.5 w-2.5 mr-0.5" />}
+            {isSubscribed ? 'Inscrito neste navegador' : 'Não inscrito'}
+          </Badge>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {!isSubscribed ? (
+            <Button size="sm" onClick={subscribe} className="gap-1.5 text-xs bg-primary text-primary-foreground" disabled={!isSupported || permission === 'denied'}>
+              <BellRing className="h-3.5 w-3.5" /> Ativar push neste navegador
+            </Button>
+          ) : (
+            <Button size="sm" variant="outline" onClick={unsubscribe} className="gap-1.5 text-xs">
+              <BellOff className="h-3.5 w-3.5" /> Desinscrever
+            </Button>
+          )}
+          <Button
+            size="sm"
+            onClick={handleTestPush}
+            disabled={testing || !isSupported}
+            className="gap-1.5 text-xs bg-accent text-accent-foreground"
+          >
+            <Send className="h-3.5 w-3.5" /> {testing ? 'Enviando teste...' : 'Enviar push de teste para mim'}
           </Button>
         </div>
-        <p className="text-[10px] text-foreground/40">Cole aqui a chave pública VAPID gerada. Essa chave é usada pelo navegador para receber push notifications.</p>
+
+        <p className="text-[10px] text-foreground/40 leading-relaxed">
+          Use o botão acima para validar se as VAPID keys e o serviço de push estão funcionando.
+          Se o teste falhar, abra o console do navegador para ver detalhes.
+          {permission === 'denied' && ' ⚠️ Permissão de notificação foi bloqueada — desbloqueie nas configurações do navegador.'}
+        </p>
+
+        <div className="pt-2 border-t border-primary/10 space-y-1">
+          <Label className="text-xs text-foreground/70">VAPID Public Key (lida pelo navegador para inscrição)</Label>
+          <div className="flex gap-2">
+            <Input
+              value={vapidKey}
+              onChange={e => setVapidKey(e.target.value)}
+              placeholder="BNK4Z..."
+              className="bg-card border-primary/20 text-foreground font-mono text-xs flex-1"
+            />
+            <Button size="sm" onClick={async () => {
+              await supabase.from('branding_settings').upsert({ key: 'vapid_public_key', value: vapidKey, category: 'push' }, { onConflict: 'key' });
+              toast.success('VAPID key salva!');
+            }} className="bg-primary text-primary-foreground shrink-0">
+              <Save className="h-3.5 w-3.5 mr-1" /> Salvar
+            </Button>
+          </div>
+          <p className="text-[10px] text-foreground/40">Deve ser igual ao secret VAPID_PUBLIC_KEY do servidor.</p>
+        </div>
       </div>
 
       {/* New template */}

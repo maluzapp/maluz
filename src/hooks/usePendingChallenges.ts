@@ -10,11 +10,13 @@ export function usePendingChallenges() {
     if (!profileId) return;
 
     const fetchCount = async () => {
+      // Only count challenges that are actually playable (have exercises_data)
       const { count: c } = await supabase
         .from('challenges')
         .select('*', { count: 'exact', head: true })
         .eq('child_profile_id', profileId)
-        .eq('status', 'pending');
+        .eq('status', 'pending')
+        .not('exercises_data', 'is', null);
       setCount(c || 0);
     };
 

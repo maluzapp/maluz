@@ -137,13 +137,19 @@ export default function Challenges() {
         .order('created_at', { ascending: false });
       setChallenges((myChallenges as any[] as Challenge[]) || []);
     } else {
-      // Child: get challenges sent to me
+      // Child: get challenges sent to me — filter out broken (no exercises) pending ones
       const { data: myChallenges } = await supabase
         .from('challenges')
         .select('*')
         .eq('child_profile_id', profileId)
         .order('created_at', { ascending: false });
-      setChallenges((myChallenges as any[] as Challenge[]) || []);
+      const list = (myChallenges as any[] as Challenge[]) || [];
+      // Auto-cleanup: delete pending challenges without exercises_data (broken)
+      const broken = list.filter(c => c.status === 'pending' && !c.exercises_data);
+      if (broken.length > 0) {
+        await supabase.from('challenges').delete().in('id', broken.map(b => b.id));
+      }
+      setChallenges(list.filter(c => !(c.status === 'pending' && !c.exercises_data)));
     }
 
     setLoading(false);

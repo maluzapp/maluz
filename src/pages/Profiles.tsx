@@ -809,21 +809,51 @@ export default function Profiles() {
                         const c = link.child;
                         const accuracy = c.total_exercises > 0 ? Math.round((c.total_correct / c.total_exercises) * 100) : 0;
                         return (
-                          <Card key={link.id} className="border-primary/10 hover:border-primary/30 transition-all cursor-pointer"
-                            onClick={() => setViewingChild(c)}>
+                          <Card key={link.id} className="border-primary/10 hover:border-primary/30 transition-all">
                             <CardContent className="p-4 flex items-center gap-4">
-                              <span className="text-3xl">{c.avatar_emoji}</span>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-display font-bold text-foreground">{c.name}</p>
-                                {c.school_year && (
-                                  <p className="text-xs text-primary">{getYearLabel(c.school_year)}</p>
-                                )}
-                                <div className="flex gap-3 text-xs text-muted-foreground mt-1">
-                                  <span>⭐ {c.xp} XP</span>
-                                  <span>🎯 {accuracy}%</span>
-                                  <span>🔥 {c.streak_days}d</span>
+                              <button className="flex items-center gap-4 flex-1 min-w-0 text-left" onClick={() => setViewingChild(c)}>
+                                <span className="text-3xl">{c.avatar_emoji}</span>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-display font-bold text-foreground">{c.name}</p>
+                                  {c.school_year && (
+                                    <p className="text-xs text-primary">{getYearLabel(c.school_year)}</p>
+                                  )}
+                                  <div className="flex gap-3 text-xs text-muted-foreground mt-1">
+                                    <span>⭐ {c.xp} XP</span>
+                                    <span>🎯 {accuracy}%</span>
+                                    <span>🔥 {c.streak_days}d</span>
+                                  </div>
                                 </div>
-                              </div>
+                              </button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10 shrink-0">
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Desvincular {c.name}?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      O perfil de {c.name} será desvinculado da sua conta. O perfil em si e o histórico de estudo não serão apagados — você só perderá acesso até receber um novo código de convite.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      onClick={async () => {
+                                        const { error } = await supabase.from('parent_child_links').delete().eq('id', link.id);
+                                        if (error) { toast.error('Erro ao desvincular: ' + error.message); return; }
+                                        toast.success('Filho desvinculado');
+                                        await loadPageData();
+                                      }}
+                                    >
+                                      Desvincular
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                               <Eye className="h-4 w-4 text-muted-foreground" />
                             </CardContent>
                           </Card>
