@@ -15,19 +15,7 @@ import { useCanStartSession, usePlanLimits } from '@/hooks/useSubscription';
 import { UpgradePrompt } from '@/components/UpgradePrompt';
 import lampadaIcon from '@/assets/lampada-2.png';
 import type { SchoolYear, Subject } from '@/types/study';
-
-const SUBJECTS: Subject[] = ['Matemática', 'Português', 'Ciências', 'História', 'Geografia', 'Inglês', 'Artes', 'Educação Física'];
-
-const SUBJECT_EMOJIS: Record<Subject, string> = {
-  'Matemática': '🔢',
-  'Português': '📝',
-  'Ciências': '🔬',
-  'História': '🏛️',
-  'Geografia': '🌍',
-  'Inglês': '🇬🇧',
-  'Artes': '🎨',
-  'Educação Física': '⚽',
-};
+import { SUBJECTS, SUBJECT_EMOJIS } from '@/constants/subjects';
 
 export default function Generate() {
   const navigate = useNavigate();
