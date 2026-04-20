@@ -95,6 +95,7 @@ export function CompleteSentence({ exercise, index, onAnswer, readOnly, savedAns
           <p className="text-sm text-muted-foreground">{exercise.explanation}</p>
         </Card>
       )}
+      </div>
     </div>
   );
 }
