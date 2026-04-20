@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useProfileStore } from '@/hooks/useProfile';
 import { Progress } from '@/components/ui/progress';
 import { Flame, Star, TrendingUp } from 'lucide-react';
-import { GameIcon } from '@/components/ui/game-icon';
 
 interface ProfileStats {
   name: string;
@@ -43,21 +42,21 @@ export function GamificationBar() {
 
   return (
     <div className="flex items-center gap-3 rounded-xl bg-card border border-border px-4 py-2.5 shadow-sm">
-      <span className="text-2xl">{stats.avatar_emoji}</span>
+      <span className="text-3xl emoji-3d">{stats.avatar_emoji}</span>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between text-sm">
           <span className="font-display font-bold text-foreground truncate">{stats.name}</span>
-          <div className="flex items-center gap-2.5 text-xs text-muted-foreground shrink-0 ml-2">
+          <div className="flex items-center gap-3 text-xs shrink-0 ml-2">
             <span className="flex items-center gap-1">
-              <GameIcon icon={TrendingUp} variant="frost" size="sm" className="!h-7 !w-7" />
+              <span className="text-base emoji-3d-frost leading-none">📈</span>
               <span className="font-mono font-bold text-foreground">Nv.{stats.level}</span>
             </span>
             <span className="flex items-center gap-1">
-              <GameIcon icon={Star} variant="gold" size="sm" className="!h-7 !w-7" />
+              <span className="text-base emoji-3d leading-none">⭐</span>
               <span className="font-mono font-bold text-foreground">{stats.xp}</span>
             </span>
             <span className="flex items-center gap-1">
-              <GameIcon icon={Flame} variant="flame" size="sm" className="!h-7 !w-7" />
+              <span className="text-base emoji-3d-flame leading-none">🔥</span>
               <span className="font-mono font-bold text-foreground">{stats.streak_days}</span>
             </span>
           </div>

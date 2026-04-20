@@ -10,7 +10,7 @@ import { useStripeSubscription, useUserSubscription } from '@/hooks/useSubscript
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
 import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings, Crown, Lock, Mic, Camera, Swords } from 'lucide-react';
-import { GameIcon } from '@/components/ui/game-icon';
+import { StatBar } from '@/components/ui/stat-bar';
 import { cn } from '@/lib/utils';
 
 interface ProfileData {
@@ -171,18 +171,18 @@ export default function Index() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <GameIcon icon={Star} variant="gold" size="md" pulse />
+                <span className="text-5xl emoji-3d animate-float">⭐</span>
                 <div>
-                  <p className="font-display font-bold text-2xl text-foreground leading-none">{profile.xp}</p>
+                  <p className="font-display font-black text-3xl text-foreground leading-none">{profile.xp}</p>
                   <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider mt-1">XP Total</p>
                 </div>
               </div>
               <span className="text-xs text-muted-foreground font-mono text-right">
                 {xpInLevel}/{xpNeeded}<br/>
-                <span className="text-primary">para Nv.{profile.level + 1}</span>
+                <span className="text-primary font-bold">→ Nv.{profile.level + 1}</span>
               </span>
             </div>
-            <Progress value={progressPct} className="h-2.5" />
+            <StatBar value={progressPct} variant="gold" size="md" />
           </CardContent>
         </Card>
 
@@ -190,22 +190,22 @@ export default function Index() {
         <div className="grid grid-cols-3 gap-3 animate-fade-in" style={{ animationDelay: '160ms' }}>
           <Card className="border-primary/10">
             <CardContent className="p-3 text-center flex flex-col items-center">
-              <GameIcon icon={Flame} variant="flame" size="md" className="mb-2" />
-              <p className="font-display font-bold text-xl text-foreground">{profile.streak_days}</p>
+              <span className="text-4xl emoji-3d-flame mb-1">🔥</span>
+              <p className="font-display font-black text-2xl text-foreground">{profile.streak_days}</p>
               <p className="text-[10px] text-muted-foreground font-mono uppercase">Dias seguidos</p>
             </CardContent>
           </Card>
           <Card className="border-primary/10">
             <CardContent className="p-3 text-center flex flex-col items-center">
-              <GameIcon icon={Target} variant="mint" size="md" className="mb-2" />
-              <p className="font-display font-bold text-xl text-foreground">{accuracy}%</p>
+              <span className="text-4xl emoji-3d-mint mb-1">🎯</span>
+              <p className="font-display font-black text-2xl text-foreground">{accuracy}%</p>
               <p className="text-[10px] text-muted-foreground font-mono uppercase">Precisão</p>
             </CardContent>
           </Card>
           <Card className="border-primary/10">
             <CardContent className="p-3 text-center flex flex-col items-center">
-              <GameIcon icon={BookOpen} variant="frost" size="md" className="mb-2" />
-              <p className="font-display font-bold text-xl text-foreground">{profile.total_exercises}</p>
+              <span className="text-4xl emoji-3d-frost mb-1">📚</span>
+              <p className="font-display font-black text-2xl text-foreground">{profile.total_exercises}</p>
               <p className="text-[10px] text-muted-foreground font-mono uppercase">Exercícios</p>
             </CardContent>
           </Card>
@@ -225,7 +225,7 @@ export default function Index() {
               <Card key={c.id} className="border-primary/20 bg-gradient-to-r from-primary/[0.06] to-card cursor-pointer hover:border-primary/30 transition-colors"
                 onClick={() => navigate(`/desafio/${c.id}`)}>
                 <CardContent className="p-4 flex items-center gap-3">
-                  <GameIcon icon={Swords} variant="frost" size="md" pulse />
+                  <span className="text-4xl emoji-3d-frost shrink-0">⚔️</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-foreground truncate">{c.subject} — {c.topic}</p>
                     <p className="text-xs text-muted-foreground">
@@ -264,15 +264,11 @@ export default function Index() {
                           pct >= 70 ? 'text-accent' : pct >= 50 ? 'text-primary' : 'text-destructive'
                         )}>{pct}%</span>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
-                        <div
-                          className={cn(
-                            'h-full rounded-full transition-all duration-500',
-                            pct >= 70 ? 'bg-accent' : pct >= 50 ? 'bg-primary' : 'bg-destructive'
-                          )}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
+                      <StatBar
+                        value={pct}
+                        variant={pct >= 70 ? 'mint' : pct >= 50 ? 'gold' : 'flame'}
+                        size="sm"
+                      />
                       <p className="text-[10px] text-muted-foreground mt-0.5">{stat.sessions} sessões</p>
                     </div>
                   );
