@@ -84,8 +84,12 @@ export default function NotificationsSection() {
     }
 
     // Fetch VAPID key
-    const { data: vapidSetting } = await supabase.from('branding_settings').select('value').eq('key', 'vapid_public_key').single();
-    if (vapidSetting?.value) setVapidKey(vapidSetting.value);
+    const { data: { session } } = await supabase.auth.getSession();
+    const { data: vapidData } = await supabase.functions.invoke('send-notification', {
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+      body: { action: 'get_vapid_public_key' },
+    });
+    if (vapidData?.public_key) setVapidKey(vapidData.public_key);
   };
 
   useEffect(() => { fetchTemplates(); fetchStats(); }, []);
@@ -437,22 +441,16 @@ export default function NotificationsSection() {
         </p>
 
         <div className="pt-2 border-t border-primary/10 space-y-1">
-          <Label className="text-xs text-foreground/70">VAPID Public Key (lida pelo navegador para inscrição)</Label>
+          <Label className="text-xs text-foreground/70">VAPID Public Key do servidor</Label>
           <div className="flex gap-2">
             <Input
               value={vapidKey}
-              onChange={e => setVapidKey(e.target.value)}
+              readOnly
               placeholder="BNK4Z..."
               className="bg-card border-primary/20 text-foreground font-mono text-xs flex-1"
             />
-            <Button size="sm" onClick={async () => {
-              await supabase.from('branding_settings').upsert({ key: 'vapid_public_key', value: vapidKey, category: 'push' }, { onConflict: 'key' });
-              toast.success('VAPID key salva!');
-            }} className="bg-primary text-primary-foreground shrink-0">
-              <Save className="h-3.5 w-3.5 mr-1" /> Salvar
-            </Button>
           </div>
-          <p className="text-[10px] text-foreground/40">Deve ser igual ao secret VAPID_PUBLIC_KEY do servidor.</p>
+          <p className="text-[10px] text-foreground/40">Essa é a chave oficial lida direto do backend, usada para inscrever os navegadores.</p>
         </div>
       </div>
 

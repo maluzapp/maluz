@@ -36,6 +36,18 @@ export function usePushSubscription() {
   const [permission, setPermission] = useState<NotificationPermission>("default");
 
   const getVapidPublicKey = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke("send-notification", {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+        body: { action: "get_vapid_public_key" },
+      });
+
+      if (!error && data?.public_key) return data.public_key as string;
+    } catch (err) {
+      console.error("Failed to fetch canonical VAPID key:", err);
+    }
+
     const { data: vapidSetting } = await supabase
       .from("branding_settings")
       .select("value")
