@@ -71,7 +71,29 @@ export default function NotificationsSection() {
         body: { action: 'send_manual', template_id: templateId },
       });
       if (error) throw error;
-      toast.success(`Enviado! Push: ${data.push_sent}, Email: ${data.email_sent || 0}`);
+
+      console.log('send_manual response:', data);
+      const pushSent = data?.push_sent ?? 0;
+      const pushFailed = data?.push_failed ?? 0;
+      const emailSent = data?.email_sent ?? 0;
+      const subsTotal = data?.subs_total ?? 0;
+      const sampleErrors: string[] = data?.sample_errors || [];
+
+      if (subsTotal === 0) {
+        toast.error('Nenhum dispositivo inscrito para receber push. Os usuários precisam ativar notificações primeiro.');
+      } else if (pushSent === 0 && pushFailed > 0) {
+        toast.error(
+          `Falha em todos os ${pushFailed} envios. ${sampleErrors[0] || 'Verifique as VAPID keys.'}`,
+          { duration: 8000 }
+        );
+      } else if (pushSent > 0 && pushFailed > 0) {
+        toast.warning(
+          `Enviado parcial: ${pushSent}/${subsTotal} push, ${pushFailed} falharam. ${sampleErrors[0] || ''}`,
+          { duration: 6000 }
+        );
+      } else {
+        toast.success(`✅ ${pushSent}/${subsTotal} push enviados${emailSent ? `, ${emailSent} emails` : ''}`);
+      }
       fetchStats();
     } catch (err: any) {
       toast.error('Erro ao enviar: ' + (err.message || 'Desconhecido'));
