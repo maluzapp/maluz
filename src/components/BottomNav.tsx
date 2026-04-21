@@ -139,12 +139,12 @@ export function BottomNav() {
         {NAV_ITEMS_LEFT.map(renderItem)}
 
         {/* Center lamp button — vidro escuro, acende quando ativo */}
-        <div className="flex items-center justify-center" style={{ width: '104px' }}>
+        <div className="flex items-center justify-center" style={{ width: '88px' }}>
           <button
             onClick={handleLampClick}
             aria-label="Gerar exercícios"
             className={cn(
-              'absolute -top-12 flex items-center justify-center w-[84px] h-[84px] rounded-full transition-all duration-300',
+              'absolute -top-9 flex items-center justify-center w-[71px] h-[71px] rounded-full transition-all duration-300',
               // borda fina (metade da espessura anterior)
               'border-2 border-card/80',
               // estado padrão: fundo PRETO tipo vidro escuro
@@ -171,8 +171,8 @@ export function BottomNav() {
               aria-hidden="true"
               onError={() => setUseRemoteLogo(false)}
               className={cn(
-                // ocupa praticamente todo o círculo (76 de 84 = ~90%)
-                'relative h-[76px] w-[76px] object-contain transition-all duration-300',
+                // ocupa praticamente todo o círculo (~90%)
+                'relative h-[64px] w-[64px] object-contain transition-all duration-300',
                 (isGeneratePage || lampLit)
                   ? 'brightness-150 drop-shadow-[0_2px_0_rgba(0,0,0,0.35)] drop-shadow-[0_0_22px_rgba(255,230,140,1)]'
                   : 'brightness-110 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] drop-shadow-[0_0_8px_rgba(255,220,120,0.4)]',
