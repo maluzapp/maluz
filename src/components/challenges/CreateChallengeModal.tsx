@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Sparkles, Send, Share2, Loader2, ArrowLeft, Target, BookOpen, GraduationCap, MessageCircle, User } from 'lucide-react';
+import { Sparkles, Send, Share2, Loader2, ArrowLeft, Target, BookOpen, GraduationCap, MessageCircle, User, Brain, CheckCircle2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfileStore } from '@/hooks/useProfile';
