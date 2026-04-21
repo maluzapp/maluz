@@ -566,6 +566,30 @@ export default function Admin() {
       return new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
     };
 
+    const formatRelative = (d: string | null) => {
+      if (!d) return 'nunca';
+      const diffMs = Date.now() - new Date(d).getTime();
+      const min = Math.floor(diffMs / 60000);
+      if (min < 1) return 'agora';
+      if (min < 60) return `há ${min}min`;
+      const hr = Math.floor(min / 60);
+      if (hr < 24) return `há ${hr}h`;
+      const days = Math.floor(hr / 24);
+      if (days < 30) return `há ${days}d`;
+      const months = Math.floor(days / 30);
+      if (months < 12) return `há ${months}mes`;
+      return `há ${Math.floor(months / 12)}a`;
+    };
+
+    const activityColor = (d: string | null) => {
+      if (!d) return 'text-foreground/40';
+      const diffDays = (Date.now() - new Date(d).getTime()) / 86400000;
+      if (diffDays < 1) return 'text-success';
+      if (diffDays < 7) return 'text-primary';
+      if (diffDays < 30) return 'text-foreground/60';
+      return 'text-destructive/70';
+    };
+
     const getPlanBadge = (sub: any) => {
       if (!sub) return <Badge variant="outline" className="text-[10px] font-mono border-foreground/20">Free</Badge>;
       const colors: Record<string, string> = {
@@ -646,12 +670,12 @@ export default function Admin() {
                       <Mail className="h-3.5 w-3.5 text-primary/60 shrink-0" />
                       <span className="text-sm font-medium text-foreground truncate">{user.email || 'Sem email'}</span>
                     </div>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-foreground/50">
+                    <div className="flex items-center gap-3 mt-1 text-xs text-foreground/50 flex-wrap">
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" /> Cadastro: {formatDate(user.created_at)}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <UserCheck className="h-3 w-3" /> Último login: {formatDate(user.last_sign_in_at)}
+                      <span className={`flex items-center gap-1 font-medium ${activityColor(user.last_active_at)}`}>
+                        <UserCheck className="h-3 w-3" /> Ativo: {formatRelative(user.last_active_at)}
                       </span>
                     </div>
                   </div>

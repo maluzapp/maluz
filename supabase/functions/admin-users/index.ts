@@ -56,13 +56,21 @@ Deno.serve(async (req) => {
     const enriched = users.map(u => {
       const userSubs = subscriptions?.filter(s => s.user_id === u.id) || [];
       const activeSub = userSubs.find(s => s.status === "active");
+      const userProfiles = profiles?.filter(p => p.user_id === u.id) || [];
+      // Latest activity across all profiles owned by this user
+      const lastActiveAt = userProfiles
+        .map(p => p.last_active_at)
+        .filter(Boolean)
+        .sort()
+        .reverse()[0] || null;
       return {
         id: u.id,
         email: u.email,
         created_at: u.created_at,
         last_sign_in_at: u.last_sign_in_at,
+        last_active_at: lastActiveAt,
         email_confirmed_at: u.email_confirmed_at,
-        profiles: profiles?.filter(p => p.user_id === u.id) || [],
+        profiles: userProfiles,
         roles: roles?.filter(r => r.user_id === u.id).map(r => r.role) || [],
         subscription: activeSub ? {
           status: activeSub.status,
