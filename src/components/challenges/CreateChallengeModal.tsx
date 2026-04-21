@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Sparkles, Send, Share2, Loader2 } from 'lucide-react';
+import { Sparkles, Send, Share2, Loader2, ArrowLeft, Target, BookOpen, GraduationCap, MessageCircle, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfileStore } from '@/hooks/useProfile';
@@ -21,6 +21,7 @@ interface Props {
 
 export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
   const profileId = useProfileStore((s) => s.activeProfileId);
+  const [step, setStep] = useState<'form' | 'review'>('form');
   const [childId, setChildId] = useState('');
   const [subject, setSubject] = useState<Subject | ''>('');
   const [topic, setTopic] = useState('');
@@ -45,6 +46,13 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
   };
 
   const canSubmit = childId && subject && topic && year;
+  const selectedChild = children.find(c => c.id === childId);
+  const yearLabel = YEAR_OPTIONS.find(y => y.value === year)?.label || year;
+
+  const handleReview = () => {
+    if (!canSubmit) return;
+    setStep('review');
+  };
 
   const handleSend = async (shareVia?: 'whatsapp') => {
     if (!canSubmit || !profileId) return;
@@ -83,7 +91,7 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
       toast.success('Desafio enviado! 🎯');
 
       if (shareVia === 'whatsapp') {
-        const childName = children.find(c => c.id === childId)?.name || '';
+        const childName = selectedChild?.name || '';
         const e = {
           bulb: String.fromCodePoint(0x1F4A1),
           target: String.fromCodePoint(0x1F3AF),
@@ -122,74 +130,155 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="font-display flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" /> Criar Desafio
+            {step === 'review' && (
+              <button
+                onClick={() => !sending && setStep('form')}
+                className="rounded-md p-1 hover:bg-muted transition-colors"
+                disabled={sending}
+                aria-label="Voltar"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+            )}
+            <Sparkles className="h-5 w-5 text-primary" />
+            {step === 'form' ? 'Criar Desafio' : 'Confirmar Desafio'}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div>
-            <Label className="mb-1.5 block text-sm font-semibold">Para quem?</Label>
-            <Select value={childId} onValueChange={handleChildChange}>
-              <SelectTrigger><SelectValue placeholder="Selecione o filho" /></SelectTrigger>
-              <SelectContent>
-                {children.map(c => (
-                  <SelectItem key={c.id} value={c.id}>{c.avatar_emoji} {c.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {step === 'form' && (
+          <div className="space-y-4">
+            <div>
+              <Label className="mb-1.5 block text-sm font-semibold">Para quem?</Label>
+              <Select value={childId} onValueChange={handleChildChange}>
+                <SelectTrigger><SelectValue placeholder="Selecione o filho" /></SelectTrigger>
+                <SelectContent>
+                  {children.map(c => (
+                    <SelectItem key={c.id} value={c.id}>{c.avatar_emoji} {c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <Label className="mb-1.5 block text-sm font-semibold">Ano escolar</Label>
-            <Select value={year} onValueChange={(v) => setYear(v as SchoolYear)}>
-              <SelectTrigger><SelectValue placeholder="Selecione o ano" /></SelectTrigger>
-              <SelectContent>
-                {YEAR_OPTIONS.map(y => (
-                  <SelectItem key={y.value} value={y.value}>{y.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <div>
+              <Label className="mb-1.5 block text-sm font-semibold">Ano escolar</Label>
+              <Select value={year} onValueChange={(v) => setYear(v as SchoolYear)}>
+                <SelectTrigger><SelectValue placeholder="Selecione o ano" /></SelectTrigger>
+                <SelectContent>
+                  {YEAR_OPTIONS.map(y => (
+                    <SelectItem key={y.value} value={y.value}>{y.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <Label className="mb-1.5 block text-sm font-semibold">Matéria</Label>
-            <Select value={subject} onValueChange={(v) => setSubject(v as Subject)}>
-              <SelectTrigger><SelectValue placeholder="Selecione a matéria" /></SelectTrigger>
-              <SelectContent>
-                {SUBJECTS.map(s => (
-                  <SelectItem key={s} value={s}>{SUBJECT_EMOJIS[s]} {s}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <div>
+              <Label className="mb-1.5 block text-sm font-semibold">Matéria</Label>
+              <Select value={subject} onValueChange={(v) => setSubject(v as Subject)}>
+                <SelectTrigger><SelectValue placeholder="Selecione a matéria" /></SelectTrigger>
+                <SelectContent>
+                  {SUBJECTS.map(s => (
+                    <SelectItem key={s} value={s}>{SUBJECT_EMOJIS[s]} {s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <Label className="mb-1.5 block text-sm font-semibold">Assunto</Label>
-            <Input placeholder="Ex: Equações do 1º grau" value={topic} onChange={e => setTopic(e.target.value)} />
-          </div>
+            <div>
+              <Label className="mb-1.5 block text-sm font-semibold">Assunto</Label>
+              <Input placeholder="Ex: Equações do 1º grau" value={topic} onChange={e => setTopic(e.target.value)} />
+            </div>
 
-          <div>
-            <Label className="mb-1.5 block text-sm font-semibold">Mensagem (opcional)</Label>
-            <Textarea
-              placeholder="Ex: Vamos revisar o que vimos ontem!"
-              value={message}
-              onChange={e => setMessage(e.target.value)}
-              className="resize-none h-20"
-              maxLength={200}
-            />
-          </div>
+            <div>
+              <Label className="mb-1.5 block text-sm font-semibold">Mensagem (opcional)</Label>
+              <Textarea
+                placeholder="Ex: Vamos revisar o que vimos ontem!"
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                className="resize-none h-20"
+                maxLength={200}
+              />
+            </div>
 
-          <div className="flex gap-2 pt-2">
-            <Button className="flex-1 gap-2" disabled={!canSubmit || sending} onClick={() => handleSend()}>
-              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              Enviar pelo app
-            </Button>
-            <Button variant="outline" className="gap-2" disabled={!canSubmit || sending} onClick={() => handleSend('whatsapp')}>
-              <Share2 className="h-4 w-4" /> WhatsApp
-            </Button>
+            <div className="pt-2">
+              <Button className="w-full gap-2" disabled={!canSubmit} onClick={handleReview}>
+                Revisar desafio
+                <Sparkles className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
+
+        {step === 'review' && (
+          <div className="space-y-4">
+            {/* Hero summary card */}
+            <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-primary/20 blur-2xl" />
+              <div className="relative flex items-center gap-3">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/40 to-primary/10 ring-1 ring-primary/40 text-3xl shadow-lg">
+                  {SUBJECT_EMOJIS[subject as Subject]}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-primary/80">Novo Desafio</p>
+                  <p className="font-display text-base font-bold text-foreground truncate">{topic}</p>
+                  <p className="text-xs text-muted-foreground">{subject} • {yearLabel}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Detail rows */}
+            <div className="space-y-2.5 rounded-xl border border-border/60 bg-card/40 p-3">
+              <ReviewRow icon={<User className="h-4 w-4 text-primary" />} label="Para">
+                <span className="font-semibold">{selectedChild?.avatar_emoji} {selectedChild?.name}</span>
+              </ReviewRow>
+              <ReviewRow icon={<GraduationCap className="h-4 w-4 text-primary" />} label="Ano">
+                <span className="font-semibold">{yearLabel}</span>
+              </ReviewRow>
+              <ReviewRow icon={<BookOpen className="h-4 w-4 text-primary" />} label="Matéria">
+                <span className="font-semibold">{SUBJECT_EMOJIS[subject as Subject]} {subject}</span>
+              </ReviewRow>
+              <ReviewRow icon={<Target className="h-4 w-4 text-primary" />} label="Assunto">
+                <span className="font-semibold">{topic}</span>
+              </ReviewRow>
+              <ReviewRow icon={<Sparkles className="h-4 w-4 text-primary" />} label="Exercícios">
+                <span className="font-semibold">10 atividades geradas por IA</span>
+              </ReviewRow>
+              {message && (
+                <ReviewRow icon={<MessageCircle className="h-4 w-4 text-primary" />} label="Mensagem">
+                  <span className="italic text-foreground/90">"{message}"</span>
+                </ReviewRow>
+              )}
+            </div>
+
+            <p className="text-center text-xs text-muted-foreground px-2">
+              Ao confirmar, geraremos os exercícios e enviaremos para <span className="font-semibold text-foreground">{selectedChild?.name}</span>.
+            </p>
+
+            <div className="flex gap-2 pt-1">
+              <Button className="flex-1 gap-2" disabled={sending} onClick={() => handleSend()}>
+                {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {sending ? 'Gerando...' : 'Enviar pelo app'}
+              </Button>
+              <Button variant="outline" className="gap-2" disabled={sending} onClick={() => handleSend('whatsapp')}>
+                <Share2 className="h-4 w-4" /> WhatsApp
+              </Button>
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function ReviewRow({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-2.5 text-sm">
+      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-primary/20">
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
+        <div className="text-foreground/95 break-words">{children}</div>
+      </div>
+    </div>
   );
 }
