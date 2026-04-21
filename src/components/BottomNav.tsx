@@ -139,12 +139,12 @@ export function BottomNav() {
         {NAV_ITEMS_LEFT.map(renderItem)}
 
         {/* Center lamp button — vidro escuro, acende quando ativo */}
-        <div className="flex items-center justify-center" style={{ width: '104px' }}>
+        <div className="flex items-center justify-center" style={{ width: '88px' }}>
           <button
             onClick={handleLampClick}
             aria-label="Gerar exercícios"
             className={cn(
-              'absolute -top-12 flex items-center justify-center w-[84px] h-[84px] rounded-full transition-all duration-300',
+              'absolute -top-9 flex items-center justify-center w-[71px] h-[71px] rounded-full transition-all duration-300',
               // borda fina (metade da espessura anterior)
               'border-2 border-card/80',
               // estado padrão: fundo PRETO tipo vidro escuro
