@@ -339,6 +339,7 @@ export type Database = {
           created_at: string
           friend_code: string | null
           id: string
+          last_active_at: string | null
           last_study_date: string | null
           level: number
           name: string
@@ -355,6 +356,7 @@ export type Database = {
           created_at?: string
           friend_code?: string | null
           id?: string
+          last_active_at?: string | null
           last_study_date?: string | null
           level?: number
           name: string
@@ -371,6 +373,7 @@ export type Database = {
           created_at?: string
           friend_code?: string | null
           id?: string
+          last_active_at?: string | null
           last_study_date?: string | null
           level?: number
           name?: string
@@ -709,6 +712,7 @@ export type Database = {
       }
       is_friend: { Args: { _profile_id: string }; Returns: boolean }
       owns_profile: { Args: { _profile_id: string }; Returns: boolean }
+      touch_profile_activity: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
