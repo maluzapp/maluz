@@ -30,6 +30,11 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
   const [sending, setSending] = useState(false);
   const [parentName, setParentName] = useState('');
 
+  // AI summary state
+  const [analyzing, setAnalyzing] = useState(false);
+  const [aiSummary, setAiSummary] = useState<{ title: string; summary: string; keyPoints: string[] } | null>(null);
+  const [analyzeError, setAnalyzeError] = useState<string | null>(null);
+
   // Fetch parent name
   useEffect(() => {
     if (!profileId) return;
@@ -49,9 +54,31 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
   const selectedChild = children.find(c => c.id === childId);
   const yearLabel = YEAR_OPTIONS.find(y => y.value === year)?.label || year;
 
-  const handleReview = () => {
+  const runAnalysis = async () => {
+    if (!canSubmit) return;
+    setAnalyzing(true);
+    setAnalyzeError(null);
+    setAiSummary(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-content', {
+        body: { year, subject, topic },
+      });
+      if (error || !data?.summary) {
+        setAnalyzeError('Não conseguimos gerar o resumo. Tente novamente.');
+      } else {
+        setAiSummary(data.summary);
+      }
+    } catch {
+      setAnalyzeError('Erro inesperado ao analisar conteúdo.');
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const handleReview = async () => {
     if (!canSubmit) return;
     setStep('review');
+    if (!aiSummary) await runAnalysis();
   };
 
   const handleSend = async (shareVia?: 'whatsapp') => {
