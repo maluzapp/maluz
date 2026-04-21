@@ -325,8 +325,8 @@ export default function NotificationsSection() {
           <div className="text-2xl font-bold text-foreground">{logStats.last7d}</div>
           <div className="text-[10px] text-foreground/50 uppercase tracking-wider">Enviados (7d)</div>
         </div>
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-center">
-          <div className="text-2xl font-bold text-emerald-500">{logStats.sent}</div>
+        <div className="rounded-xl border border-success/30 bg-success/5 p-4 text-center">
+          <div className="text-2xl font-bold text-success">{logStats.sent}</div>
           <div className="text-[10px] text-foreground/50 uppercase tracking-wider">✓ Sucesso</div>
         </div>
         <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-center">
