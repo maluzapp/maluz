@@ -21,6 +21,14 @@ function uint8ArrayToUrlBase64(bytes: Uint8Array) {
   return window.btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
+async function ensureServiceWorkerRegistration() {
+  const existingRegistration = await navigator.serviceWorker.getRegistration("/");
+  if (existingRegistration) return existingRegistration;
+
+  await navigator.serviceWorker.register("/sw-push.js", { scope: "/" });
+  return navigator.serviceWorker.ready;
+}
+
 export function usePushSubscription() {
   const { user } = useAuth();
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -61,7 +69,7 @@ export function usePushSubscription() {
         return false;
       }
 
-      const reg = await navigator.serviceWorker.ready;
+      const reg = await ensureServiceWorkerRegistration();
       let currentSub = await reg.pushManager.getSubscription();
       const desiredKey = urlBase64ToUint8Array(vapidPublicKey);
 
@@ -98,7 +106,7 @@ export function usePushSubscription() {
 
       if (recoverable) {
         try {
-          const reg = await navigator.serviceWorker.ready;
+          const reg = await ensureServiceWorkerRegistration();
           const currentSub = await reg.pushManager.getSubscription();
           if (currentSub) {
             await supabase.from("push_subscriptions").delete().eq("endpoint", currentSub.endpoint);
@@ -147,7 +155,7 @@ export function usePushSubscription() {
   const unsubscribe = async () => {
     if (!user || !isSupported) return;
     try {
-      const reg = await navigator.serviceWorker.ready;
+      const reg = await ensureServiceWorkerRegistration();
       const sub = await reg.pushManager.getSubscription();
       if (sub) {
         await sub.unsubscribe();
