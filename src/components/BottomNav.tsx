@@ -171,8 +171,8 @@ export function BottomNav() {
               aria-hidden="true"
               onError={() => setUseRemoteLogo(false)}
               className={cn(
-                // ocupa praticamente todo o círculo (76 de 84 = ~90%)
-                'relative h-[76px] w-[76px] object-contain transition-all duration-300',
+                // ocupa praticamente todo o círculo (~90%)
+                'relative h-[64px] w-[64px] object-contain transition-all duration-300',
                 (isGeneratePage || lampLit)
                   ? 'brightness-150 drop-shadow-[0_2px_0_rgba(0,0,0,0.35)] drop-shadow-[0_0_22px_rgba(255,230,140,1)]'
                   : 'brightness-110 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] drop-shadow-[0_0_8px_rgba(255,220,120,0.4)]',
