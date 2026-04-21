@@ -355,7 +355,7 @@ export default function NotificationsSection() {
                 </div>
                 <Badge
                   variant={log.status === 'sent' ? 'secondary' : 'destructive'}
-                  className={`text-[9px] shrink-0 ${log.status === 'sent' ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30' : ''}`}
+                  className={`text-[9px] shrink-0 ${log.status === 'sent' ? 'bg-success/15 text-success border-success/30' : ''}`}
                 >
                   {log.status === 'sent' ? '✓' : '✗'} {log.channel}
                 </Badge>
