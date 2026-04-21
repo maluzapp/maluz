@@ -191,6 +191,14 @@ serve(async (req) => {
       }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    if (action === "get_vapid_public_key") {
+      return new Response(JSON.stringify({
+        ok: !!VAPID_PUBLIC_KEY,
+        public_key: VAPID_PUBLIC_KEY || null,
+        vapid_public_prefix: VAPID_PUBLIC_KEY ? `${VAPID_PUBLIC_KEY.slice(0, 12)}...` : null,
+      }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     // For all other actions → require admin
     const { data: isAdmin } = await supabaseClient.rpc("has_role", { _user_id: user.id, _role: "admin" });
     if (!isAdmin) {
