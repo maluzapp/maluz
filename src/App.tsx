@@ -10,6 +10,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { DynamicPwaBranding } from "@/components/DynamicPwaBranding";
 import { UpdateModal } from "@/components/UpdateModal";
 import { NewVersionModal } from "@/components/NewVersionModal";
+import { useActivityHeartbeat } from "@/hooks/useActivityHeartbeat";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import Profiles from "./pages/Profiles";
@@ -75,6 +76,11 @@ function SmartHome() {
 }
 
 
+function ActivityTracker() {
+  useActivityHeartbeat();
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -83,6 +89,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <ActivityTracker />
           <DynamicPwaBranding />
           <UpdateModal />
           <NewVersionModal />
