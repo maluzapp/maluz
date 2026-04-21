@@ -312,7 +312,7 @@ export default function NotificationsSection() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <div className="rounded-xl border border-primary/15 bg-card/50 p-4 text-center">
           <div className="text-2xl font-bold text-foreground">{templates.length}</div>
           <div className="text-[10px] text-foreground/50 uppercase tracking-wider">Templates</div>
@@ -325,10 +325,47 @@ export default function NotificationsSection() {
           <div className="text-2xl font-bold text-foreground">{logStats.last7d}</div>
           <div className="text-[10px] text-foreground/50 uppercase tracking-wider">Enviados (7d)</div>
         </div>
-        <div className="rounded-xl border border-primary/15 bg-card/50 p-4 text-center">
-          <div className="text-2xl font-bold text-foreground/60">{logStats.total}</div>
-          <div className="text-[10px] text-foreground/50 uppercase tracking-wider">Total enviados</div>
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-center">
+          <div className="text-2xl font-bold text-emerald-500">{logStats.sent}</div>
+          <div className="text-[10px] text-foreground/50 uppercase tracking-wider">✓ Sucesso</div>
         </div>
+        <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-center">
+          <div className="text-2xl font-bold text-destructive">{logStats.failed}</div>
+          <div className="text-[10px] text-foreground/50 uppercase tracking-wider">✗ Falhas</div>
+        </div>
+      </div>
+
+      {/* Recent activity log */}
+      <div className="rounded-xl border border-primary/15 bg-card/50 p-4 space-y-2">
+        <div className="flex items-center justify-between">
+          <h3 className="font-display font-bold text-foreground text-sm flex items-center gap-2">
+            <Clock className="h-4 w-4 text-primary" /> Histórico recente (últimos 20)
+          </h3>
+          <Button size="sm" variant="ghost" onClick={fetchStats} className="text-xs">Atualizar</Button>
+        </div>
+        {recentLogs.length === 0 ? (
+          <p className="text-xs text-foreground/40 py-4 text-center">Nenhum envio registrado ainda.</p>
+        ) : (
+          <div className="space-y-1 max-h-72 overflow-y-auto">
+            {recentLogs.map(log => (
+              <div key={log.id} className="flex items-center justify-between gap-2 text-xs py-1.5 px-2 rounded border border-primary/5 hover:bg-primary/5">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span className="text-base">{log.template_emoji || '🔔'}</span>
+                  <span className="truncate text-foreground/80">{log.template_title || 'Sem template'}</span>
+                </div>
+                <Badge
+                  variant={log.status === 'sent' ? 'secondary' : 'destructive'}
+                  className={`text-[9px] shrink-0 ${log.status === 'sent' ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30' : ''}`}
+                >
+                  {log.status === 'sent' ? '✓' : '✗'} {log.channel}
+                </Badge>
+                <span className="text-[10px] text-foreground/40 shrink-0 font-mono">
+                  {new Date(log.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Push diagnostics & test */}
