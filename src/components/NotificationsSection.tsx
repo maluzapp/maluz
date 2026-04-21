@@ -24,7 +24,7 @@ interface NotificationTemplate {
 }
 
 export default function NotificationsSection() {
-  const { isSubscribed, isSupported, permission, subscribe, unsubscribe } = usePushSubscription();
+  const { isSubscribed, isSupported, permission, subscribe, unsubscribe, refreshSubscription } = usePushSubscription();
   const [templates, setTemplates] = useState<NotificationTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState<string | null>(null);
@@ -107,11 +107,22 @@ export default function NotificationsSection() {
       const subsTotal = data?.subs_total ?? 0;
       const sampleErrors: string[] = data?.sample_errors || [];
 
+      const has403Error = sampleErrors.some((msg) => msg.includes('403'));
+
+      if (has403Error && isSupported && permission === 'granted') {
+        const repaired = await refreshSubscription();
+        if (repaired) {
+          toast.warning('Seu navegador foi reinscrito no push com a chave atual. Tente enviar novamente.', { duration: 7000 });
+          fetchStats();
+          return;
+        }
+      }
+
       if (subsTotal === 0) {
         toast.error('Nenhum dispositivo inscrito para receber push. Os usuários precisam ativar notificações primeiro.');
       } else if (pushSent === 0 && pushFailed > 0) {
         toast.error(
-          `Falha em todos os ${pushFailed} envios. ${sampleErrors[0] || 'Verifique as VAPID keys.'}`,
+          `Falha em todos os ${pushFailed} envios. ${sampleErrors[0] || 'Verifique as chaves push e reinscreva os aparelhos.'}`,
           { duration: 8000 }
         );
       } else if (pushSent > 0 && pushFailed > 0) {
@@ -150,6 +161,16 @@ export default function NotificationsSection() {
         toast.success(`Teste enviado! ${data.sent}/${data.total} dispositivo(s). Você deve recebê-lo em segundos.`);
       } else {
         const errMsg = data?.error || (data?.errors ? data.errors[0] : null) || 'erro desconhecido';
+        const has403Error = typeof errMsg === 'string' && errMsg.includes('403');
+
+        if (has403Error && permission === 'granted') {
+          const repaired = await refreshSubscription();
+          if (repaired) {
+            toast.warning('Reinscrevi este navegador no push. Toque em testar novamente.', { duration: 7000 });
+            return;
+          }
+        }
+
         toast.error(`Falha no teste: ${errMsg}`);
         if (data?.errors) console.error('Push errors:', data.errors);
         console.error('Full test response:', data);
@@ -412,6 +433,7 @@ export default function NotificationsSection() {
           Use o botão acima para validar se as VAPID keys e o serviço de push estão funcionando.
           Se o teste falhar, abra o console do navegador para ver detalhes.
           {permission === 'denied' && ' ⚠️ Permissão de notificação foi bloqueada — desbloqueie nas configurações do navegador.'}
+          {permission === 'granted' && ' Se aparecer erro 403, o sistema tenta reinscrever este navegador automaticamente.'}
         </p>
 
         <div className="pt-2 border-t border-primary/10 space-y-1">

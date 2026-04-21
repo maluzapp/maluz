@@ -176,7 +176,7 @@ serve(async (req) => {
         } catch (err: any) {
           const msg = err?.message || String(err);
           errors.push(`${err?.statusCode || "?"}: ${msg.slice(0, 200)}`);
-          if (err?.statusCode === 410 || err?.statusCode === 404) {
+          if (err?.statusCode === 410 || err?.statusCode === 404 || err?.statusCode === 403) {
             await supabaseClient.from("push_subscriptions").delete().eq("id", sub.id);
           }
         }
@@ -243,7 +243,7 @@ serve(async (req) => {
           if (sampleErrors.length < 3) {
             sampleErrors.push(`${err?.statusCode || "?"}: ${(err?.message || String(err)).slice(0, 150)}`);
           }
-          if (err?.statusCode === 410 || err?.statusCode === 404) {
+          if (err?.statusCode === 410 || err?.statusCode === 404 || err?.statusCode === 403) {
             await supabaseClient.from("push_subscriptions").delete().eq("id", sub.id);
           }
           await supabaseClient.from("notification_log").insert({
@@ -356,7 +356,7 @@ serve(async (req) => {
                 user_id: userId, template_id: template.id, channel: "push", status: "sent",
               });
             } catch (err: any) {
-              if (err?.statusCode === 410 || err?.statusCode === 404) {
+               if (err?.statusCode === 410 || err?.statusCode === 404 || err?.statusCode === 403) {
                 await supabaseClient.from("push_subscriptions").delete().eq("id", sub.id);
               }
             }
