@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Sparkles, Send, Share2, Loader2, ArrowLeft, Target, BookOpen, GraduationCap, MessageCircle, User } from 'lucide-react';
+import { Sparkles, Send, Share2, Loader2, ArrowLeft, GraduationCap, MessageCircle, User, Brain, CheckCircle2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfileStore } from '@/hooks/useProfile';
@@ -30,6 +30,11 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
   const [sending, setSending] = useState(false);
   const [parentName, setParentName] = useState('');
 
+  // AI summary state
+  const [analyzing, setAnalyzing] = useState(false);
+  const [aiSummary, setAiSummary] = useState<{ title: string; summary: string; keyPoints: string[] } | null>(null);
+  const [analyzeError, setAnalyzeError] = useState<string | null>(null);
+
   // Fetch parent name
   useEffect(() => {
     if (!profileId) return;
@@ -49,9 +54,31 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
   const selectedChild = children.find(c => c.id === childId);
   const yearLabel = YEAR_OPTIONS.find(y => y.value === year)?.label || year;
 
-  const handleReview = () => {
+  const runAnalysis = async () => {
+    if (!canSubmit) return;
+    setAnalyzing(true);
+    setAnalyzeError(null);
+    setAiSummary(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-content', {
+        body: { year, subject, topic },
+      });
+      if (error || !data?.summary) {
+        setAnalyzeError('Não conseguimos gerar o resumo. Tente novamente.');
+      } else {
+        setAiSummary(data.summary);
+      }
+    } catch {
+      setAnalyzeError('Erro inesperado ao analisar conteúdo.');
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const handleReview = async () => {
     if (!canSubmit) return;
     setStep('review');
+    if (!aiSummary) await runAnalysis();
   };
 
   const handleSend = async (shareVia?: 'whatsapp') => {
@@ -59,9 +86,9 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
     setSending(true);
 
     try {
-      // Generate exercises via edge function
+      // Generate exercises via edge function (use AI keyPoints if available)
       const { data: genData, error: genError } = await supabase.functions.invoke('generate-exercises', {
-        body: { year, subject, topic, keyPoints: [topic] },
+        body: { year, subject, topic, keyPoints: aiSummary?.keyPoints?.length ? aiSummary.keyPoints : [topic] },
       });
 
       if (genError || !genData?.exercises) {
@@ -225,6 +252,76 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
               </div>
             </div>
 
+            {/* AI Summary card — what the IA understood */}
+            <div className="relative overflow-hidden rounded-2xl border border-[hsl(160,94%,58%)]/30 bg-gradient-to-br from-[hsl(160,84%,30%)]/15 via-[hsl(160,84%,30%)]/5 to-transparent p-4">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[hsl(160,94%,58%)]/20 ring-1 ring-[hsl(160,94%,58%)]/40">
+                    <Brain className="h-4 w-4 text-[hsl(160,94%,68%)]" />
+                  </div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[hsl(160,94%,68%)]">
+                    O que a IA entendeu
+                  </p>
+                </div>
+                {!analyzing && aiSummary && (
+                  <button
+                    onClick={runAnalysis}
+                    disabled={sending}
+                    className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
+                  >
+                    <RefreshCw className="h-3 w-3" /> Refazer
+                  </button>
+                )}
+              </div>
+
+              {analyzing && (
+                <div className="space-y-2 py-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin text-[hsl(160,94%,68%)]" />
+                    Analisando o assunto…
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="h-2.5 w-3/4 animate-pulse rounded bg-foreground/10" />
+                    <div className="h-2.5 w-full animate-pulse rounded bg-foreground/10" />
+                    <div className="h-2.5 w-2/3 animate-pulse rounded bg-foreground/10" />
+                  </div>
+                </div>
+              )}
+
+              {!analyzing && analyzeError && (
+                <div className="space-y-2">
+                  <p className="text-sm text-destructive">{analyzeError}</p>
+                  <Button size="sm" variant="outline" onClick={runAnalysis} className="gap-1.5">
+                    <RefreshCw className="h-3 w-3" /> Tentar novamente
+                  </Button>
+                </div>
+              )}
+
+              {!analyzing && aiSummary && (
+                <div className="space-y-3">
+                  <div>
+                    <p className="font-display text-sm font-bold text-foreground">{aiSummary.title}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-foreground/85">{aiSummary.summary}</p>
+                  </div>
+                  {aiSummary.keyPoints?.length > 0 && (
+                    <div>
+                      <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        Pontos abordados
+                      </p>
+                      <ul className="space-y-1.5">
+                        {aiSummary.keyPoints.map((kp, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-foreground/90">
+                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(160,94%,68%)]" />
+                            <span>{kp}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Detail rows */}
             <div className="space-y-2.5 rounded-xl border border-border/60 bg-card/40 p-3">
               <ReviewRow icon={<User className="h-4 w-4 text-primary" />} label="Para">
@@ -233,14 +330,8 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
               <ReviewRow icon={<GraduationCap className="h-4 w-4 text-primary" />} label="Ano">
                 <span className="font-semibold">{yearLabel}</span>
               </ReviewRow>
-              <ReviewRow icon={<BookOpen className="h-4 w-4 text-primary" />} label="Matéria">
-                <span className="font-semibold">{SUBJECT_EMOJIS[subject as Subject]} {subject}</span>
-              </ReviewRow>
-              <ReviewRow icon={<Target className="h-4 w-4 text-primary" />} label="Assunto">
-                <span className="font-semibold">{topic}</span>
-              </ReviewRow>
               <ReviewRow icon={<Sparkles className="h-4 w-4 text-primary" />} label="Exercícios">
-                <span className="font-semibold">10 atividades geradas por IA</span>
+                <span className="font-semibold">10 atividades adaptadas ao resumo acima</span>
               </ReviewRow>
               {message && (
                 <ReviewRow icon={<MessageCircle className="h-4 w-4 text-primary" />} label="Mensagem">
@@ -250,15 +341,15 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
             </div>
 
             <p className="text-center text-xs text-muted-foreground px-2">
-              Ao confirmar, geraremos os exercícios e enviaremos para <span className="font-semibold text-foreground">{selectedChild?.name}</span>.
+              Confira o resumo acima. Se a IA entendeu corretamente, confirme para gerar os exercícios e enviar para <span className="font-semibold text-foreground">{selectedChild?.name}</span>.
             </p>
 
             <div className="flex gap-2 pt-1">
-              <Button className="flex-1 gap-2" disabled={sending} onClick={() => handleSend()}>
+              <Button className="flex-1 gap-2" disabled={sending || analyzing || !aiSummary} onClick={() => handleSend()}>
                 {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                {sending ? 'Gerando...' : 'Enviar pelo app'}
+                {sending ? 'Gerando...' : 'Confirmar e enviar'}
               </Button>
-              <Button variant="outline" className="gap-2" disabled={sending} onClick={() => handleSend('whatsapp')}>
+              <Button variant="outline" className="gap-2" disabled={sending || analyzing || !aiSummary} onClick={() => handleSend('whatsapp')}>
                 <Share2 className="h-4 w-4" /> WhatsApp
               </Button>
             </div>
