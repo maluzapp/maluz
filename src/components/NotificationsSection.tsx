@@ -37,7 +37,8 @@ export default function NotificationsSection() {
     title: '', body: '', icon_emoji: '🔔', trigger_type: 'manual', channel: 'push', inactive_days: null, category: 'custom',
   });
   const [subscriberCount, setSubscriberCount] = useState(0);
-  const [logStats, setLogStats] = useState({ total: 0, last7d: 0 });
+  const [logStats, setLogStats] = useState({ total: 0, last7d: 0, sent: 0, failed: 0 });
+  const [recentLogs, setRecentLogs] = useState<Array<{ id: string; created_at: string; status: string; channel: string; template_title?: string; template_emoji?: string }>>([]);
 
   const fetchTemplates = async () => {
     setLoading(true);
@@ -53,7 +54,34 @@ export default function NotificationsSection() {
     const { count: totalLogs } = await supabase.from('notification_log').select('*', { count: 'exact', head: true });
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const { count: weekLogs } = await supabase.from('notification_log').select('*', { count: 'exact', head: true }).gte('created_at', weekAgo);
-    setLogStats({ total: totalLogs || 0, last7d: weekLogs || 0 });
+    const { count: sentCount } = await supabase.from('notification_log').select('*', { count: 'exact', head: true }).eq('status', 'sent');
+    const { count: failedCount } = await supabase.from('notification_log').select('*', { count: 'exact', head: true }).eq('status', 'failed');
+    setLogStats({ total: totalLogs || 0, last7d: weekLogs || 0, sent: sentCount || 0, failed: failedCount || 0 });
+
+    // Recent log entries with template info
+    const { data: logs } = await supabase
+      .from('notification_log')
+      .select('id, created_at, status, channel, template_id')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if (logs && logs.length > 0) {
+      const templateIds = [...new Set(logs.map(l => l.template_id).filter(Boolean))] as string[];
+      const { data: tmpls } = await supabase
+        .from('notification_templates')
+        .select('id, title, icon_emoji')
+        .in('id', templateIds);
+      const tmap = new Map((tmpls || []).map(t => [t.id, t]));
+      setRecentLogs(logs.map(l => ({
+        id: l.id,
+        created_at: l.created_at,
+        status: l.status,
+        channel: l.channel,
+        template_title: l.template_id ? tmap.get(l.template_id)?.title : undefined,
+        template_emoji: l.template_id ? tmap.get(l.template_id)?.icon_emoji : undefined,
+      })));
+    } else {
+      setRecentLogs([]);
+    }
 
     // Fetch VAPID key
     const { data: vapidSetting } = await supabase.from('branding_settings').select('value').eq('key', 'vapid_public_key').single();
