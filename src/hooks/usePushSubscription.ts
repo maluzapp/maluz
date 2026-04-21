@@ -13,11 +13,109 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray;
 }
 
+function uint8ArrayToUrlBase64(bytes: Uint8Array) {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
 export function usePushSubscription() {
   const { user } = useAuth();
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>("default");
+
+  const getVapidPublicKey = async () => {
+    const { data: vapidSetting } = await supabase
+      .from("branding_settings")
+      .select("value")
+      .eq("key", "vapid_public_key")
+      .single();
+
+    return vapidSetting?.value ?? "";
+  };
+
+  const saveSubscription = async (subscription: PushSubscription) => {
+    const subJson = subscription.toJSON();
+
+    await supabase.from("push_subscriptions").upsert(
+      {
+        user_id: user!.id,
+        endpoint: subJson.endpoint!,
+        p256dh: subJson.keys!.p256dh!,
+        auth: subJson.keys!.auth!,
+      },
+      { onConflict: "endpoint" }
+    );
+  };
+
+  const syncSubscription = async (forceRefresh = false, retrying = false) => {
+    if (!user || !isSupported) return false;
+
+    try {
+      const vapidPublicKey = await getVapidPublicKey();
+      if (!vapidPublicKey) {
+        console.error("VAPID public key not found in branding_settings");
+        return false;
+      }
+
+      const reg = await navigator.serviceWorker.ready;
+      let currentSub = await reg.pushManager.getSubscription();
+      const desiredKey = urlBase64ToUint8Array(vapidPublicKey);
+
+      const currentKeyBuffer = currentSub?.options?.applicationServerKey;
+      const currentKey = currentKeyBuffer
+        ? uint8ArrayToUrlBase64(new Uint8Array(currentKeyBuffer))
+        : "";
+      const needsRefresh = forceRefresh || (!!currentSub && currentKey && currentKey !== vapidPublicKey);
+
+      if (needsRefresh && currentSub) {
+        await supabase.from("push_subscriptions").delete().eq("endpoint", currentSub.endpoint);
+        await currentSub.unsubscribe();
+        currentSub = null;
+      }
+
+      if (!currentSub) {
+        if (Notification.permission !== "granted") {
+          setIsSubscribed(false);
+          return false;
+        }
+
+        currentSub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: desiredKey,
+        });
+      }
+
+      await saveSubscription(currentSub);
+      setIsSubscribed(true);
+      return true;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      const recoverable = !retrying && (message.includes("different application server key") || message.includes("InvalidStateError"));
+
+      if (recoverable) {
+        try {
+          const reg = await navigator.serviceWorker.ready;
+          const currentSub = await reg.pushManager.getSubscription();
+          if (currentSub) {
+            await supabase.from("push_subscriptions").delete().eq("endpoint", currentSub.endpoint);
+            await currentSub.unsubscribe();
+          }
+        } catch (cleanupErr) {
+          console.error("Push cleanup error:", cleanupErr);
+        }
+
+        return syncSubscription(true, true);
+      }
+
+      console.error("Push subscription error:", err);
+      setIsSubscribed(false);
+      return false;
+    }
+  };
 
   useEffect(() => {
     const supported = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
@@ -29,53 +127,17 @@ export function usePushSubscription() {
 
   useEffect(() => {
     if (!user || !isSupported) return;
-    navigator.serviceWorker.ready.then(async (reg) => {
-      const sub = await reg.pushManager.getSubscription();
-      setIsSubscribed(!!sub);
+    syncSubscription(false).catch((err) => {
+      console.error("Push sync error:", err);
     });
   }, [user, isSupported]);
 
   const subscribe = async () => {
-    if (!user || !isSupported) return false;
-
     try {
       const perm = await Notification.requestPermission();
       setPermission(perm);
       if (perm !== "granted") return false;
-
-      const reg = await navigator.serviceWorker.ready;
-
-      // Get VAPID public key from branding_settings
-      const { data: vapidSetting } = await supabase
-        .from("branding_settings")
-        .select("value")
-        .eq("key", "vapid_public_key")
-        .single();
-
-      if (!vapidSetting?.value) {
-        console.error("VAPID public key not found in branding_settings");
-        return false;
-      }
-
-      const sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidSetting.value),
-      });
-
-      const subJson = sub.toJSON();
-
-      await supabase.from("push_subscriptions").upsert(
-        {
-          user_id: user.id,
-          endpoint: subJson.endpoint!,
-          p256dh: subJson.keys!.p256dh!,
-          auth: subJson.keys!.auth!,
-        },
-        { onConflict: "endpoint" }
-      );
-
-      setIsSubscribed(true);
-      return true;
+      return await syncSubscription(false);
     } catch (err) {
       console.error("Push subscription error:", err);
       return false;
@@ -97,5 +159,11 @@ export function usePushSubscription() {
     }
   };
 
-  return { isSubscribed, isSupported, permission, subscribe, unsubscribe };
+  const refreshSubscription = async () => {
+    setPermission(Notification.permission);
+    if (Notification.permission !== "granted") return false;
+    return syncSubscription(true);
+  };
+
+  return { isSubscribed, isSupported, permission, subscribe, unsubscribe, refreshSubscription };
 }
