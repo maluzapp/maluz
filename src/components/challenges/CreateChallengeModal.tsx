@@ -154,8 +154,8 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
 
   return (
     <Dialog open onOpenChange={() => !sending && onClose()}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="max-w-md max-h-[90vh] flex flex-col gap-0 p-0">
+        <DialogHeader className="px-6 pt-6 pb-3 shrink-0 border-b border-border/40">
           <DialogTitle className="font-display flex items-center gap-2">
             {step === 'review' && (
               <button
