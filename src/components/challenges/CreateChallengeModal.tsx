@@ -86,9 +86,9 @@ export function CreateChallengeModal({ children, onClose, onCreated }: Props) {
     setSending(true);
 
     try {
-      // Generate exercises via edge function
+      // Generate exercises via edge function (use AI keyPoints if available)
       const { data: genData, error: genError } = await supabase.functions.invoke('generate-exercises', {
-        body: { year, subject, topic, keyPoints: [topic] },
+        body: { year, subject, topic, keyPoints: aiSummary?.keyPoints?.length ? aiSummary.keyPoints : [topic] },
       });
 
       if (genError || !genData?.exercises) {
