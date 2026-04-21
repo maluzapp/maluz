@@ -100,7 +100,7 @@ export default function Generate() {
   };
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 pb-56 md:pb-60">
+    <div className="min-h-screen bg-background px-4 py-6 pb-40 md:pb-44">
       <div className="mx-auto max-w-lg">
         <div className="mb-4">
           <GamificationBar />
