@@ -112,6 +112,12 @@ export default function Landing() {
       return;
     }
 
+    // Clear stale "installed" flag from previous logic — if we're not in
+    // standalone now, the user is browsing the web and should see the banner.
+    if (localStorage.getItem('maluz_installed') === '1') {
+      localStorage.removeItem('maluz_installed');
+    }
+
     // Check via getInstalledRelatedApps (Chrome 80+) — only trust this signal
     // for the current session, not as a permanent flag.
     if ('getInstalledRelatedApps' in navigator) {
