@@ -175,7 +175,7 @@ export default function Landing() {
   const dismissBanner = () => {
     setShowInstallBanner(false);
     setBannerDismissed(true);
-    sessionStorage.setItem('install_banner_dismissed', '1');
+    localStorage.setItem('install_banner_dismissed_at', String(Date.now()));
   };
 
   const shareText = t('share_whatsapp_text', 'Conheça o Maluz: exercícios personalizados para crianças do 2º ao 9º ano. https://maluz.app');
