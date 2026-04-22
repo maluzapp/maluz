@@ -100,30 +100,44 @@ export default function Landing() {
     const ua = navigator.userAgent;
     setIsIOS(/iPad|iPhone|iPod/.test(ua));
 
-    // Check if already installed as PWA (multiple signals)
+    // Only consider truly installed if currently running in standalone mode.
+    // We avoid using a sticky localStorage flag because it persists forever
+    // even when the user uninstalled the PWA, blocking the banner indefinitely.
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches
       || (navigator as any).standalone === true;
-    const wasInstalled = localStorage.getItem('maluz_installed') === '1';
 
-    if (isStandalone || wasInstalled) {
+    if (isStandalone) {
       setIsInstalled(true);
       localStorage.setItem('maluz_installed', '1');
       return;
     }
 
-    // Check via getInstalledRelatedApps (Chrome 80+)
+    // Clear stale "installed" flag from previous logic — if we're not in
+    // standalone now, the user is browsing the web and should see the banner.
+    if (localStorage.getItem('maluz_installed') === '1') {
+      localStorage.removeItem('maluz_installed');
+    }
+
+    // Check via getInstalledRelatedApps (Chrome 80+) — only trust this signal
+    // for the current session, not as a permanent flag.
     if ('getInstalledRelatedApps' in navigator) {
       (navigator as any).getInstalledRelatedApps().then((apps: any[]) => {
         if (apps && apps.length > 0) {
           setIsInstalled(true);
-          localStorage.setItem('maluz_installed', '1');
         }
       }).catch(() => {});
     }
 
-    // Check if banner was dismissed this session
-    if (sessionStorage.getItem('install_banner_dismissed')) {
-      setBannerDismissed(true);
+    // Banner dismissal expires after 24h so it reappears for returning visitors
+    const dismissedAt = localStorage.getItem('install_banner_dismissed_at');
+    if (dismissedAt) {
+      const elapsed = Date.now() - Number(dismissedAt);
+      const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+      if (elapsed < TWENTY_FOUR_HOURS) {
+        setBannerDismissed(true);
+      } else {
+        localStorage.removeItem('install_banner_dismissed_at');
+      }
     }
 
     // Show banner after a short delay
@@ -167,7 +181,7 @@ export default function Landing() {
   const dismissBanner = () => {
     setShowInstallBanner(false);
     setBannerDismissed(true);
-    sessionStorage.setItem('install_banner_dismissed', '1');
+    localStorage.setItem('install_banner_dismissed_at', String(Date.now()));
   };
 
   const shareText = t('share_whatsapp_text', 'Conheça o Maluz: exercícios personalizados para crianças do 2º ao 9º ano. https://maluz.app');
