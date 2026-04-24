@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { profile_id, subject, school_year } = await req.json();
+    const { profile_id, subject, school_year, expand } = await req.json();
     if (!profile_id || !subject || !school_year) {
       return new Response(JSON.stringify({ error: "Missing parameters" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       .eq("profile_id", profile_id).eq("subject", subject).eq("school_year", school_year)
       .maybeSingle();
 
-    if (existing) {
+    if (existing && !expand) {
       return new Response(JSON.stringify({ track_id: existing.id, created: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
