@@ -9,7 +9,7 @@ import { useProfileStore } from "@/hooks/useProfile";
 import { useStudyStore } from "@/store/study-store";
 import { useTrackContext } from "@/store/track-context";
 import { SUBJECTS, getSubjectEmoji } from "@/constants/subjects";
-import { YEAR_OPTIONS } from "@/constants/years";
+import { getYearLabel } from "@/constants/years";
 import { SubjectXpBar } from "@/components/SubjectXpBar";
 import { useCanStartSession } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
@@ -44,13 +44,12 @@ export default function Trilha() {
 
   const [profileYear, setProfileYear] = useState<SchoolYear | "">("");
   const [subject, setSubject] = useState<Subject | "">("");
-  const [year, setYear] = useState<SchoolYear | "">("");
   const [track, setTrack] = useState<Track | null>(null);
   const [nodes, setNodes] = useState<TrackNode[]>([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
 
-  // Carrega ano padrão do perfil
+  // Carrega ano do perfil — sempre usado, nunca selecionável
   useEffect(() => {
     if (!profileId) return;
     supabase
@@ -61,21 +60,20 @@ export default function Trilha() {
       .then(({ data }) => {
         if (data?.school_year) {
           setProfileYear(data.school_year as SchoolYear);
-          setYear(data.school_year as SchoolYear);
         }
       });
   }, [profileId]);
 
-  // Busca trilha + nós
+  // Busca trilha + nós (usa sempre o ano do perfil)
   const fetchTrack = async () => {
-    if (!profileId || !subject || !year) return;
+    if (!profileId || !subject || !profileYear) return;
     setLoading(true);
     const { data: t } = await supabase
       .from("learning_tracks")
       .select("id, title, subject, school_year")
       .eq("profile_id", profileId)
       .eq("subject", subject)
-      .eq("school_year", year)
+      .eq("school_year", profileYear)
       .maybeSingle();
 
     if (!t) {
@@ -96,10 +94,9 @@ export default function Trilha() {
 
   useEffect(() => {
     fetchTrack();
-    // realtime subscription
     if (!profileId) return;
     const ch = supabase
-      .channel(`track-${profileId}-${subject}-${year}`)
+      .channel(`track-${profileId}-${subject}-${profileYear}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "track_nodes" },
@@ -110,16 +107,16 @@ export default function Trilha() {
       supabase.removeChannel(ch);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profileId, subject, year]);
+  }, [profileId, subject, profileYear]);
 
   const handleCreateTrack = async () => {
-    if (!profileId || !subject || !year) return;
+    if (!profileId || !subject || !profileYear) return;
     setCreating(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const { error } = await supabase.functions.invoke("generate-track", {
         headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined,
-        body: { profile_id: profileId, subject, school_year: year },
+        body: { profile_id: profileId, subject, school_year: profileYear },
       });
       if (error) throw error;
       toast.success("✨ Trilha criada!");
@@ -132,8 +129,11 @@ export default function Trilha() {
     }
   };
 
+  // Ao tocar num nó: leva para a tela de Gerar com matéria + tópico pré-preenchidos.
+  // O usuário ainda envia foto/áudio/texto livremente — a conclusão da sessão
+  // marcará o nó como completo via pendingNodeId.
   const handleStartNode = (node: TrackNode) => {
-    if (node.status !== "available" && node.status !== "completed") return;
+    if (node.status === "locked") return;
     if (!canStart) {
       toast.error("Você atingiu o limite de sessões diárias.");
       return;
@@ -145,13 +145,12 @@ export default function Trilha() {
       topic: node.topic,
       images: [],
     });
-    setStudyLoading(true);
+    setStudyLoading(false);
     setPendingNode(track.id, node.id);
-    navigate("/confirmacao");
+    navigate("/gerar");
   };
 
   const completedCount = useMemo(() => nodes.filter(n => n.status === "completed").length, [nodes]);
-  const trailProgress = nodes.length > 0 ? (completedCount / nodes.length) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-background px-4 py-6 pb-32 md:pb-40">
@@ -170,31 +169,27 @@ export default function Trilha() {
           <div className="w-12" />
         </div>
 
+        {profileYear && (
+          <p className="text-center text-xs font-mono text-muted-foreground -mt-2">
+            {getYearLabel(profileYear)} · trilha personalizada para o seu ano
+          </p>
+        )}
+
         {!canStart && <UpgradePrompt />}
 
-        {/* Seleção de matéria + ano */}
+        {/* Seleção de matéria */}
         <Card className="border-primary/15 animate-fade-in">
           <CardContent className="p-4 space-y-3">
-            <div className="grid grid-cols-2 gap-2">
-              <Select value={subject} onValueChange={(v) => setSubject(v as Subject)}>
-                <SelectTrigger><SelectValue placeholder="Matéria" /></SelectTrigger>
-                <SelectContent>
-                  {SUBJECTS.map((s) => (
-                    <SelectItem key={s} value={s}>{getSubjectEmoji(s)} {s}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={year} onValueChange={(v) => setYear(v as SchoolYear)}>
-                <SelectTrigger><SelectValue placeholder="Ano" /></SelectTrigger>
-                <SelectContent>
-                  {YEAR_OPTIONS.map((y) => (
-                    <SelectItem key={y.value} value={y.value}>{y.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Select value={subject} onValueChange={(v) => setSubject(v as Subject)}>
+              <SelectTrigger><SelectValue placeholder="Escolha uma matéria" /></SelectTrigger>
+              <SelectContent>
+                {SUBJECTS.map((s) => (
+                  <SelectItem key={s} value={s}>{getSubjectEmoji(s)} {s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-            {subject && year && !track && !loading && (
+            {subject && profileYear && !track && !loading && (
               <Button onClick={handleCreateTrack} disabled={creating} className="w-full gap-2 font-display font-bold">
                 {creating ? "Criando trilha..." : <><Sparkles className="h-4 w-4" /> Criar trilha de {subject}</>}
               </Button>
@@ -218,16 +213,19 @@ export default function Trilha() {
               <span>{track.title}</span>
               <span>{completedCount}/{nodes.length} acesos ✨</span>
             </div>
+            <p className="text-[11px] text-center text-muted-foreground italic px-2">
+              Toque num ponto para enviar fotos, áudio ou tema do exercício — ao terminar, o caminho se ilumina ✨
+            </p>
             <TrackMap nodes={nodes} onSelect={handleStartNode} />
           </div>
         )}
 
-        {!loading && !track && subject && year && (
+        {!loading && !track && subject && profileYear && (
           <Card className="border-primary/10">
             <CardContent className="p-6 text-center">
               <BookOpen className="h-10 w-10 text-primary/60 mx-auto mb-3" />
               <p className="text-sm text-muted-foreground">
-                Nenhuma trilha aqui ainda. Crie a primeira trilha de <strong>{subject}</strong> para o {YEAR_OPTIONS.find(y=>y.value===year)?.label}!
+                Nenhuma trilha aqui ainda. Crie a primeira trilha de <strong>{subject}</strong>!
               </p>
             </CardContent>
           </Card>
@@ -250,17 +248,12 @@ export default function Trilha() {
 
 /** Mapa vertical estilo Duolingo com efeito de iluminação */
 function TrackMap({ nodes, onSelect }: { nodes: TrackNode[]; onSelect: (n: TrackNode) => void }) {
-  // posição alternada: zig-zag suave
   const offsets = ["mr-0 ml-0", "ml-16", "ml-32", "ml-16", "ml-0", "mr-16", "mr-32", "mr-16"];
-
-  // Encontra próximo nó disponível para destacar
   const nextAvailableIdx = nodes.findIndex(n => n.status === "available");
 
   return (
     <div className="relative py-4">
-      {/* trilha de fundo */}
       <div className="absolute left-1/2 top-0 bottom-0 w-1 -translate-x-1/2 bg-muted/40 rounded-full" />
-      {/* trilha iluminada (proporcional a completos) */}
       <div
         className="absolute left-1/2 top-0 w-1 -translate-x-1/2 rounded-full bg-gradient-to-b from-[hsl(42,91%,68%)] via-[hsl(42,91%,55%)] to-[hsl(42,91%,40%)] shadow-[0_0_20px_hsl(42_91%_61%/0.6)] transition-all duration-700"
         style={{
@@ -288,12 +281,10 @@ function TrackMap({ nodes, onSelect }: { nodes: TrackNode[]; onSelect: (n: Track
                 )}
                 aria-label={node.topic}
               >
-                {/* Glow externo para nó atual */}
                 {isNext && (
                   <span className="absolute inset-0 -m-3 rounded-full bg-primary/30 blur-xl animate-pulse pointer-events-none" />
                 )}
 
-                {/* Botão circular */}
                 <div
                   className={cn(
                     "relative flex h-20 w-20 items-center justify-center rounded-full transition-all duration-500",
@@ -311,15 +302,12 @@ function TrackMap({ nodes, onSelect }: { nodes: TrackNode[]; onSelect: (n: Track
                 >
                   {isLocked ? (
                     <Lock className="h-7 w-7 text-muted-foreground" />
-                  ) : isCompleted ? (
-                    <span className="text-4xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" aria-hidden="true">
-                      {node.emoji}
-                    </span>
                   ) : (
                     <span
                       className={cn(
                         "text-4xl",
-                        isNext && "drop-shadow-[0_2px_8px_rgba(255,220,120,0.7)]"
+                        isNext && "drop-shadow-[0_2px_8px_rgba(255,220,120,0.7)]",
+                        isCompleted && "drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]",
                       )}
                       aria-hidden="true"
                     >
@@ -327,7 +315,6 @@ function TrackMap({ nodes, onSelect }: { nodes: TrackNode[]; onSelect: (n: Track
                     </span>
                   )}
 
-                  {/* Estrela de completo */}
                   {isCompleted && (
                     <span className="absolute -top-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-card ring-2 ring-[hsl(42,91%,55%)] shadow-lg">
                       <Star className="h-4 w-4 fill-[hsl(42,91%,55%)] text-[hsl(42,91%,55%)]" />
@@ -335,7 +322,6 @@ function TrackMap({ nodes, onSelect }: { nodes: TrackNode[]; onSelect: (n: Track
                   )}
                 </div>
 
-                {/* Label */}
                 <div className="text-center max-w-[140px] mt-1">
                   <p
                     className={cn(
@@ -361,7 +347,6 @@ function TrackMap({ nodes, onSelect }: { nodes: TrackNode[]; onSelect: (n: Track
           );
         })}
 
-        {/* Bandeira final */}
         <div className="relative flex items-center justify-center pt-4">
           <div
             className={cn(
