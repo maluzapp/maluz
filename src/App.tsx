@@ -29,6 +29,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import Challenges from "./pages/Challenges";
 import ChallengeExercise from "./pages/ChallengeExercise";
 import ChallengeReview from "./pages/ChallengeReview";
+import Trilha from "./pages/Trilha";
 import NotFound from "./pages/NotFound";
 import type { ReactNode } from "react";
 
@@ -99,6 +100,7 @@ const App = () => (
             <Route path="/perfis" element={<Profiles />} />
             <Route path="/inicio" element={<RequireAuth><Index /></RequireAuth>} />
             <Route path="/gerar" element={<RequireAuth><Generate /></RequireAuth>} />
+            <Route path="/trilha" element={<RequireAuth><Trilha /></RequireAuth>} />
             <Route path="/confirmacao" element={<RequireAuth><Confirmation /></RequireAuth>} />
             <Route path="/exercicios" element={<RequireAuth><Exercises /></RequireAuth>} />
             <Route path="/resultado" element={<RequireAuth><Results /></RequireAuth>} />

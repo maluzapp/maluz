@@ -220,6 +220,36 @@ export type Database = {
           },
         ]
       }
+      learning_tracks: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string
+          school_year: string
+          subject: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id: string
+          school_year: string
+          subject: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string
+          school_year?: string
+          subject?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notification_log: {
         Row: {
           channel: string
@@ -332,6 +362,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profile_subject_xp: {
+        Row: {
+          created_at: string
+          id: string
+          level: number
+          profile_id: string
+          subject: string
+          updated_at: string
+          xp: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          level?: number
+          profile_id: string
+          subject: string
+          updated_at?: string
+          xp?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          level?: number
+          profile_id?: string
+          subject?: string
+          updated_at?: string
+          xp?: number
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -581,6 +641,53 @@ export type Database = {
         }
         Relationships: []
       }
+      track_nodes: {
+        Row: {
+          best_score: number | null
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          emoji: string
+          id: string
+          position: number
+          status: string
+          topic: string
+          track_id: string
+        }
+        Insert: {
+          best_score?: number | null
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          emoji?: string
+          id?: string
+          position: number
+          status?: string
+          topic: string
+          track_id: string
+        }
+        Update: {
+          best_score?: number | null
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          emoji?: string
+          id?: string
+          position?: number
+          status?: string
+          topic?: string
+          track_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "track_nodes_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "learning_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -655,6 +762,10 @@ export type Database = {
     }
     Functions: {
       can_view_profile: { Args: { _profile_id: string }; Returns: boolean }
+      complete_track_node: {
+        Args: { _node_id: string; _score: number; _xp_earned: number }
+        Returns: Json
+      }
       find_profile_by_friend_code: {
         Args: { _code: string }
         Returns: {
