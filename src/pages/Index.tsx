@@ -188,6 +188,37 @@ export default function Index() {
           </CardContent>
         </Card>
 
+        {/* CTA Trilha de Luz */}
+        <button
+          onClick={() => navigate('/trilha')}
+          className="w-full group relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/15 via-card to-card p-4 text-left transition-all hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_0_30px_hsl(42_91%_61%/0.4)] animate-fade-in"
+          style={{ animationDelay: '120ms' }}
+        >
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/20 blur-2xl group-hover:bg-primary/40 transition-all" />
+          <div className="relative flex items-center gap-3">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/40 to-primary/10 ring-1 ring-primary/40 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)]">
+              <span className="text-3xl">✨</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-display font-bold text-foreground flex items-center gap-1.5">
+                Trilha de Luz <Sparkles className="h-4 w-4 text-primary" />
+              </p>
+              <p className="text-xs text-muted-foreground">Ilumine o caminho do saber, passo a passo</p>
+            </div>
+          </div>
+        </button>
+
+        {/* XP por matéria (níveis nomeados) */}
+        {profileId && (
+          <div className="animate-fade-in" style={{ animationDelay: '160ms' }}>
+            <h2 className="font-display font-bold text-foreground mb-2 flex items-center gap-2">
+              <Star className="h-4 w-4 text-primary" />
+              Sua Luz por matéria
+            </h2>
+            <SubjectXpBar profileId={profileId} />
+          </div>
+        )}
+
         {/* Stats grid */}
         <div className="grid grid-cols-3 gap-3 animate-fade-in" style={{ animationDelay: '160ms' }}>
           <Card className="border-primary/10">
