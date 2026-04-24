@@ -11,6 +11,7 @@ import { getSubjectEmoji } from '@/constants/subjects';
 import { cn } from '@/lib/utils';
 import { PerfectScoreConfetti, firePerfectScoreConfetti } from '@/components/exercises/Confetti';
 import { awardStudyProgress, calculateXp } from '@/lib/studyProgress';
+import { useTrackContext } from '@/store/track-context';
 
 function getEmoji(pct: number) {
   if (pct >= 90) return '🏆';
@@ -179,6 +180,8 @@ export default function Results() {
   const navigate = useNavigate();
   const { exercises, answers, config, reset, sessionId } = useStudyStore();
   const profileId = useProfileStore((s) => s.activeProfileId);
+  const pendingNodeId = useTrackContext((s) => s.pendingNodeId);
+  const clearPendingNode = useTrackContext((s) => s.clearPendingNode);
   const [xpEarned, setXpEarned] = useState(0);
   const [saved, setSaved] = useState(false);
 
@@ -213,17 +216,20 @@ export default function Results() {
         exercises,
         answers,
         countDailyUsage: true,
+        trackNodeId: pendingNodeId || undefined,
       });
 
       if (result.error) return;
 
       sessionStorage.setItem('lastSavedStudySessionId', sessionId);
+      // limpa contexto da trilha após salvar
+      if (pendingNodeId) clearPendingNode();
 
       setSaved(true);
     };
 
     saveResults();
-  }, [answers, config, exercises, profileId, score, sessionId, total]);
+  }, [answers, config, exercises, profileId, score, sessionId, total, pendingNodeId, clearPendingNode]);
 
   const handleNewSession = () => {
     reset();
