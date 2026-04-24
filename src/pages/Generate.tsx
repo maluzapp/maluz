@@ -127,13 +127,33 @@ export default function Generate() {
           </div>
         )}
 
+        {isFromTrack && (
+          <Card className="mb-6 border-primary/40 bg-gradient-to-r from-primary/15 to-card animate-fade-in">
+            <CardContent className="p-3 flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/20 ring-1 ring-primary/40">
+                <MapPin className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-mono uppercase tracking-wider text-primary">Trilha de Luz</p>
+                <p className="text-sm font-display font-bold text-foreground truncate">{topic}</p>
+                <p className="text-[11px] text-muted-foreground">Concluir esta sessão acende este ponto ✨</p>
+              </div>
+              <Button variant="ghost" size="sm" className="text-xs shrink-0" onClick={handleExitTrack}>
+                Sair
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         <div className={`mb-8 text-center animate-fade-in ${!canStart ? 'opacity-50 pointer-events-none' : ''}`}>
           <img src={lampadaIcon} alt="Maluz" className="h-16 mx-auto mb-3" />
           <h1 className="font-display text-3xl font-bold text-foreground">
-            Acenda a <span className="text-primary italic">luz</span> do saber! 💡
+            {isFromTrack ? <>Iluminando: <span className="text-primary italic">{topic}</span></> : <>Acenda a <span className="text-primary italic">luz</span> do saber! 💡</>}
           </h1>
           <p className="mt-2 text-muted-foreground font-body">
-            Vamos clarear as dúvidas? A Maluz cria exercícios sob medida ✨
+            {isFromTrack
+              ? 'Envie fotos, áudio ou só o tema — a Maluz cria os exercícios.'
+              : 'Vamos clarear as dúvidas? A Maluz cria exercícios sob medida ✨'}
           </p>
         </div>
 
