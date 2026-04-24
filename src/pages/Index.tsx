@@ -188,22 +188,40 @@ export default function Index() {
           </CardContent>
         </Card>
 
-        {/* CTA Trilha de Luz */}
+        {/* CTA principal: Gerar exercícios (estudo livre com fotos/áudio) */}
         <button
-          onClick={() => navigate('/trilha')}
-          className="w-full group relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/15 via-card to-card p-4 text-left transition-all hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_0_30px_hsl(42_91%_61%/0.4)] animate-fade-in"
+          onClick={() => navigate('/gerar')}
+          className="w-full group relative overflow-hidden rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/20 via-card to-card p-4 text-left transition-all hover:scale-[1.02] hover:border-primary/60 hover:shadow-[0_0_30px_hsl(42_91%_61%/0.5)] animate-fade-in"
           style={{ animationDelay: '120ms' }}
         >
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/20 blur-2xl group-hover:bg-primary/40 transition-all" />
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/30 blur-2xl group-hover:bg-primary/50 transition-all" />
           <div className="relative flex items-center gap-3">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/40 to-primary/10 ring-1 ring-primary/40 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)]">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/50 to-primary/20 ring-1 ring-primary/50 shadow-[inset_0_2px_4px_rgba(255,255,255,0.25)]">
+              <Camera className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-display font-bold text-foreground">Estudar agora 💡</p>
+              <p className="text-xs text-muted-foreground">Tire foto, grave áudio ou digite o tema</p>
+            </div>
+          </div>
+        </button>
+
+        {/* CTA secundário: Trilha de Luz */}
+        <button
+          onClick={() => navigate('/trilha')}
+          className="w-full group relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card p-4 text-left transition-all hover:scale-[1.02] hover:border-primary/40 hover:shadow-[0_0_24px_hsl(42_91%_61%/0.3)] animate-fade-in"
+          style={{ animationDelay: '140ms' }}
+        >
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/15 blur-2xl group-hover:bg-primary/30 transition-all" />
+          <div className="relative flex items-center gap-3">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 ring-1 ring-primary/30 shadow-[inset_0_2px_4px_rgba(255,255,255,0.15)]">
               <span className="text-3xl">✨</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-display font-bold text-foreground flex items-center gap-1.5">
                 Trilha de Luz <Sparkles className="h-4 w-4 text-primary" />
               </p>
-              <p className="text-xs text-muted-foreground">Ilumine o caminho do saber, passo a passo</p>
+              <p className="text-xs text-muted-foreground">Siga o caminho passo a passo por matéria</p>
             </div>
           </div>
         </button>
