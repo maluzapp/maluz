@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { profile_id, subject, school_year } = await req.json();
+    const { profile_id, subject, school_year, expand } = await req.json();
     if (!profile_id || !subject || !school_year) {
       return new Response(JSON.stringify({ error: "Missing parameters" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       .eq("profile_id", profile_id).eq("subject", subject).eq("school_year", school_year)
       .maybeSingle();
 
-    if (existing) {
+    if (existing && !expand) {
       return new Response(JSON.stringify({ track_id: existing.id, created: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -166,32 +166,51 @@ Retorne APENAS um array JSON válido, sem markdown, sem explicação extra.`;
       }));
     }
 
-    // cria trilha
+    // cria ou reutiliza trilha
     const subjectEmoji = SUBJECT_EMOJIS[subject] || "📚";
-    const { data: track, error: trackErr } = await admin
-      .from("learning_tracks")
-      .insert({
-        profile_id,
-        subject,
-        school_year,
-        title: `${subjectEmoji} ${subject} — ${school_year}º ano`,
-      })
-      .select("id").single();
-    if (trackErr || !track) throw trackErr;
+    let trackId: string;
+    let startPosition = 0;
+    let firstNodeStatus: "available" | "locked" = "available";
+
+    if (existing && expand) {
+      trackId = existing.id;
+      const { data: lastNode } = await admin
+        .from("track_nodes")
+        .select("position")
+        .eq("track_id", trackId)
+        .order("position", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      startPosition = (lastNode?.position ?? -1) + 1;
+      // novos nós sempre nascem locked — o anterior abre o primeiro novo ao ser concluído
+      firstNodeStatus = "locked";
+    } else {
+      const { data: track, error: trackErr } = await admin
+        .from("learning_tracks")
+        .insert({
+          profile_id,
+          subject,
+          school_year,
+          title: `${subjectEmoji} ${subject} — ${school_year}º ano`,
+        })
+        .select("id").single();
+      if (trackErr || !track) throw trackErr;
+      trackId = track.id;
+    }
 
     // cria nós
     const nodes = topics.map((t, idx) => ({
-      track_id: track.id,
-      position: idx,
+      track_id: trackId,
+      position: startPosition + idx,
       topic: t.topic.slice(0, 60),
       description: (t.description || "").slice(0, 200),
       emoji: t.emoji || NODE_EMOJIS[idx % NODE_EMOJIS.length],
-      status: idx === 0 ? "available" : "locked",
+      status: idx === 0 ? firstNodeStatus : "locked",
     }));
     const { error: nodesErr } = await admin.from("track_nodes").insert(nodes);
     if (nodesErr) throw nodesErr;
 
-    return new Response(JSON.stringify({ track_id: track.id, created: true }), {
+    return new Response(JSON.stringify({ track_id: trackId, created: !existing, expanded: !!(existing && expand) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
