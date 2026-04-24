@@ -75,12 +75,12 @@ export function BottomNav() {
   const handleLampClick = () => {
     setLampLit(true);
     setTimeout(() => {
-      navigate('/gerar');
+      navigate('/trilha');
       setLampLit(false);
     }, 400);
   };
 
-  const isGeneratePage = pathname === '/gerar';
+  const isGeneratePage = pathname === '/trilha' || pathname === '/gerar';
 
   const renderItem = (item: NavItem) => {
     // Considera ativo: rota exata OU /resultado quando estiver no Início (resultados embutidos)
