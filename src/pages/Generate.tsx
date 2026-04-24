@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Mic, MicOff, Sparkles, X, Crown, Lock } from 'lucide-react';
+import { Camera, Mic, MicOff, Sparkles, X, Crown, Lock, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useStudyStore } from '@/store/study-store';
 import { GamificationBar } from '@/components/GamificationBar';
 import { useProfileStore } from '@/hooks/useProfile';
+import { useTrackContext } from '@/store/track-context';
 import { supabase } from '@/integrations/supabase/client';
 import { YEAR_OPTIONS } from '@/constants/years';
 import { useCanStartSession, usePlanLimits } from '@/hooks/useSubscription';
@@ -19,14 +20,20 @@ import { SUBJECTS, SUBJECT_EMOJIS } from '@/constants/subjects';
 
 export default function Generate() {
   const navigate = useNavigate();
-  const { setConfig, setLoading } = useStudyStore();
-  const [year, setYear] = useState<SchoolYear | ''>('');
+  const { setConfig, setLoading, config: existingConfig } = useStudyStore();
+  const pendingNodeId = useTrackContext((s) => s.pendingNodeId);
+  const clearPendingNode = useTrackContext((s) => s.clearPendingNode);
+  const isFromTrack = !!pendingNodeId && !!existingConfig;
+
+  const [year, setYear] = useState<SchoolYear | ''>(isFromTrack ? (existingConfig!.year as SchoolYear) : '');
   const activeProfileId = useProfileStore((s) => s.activeProfileId);
   const { canStart } = useCanStartSession();
   const { maxPhotos, canUseAudio } = usePlanLimits();
 
   useEffect(() => {
     if (!activeProfileId) return;
+    // Se veio da trilha, ano já está fixado pelo perfil; só carrega se não estamos em modo trilha
+    if (isFromTrack) return;
     supabase
       .from('profiles')
       .select('school_year')
@@ -35,16 +42,24 @@ export default function Generate() {
       .then(({ data }) => {
         if (data?.school_year) setYear(data.school_year as SchoolYear);
       });
-  }, [activeProfileId]);
+  }, [activeProfileId, isFromTrack]);
 
-  const [subject, setSubject] = useState<Subject | ''>('');
-  const [topic, setTopic] = useState('');
+  const [subject, setSubject] = useState<Subject | ''>(
+    isFromTrack ? (existingConfig!.subject as Subject) : '',
+  );
+  const [topic, setTopic] = useState(isFromTrack ? existingConfig!.topic : '');
   const [images, setImages] = useState<File[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleExitTrack = () => {
+    clearPendingNode();
+    setSubject('');
+    setTopic('');
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
