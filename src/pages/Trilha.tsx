@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock, Star, Sparkles, ArrowLeft, BookOpen } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfileStore } from "@/hooks/useProfile";
 import { useStudyStore } from "@/store/study-store";
@@ -43,14 +41,13 @@ export default function Trilha() {
   const { canStart } = useCanStartSession();
 
   const [profileYear, setProfileYear] = useState<SchoolYear | "">("");
-  const [subject, setSubject] = useState<Subject | "">("");
-  const [year, setYear] = useState<SchoolYear | "">("");
+  const [subject, setSubject] = useState<Subject>(SUBJECTS[0] as Subject);
   const [track, setTrack] = useState<Track | null>(null);
   const [nodes, setNodes] = useState<TrackNode[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
 
-  // Carrega ano padrão do perfil
+  // Carrega ano do perfil (usado automaticamente em todas as trilhas)
   useEffect(() => {
     if (!profileId) return;
     supabase
@@ -61,76 +58,89 @@ export default function Trilha() {
       .then(({ data }) => {
         if (data?.school_year) {
           setProfileYear(data.school_year as SchoolYear);
-          setYear(data.school_year as SchoolYear);
         }
       });
   }, [profileId]);
 
-  // Busca trilha + nós
-  const fetchTrack = async () => {
-    if (!profileId || !subject || !year) return;
+  // Auto-cria trilha se não existir
+  const ensureTrack = async (currentSubject: Subject, currentYear: SchoolYear) => {
     setLoading(true);
-    const { data: t } = await supabase
+    const { data: existing } = await supabase
       .from("learning_tracks")
       .select("id, title, subject, school_year")
-      .eq("profile_id", profileId)
-      .eq("subject", subject)
-      .eq("school_year", year)
+      .eq("profile_id", profileId!)
+      .eq("subject", currentSubject)
+      .eq("school_year", currentYear)
       .maybeSingle();
 
-    if (!t) {
-      setTrack(null);
-      setNodes([]);
+    if (existing) {
+      setTrack(existing as Track);
+      const { data: nlist } = await supabase
+        .from("track_nodes")
+        .select("id, position, topic, description, emoji, status, best_score")
+        .eq("track_id", existing.id)
+        .order("position", { ascending: true });
+      setNodes((nlist as TrackNode[]) || []);
       setLoading(false);
       return;
     }
-    setTrack(t as Track);
-    const { data: nlist } = await supabase
-      .from("track_nodes")
-      .select("id, position, topic, description, emoji, status, best_score")
-      .eq("track_id", t.id)
-      .order("position", { ascending: true });
-    setNodes((nlist as TrackNode[]) || []);
-    setLoading(false);
+
+    // Não existe — gera automaticamente
+    setCreating(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const { error } = await supabase.functions.invoke("generate-track", {
+        headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined,
+        body: { profile_id: profileId, subject: currentSubject, school_year: currentYear },
+      });
+      if (error) throw error;
+      // refetch
+      const { data: t2 } = await supabase
+        .from("learning_tracks")
+        .select("id, title, subject, school_year")
+        .eq("profile_id", profileId!)
+        .eq("subject", currentSubject)
+        .eq("school_year", currentYear)
+        .maybeSingle();
+      if (t2) {
+        setTrack(t2 as Track);
+        const { data: nlist } = await supabase
+          .from("track_nodes")
+          .select("id, position, topic, description, emoji, status, best_score")
+          .eq("track_id", t2.id)
+          .order("position", { ascending: true });
+        setNodes((nlist as TrackNode[]) || []);
+      }
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Não foi possível carregar a trilha. Tente novamente.");
+      setTrack(null);
+      setNodes([]);
+    } finally {
+      setCreating(false);
+      setLoading(false);
+    }
   };
 
+  // Sempre que tiver perfilYear + subject, garante a trilha
   useEffect(() => {
-    fetchTrack();
-    // realtime subscription
-    if (!profileId) return;
+    if (!profileId || !profileYear || !subject) return;
+    ensureTrack(subject, profileYear);
+
+    // realtime subscription dos nós
     const ch = supabase
-      .channel(`track-${profileId}-${subject}-${year}`)
+      .channel(`track-${profileId}-${subject}-${profileYear}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "track_nodes" },
-        () => fetchTrack(),
+        () => ensureTrack(subject, profileYear),
       )
       .subscribe();
     return () => {
       supabase.removeChannel(ch);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profileId, subject, year]);
-
-  const handleCreateTrack = async () => {
-    if (!profileId || !subject || !year) return;
-    setCreating(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const { error } = await supabase.functions.invoke("generate-track", {
-        headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined,
-        body: { profile_id: profileId, subject, school_year: year },
-      });
-      if (error) throw error;
-      toast.success("✨ Trilha criada!");
-      await fetchTrack();
-    } catch (e: any) {
-      console.error(e);
-      toast.error("Não foi possível criar a trilha. Tente novamente.");
-    } finally {
-      setCreating(false);
-    }
-  };
+  }, [profileId, subject, profileYear]);
 
   const handleStartNode = (node: TrackNode) => {
     if (node.status !== "available" && node.status !== "completed") return;
@@ -151,7 +161,7 @@ export default function Trilha() {
   };
 
   const completedCount = useMemo(() => nodes.filter(n => n.status === "completed").length, [nodes]);
-  const trailProgress = nodes.length > 0 ? (completedCount / nodes.length) * 100 : 0;
+  const yearLabel = YEAR_OPTIONS.find(y => y.value === profileYear)?.label;
 
   return (
     <div className="min-h-screen bg-background px-4 py-6 pb-32 md:pb-40">
@@ -172,47 +182,69 @@ export default function Trilha() {
 
         {!canStart && <UpgradePrompt />}
 
-        {/* Seleção de matéria + ano */}
-        <Card className="border-primary/15 animate-fade-in">
-          <CardContent className="p-4 space-y-3">
-            <div className="grid grid-cols-2 gap-2">
-              <Select value={subject} onValueChange={(v) => setSubject(v as Subject)}>
-                <SelectTrigger><SelectValue placeholder="Matéria" /></SelectTrigger>
-                <SelectContent>
-                  {SUBJECTS.map((s) => (
-                    <SelectItem key={s} value={s}>{getSubjectEmoji(s)} {s}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={year} onValueChange={(v) => setYear(v as SchoolYear)}>
-                <SelectTrigger><SelectValue placeholder="Ano" /></SelectTrigger>
-                <SelectContent>
-                  {YEAR_OPTIONS.map((y) => (
-                    <SelectItem key={y.value} value={y.value}>{y.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        {/* Chips de matéria — clique troca a trilha */}
+        <div className="animate-fade-in">
+          <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-thin">
+            {SUBJECTS.map((s) => {
+              const active = subject === s;
+              return (
+                <button
+                  key={s}
+                  onClick={() => setSubject(s as Subject)}
+                  className={cn(
+                    "flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-display font-bold transition-all",
+                    active
+                      ? "bg-primary text-primary-foreground border-primary shadow-md scale-105"
+                      : "bg-card text-foreground border-border hover:border-primary/40",
+                  )}
+                >
+                  <span aria-hidden>{getSubjectEmoji(s)}</span>
+                  <span>{s}</span>
+                </button>
+              );
+            })}
+          </div>
+          {yearLabel && (
+            <p className="text-[11px] font-mono text-muted-foreground mt-1 px-1">
+              Adaptado para o <strong>{yearLabel}</strong>
+            </p>
+          )}
+        </div>
 
-            {subject && year && !track && !loading && (
-              <Button onClick={handleCreateTrack} disabled={creating} className="w-full gap-2 font-display font-bold">
-                {creating ? "Criando trilha..." : <><Sparkles className="h-4 w-4" /> Criar trilha de {subject}</>}
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+        {/* Aviso quando não há ano cadastrado */}
+        {!profileYear && profileId && (
+          <Card className="border-primary/15">
+            <CardContent className="p-5 text-center">
+              <BookOpen className="h-8 w-8 text-primary/60 mx-auto mb-2" />
+              <p className="text-sm text-foreground mb-3">
+                Para personalizar sua trilha, escolha o seu ano escolar.
+              </p>
+              <button
+                onClick={() => navigate("/perfis")}
+                className="text-sm font-display font-bold text-primary underline-offset-4 hover:underline"
+              >
+                Ir para Perfis
+              </button>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Barra XP por matéria (todas) */}
+        {/* Barra XP por matéria */}
         {profileId && <SubjectXpBar profileId={profileId} />}
 
         {/* Trilha */}
-        {loading && (
-          <div className="flex justify-center py-10">
+        {(loading || creating) && (
+          <div className="flex flex-col items-center py-10 gap-2">
             <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+            {creating && (
+              <p className="text-xs font-mono text-muted-foreground animate-pulse">
+                Iluminando seu caminho...
+              </p>
+            )}
           </div>
         )}
 
-        {!loading && track && nodes.length > 0 && (
+        {!loading && !creating && track && nodes.length > 0 && (
           <div className="space-y-2 animate-fade-in">
             <div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
               <span>{track.title}</span>
@@ -220,28 +252,6 @@ export default function Trilha() {
             </div>
             <TrackMap nodes={nodes} onSelect={handleStartNode} />
           </div>
-        )}
-
-        {!loading && !track && subject && year && (
-          <Card className="border-primary/10">
-            <CardContent className="p-6 text-center">
-              <BookOpen className="h-10 w-10 text-primary/60 mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">
-                Nenhuma trilha aqui ainda. Crie a primeira trilha de <strong>{subject}</strong> para o {YEAR_OPTIONS.find(y=>y.value===year)?.label}!
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        {!loading && !subject && (
-          <Card className="border-primary/10">
-            <CardContent className="p-6 text-center">
-              <Sparkles className="h-10 w-10 text-primary/60 mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">
-                Escolha uma <strong>matéria</strong> para começar a iluminar o caminho.
-              </p>
-            </CardContent>
-          </Card>
         )}
       </div>
     </div>
