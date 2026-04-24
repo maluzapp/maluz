@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Mic, MicOff, Sparkles, X, Crown, Lock } from 'lucide-react';
+import { Camera, Mic, MicOff, Sparkles, X, Crown, Lock, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useStudyStore } from '@/store/study-store';
 import { GamificationBar } from '@/components/GamificationBar';
 import { useProfileStore } from '@/hooks/useProfile';
+import { useTrackContext } from '@/store/track-context';
 import { supabase } from '@/integrations/supabase/client';
 import { YEAR_OPTIONS } from '@/constants/years';
 import { useCanStartSession, usePlanLimits } from '@/hooks/useSubscription';
@@ -19,14 +20,20 @@ import { SUBJECTS, SUBJECT_EMOJIS } from '@/constants/subjects';
 
 export default function Generate() {
   const navigate = useNavigate();
-  const { setConfig, setLoading } = useStudyStore();
-  const [year, setYear] = useState<SchoolYear | ''>('');
+  const { setConfig, setLoading, config: existingConfig } = useStudyStore();
+  const pendingNodeId = useTrackContext((s) => s.pendingNodeId);
+  const clearPendingNode = useTrackContext((s) => s.clearPendingNode);
+  const isFromTrack = !!pendingNodeId && !!existingConfig;
+
+  const [year, setYear] = useState<SchoolYear | ''>(isFromTrack ? (existingConfig!.year as SchoolYear) : '');
   const activeProfileId = useProfileStore((s) => s.activeProfileId);
   const { canStart } = useCanStartSession();
   const { maxPhotos, canUseAudio } = usePlanLimits();
 
   useEffect(() => {
     if (!activeProfileId) return;
+    // Se veio da trilha, ano já está fixado pelo perfil; só carrega se não estamos em modo trilha
+    if (isFromTrack) return;
     supabase
       .from('profiles')
       .select('school_year')
@@ -35,16 +42,24 @@ export default function Generate() {
       .then(({ data }) => {
         if (data?.school_year) setYear(data.school_year as SchoolYear);
       });
-  }, [activeProfileId]);
+  }, [activeProfileId, isFromTrack]);
 
-  const [subject, setSubject] = useState<Subject | ''>('');
-  const [topic, setTopic] = useState('');
+  const [subject, setSubject] = useState<Subject | ''>(
+    isFromTrack ? (existingConfig!.subject as Subject) : '',
+  );
+  const [topic, setTopic] = useState(isFromTrack ? existingConfig!.topic : '');
   const [images, setImages] = useState<File[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleExitTrack = () => {
+    clearPendingNode();
+    setSubject('');
+    setTopic('');
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -112,13 +127,33 @@ export default function Generate() {
           </div>
         )}
 
+        {isFromTrack && (
+          <Card className="mb-6 border-primary/40 bg-gradient-to-r from-primary/15 to-card animate-fade-in">
+            <CardContent className="p-3 flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/20 ring-1 ring-primary/40">
+                <MapPin className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-mono uppercase tracking-wider text-primary">Trilha de Luz</p>
+                <p className="text-sm font-display font-bold text-foreground truncate">{topic}</p>
+                <p className="text-[11px] text-muted-foreground">Concluir esta sessão acende este ponto ✨</p>
+              </div>
+              <Button variant="ghost" size="sm" className="text-xs shrink-0" onClick={handleExitTrack}>
+                Sair
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         <div className={`mb-8 text-center animate-fade-in ${!canStart ? 'opacity-50 pointer-events-none' : ''}`}>
           <img src={lampadaIcon} alt="Maluz" className="h-16 mx-auto mb-3" />
           <h1 className="font-display text-3xl font-bold text-foreground">
-            Acenda a <span className="text-primary italic">luz</span> do saber! 💡
+            {isFromTrack ? <>Iluminando: <span className="text-primary italic">{topic}</span></> : <>Acenda a <span className="text-primary italic">luz</span> do saber! 💡</>}
           </h1>
           <p className="mt-2 text-muted-foreground font-body">
-            Vamos clarear as dúvidas? A Maluz cria exercícios sob medida ✨
+            {isFromTrack
+              ? 'Envie fotos, áudio ou só o tema — a Maluz cria os exercícios.'
+              : 'Vamos clarear as dúvidas? A Maluz cria exercícios sob medida ✨'}
           </p>
         </div>
 
