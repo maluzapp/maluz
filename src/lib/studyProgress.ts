@@ -56,12 +56,36 @@ export async function awardStudyProgress({
     await incrementDailyUsage(profileId);
   }
 
-  // Se vem de uma trilha: a RPC complete_track_node soma XP por matéria,
+  // Estudo livre alimenta a trilha em paralelo:
+  // se o usuário NÃO veio explicitamente de um nó, mas existe um nó "available"
+  // na trilha da matéria estudada, concluímos esse nó automaticamente.
+  let effectiveNodeId = trackNodeId;
+  if (!effectiveNodeId) {
+    const { data: tracks } = await supabase
+      .from('learning_tracks')
+      .select('id')
+      .eq('profile_id', profileId)
+      .eq('subject', subject);
+    const trackIds = (tracks || []).map((t) => t.id);
+    if (trackIds.length > 0) {
+      const { data: availableNode } = await supabase
+        .from('track_nodes')
+        .select('id')
+        .in('track_id', trackIds)
+        .eq('status', 'available')
+        .order('position', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (availableNode) effectiveNodeId = availableNode.id;
+    }
+  }
+
+  // Se vem de uma trilha (explícita ou auto-detectada): a RPC complete_track_node soma XP por matéria,
   // recalcula nível por matéria e atualiza profile.xp como soma das matérias.
   // NÃO somamos profile.xp aqui pra evitar dupla contagem.
-  if (trackNodeId) {
+  if (effectiveNodeId) {
     await supabase.rpc('complete_track_node', {
-      _node_id: trackNodeId,
+      _node_id: effectiveNodeId,
       _score: score,
       _xp_earned: xp,
     });
@@ -88,7 +112,7 @@ export async function awardStudyProgress({
     const newTotalExercises = (profile.total_exercises || 0) + total;
     const newTotalCorrect = (profile.total_correct || 0) + score;
 
-    if (trackNodeId) {
+    if (effectiveNodeId) {
       // RPC já atualizou profile.xp; só atualiza streak + totais aqui
       await supabase
         .from('profiles')
