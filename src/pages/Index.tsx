@@ -10,8 +10,9 @@ import { useStripeSubscription, useUserSubscription } from '@/hooks/useSubscript
 import { supabase } from '@/integrations/supabase/client';
 import { getYearLabel } from '@/constants/years';
 import { getSubjectEmoji } from '@/constants/subjects';
-import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings, Crown, Lock, Mic, Camera, Swords } from 'lucide-react';
+import { Flame, Star, BookOpen, Target, Calendar, Zap, BarChart3, Settings, Crown, Lock, Mic, Camera, Swords, Sparkles } from 'lucide-react';
 import { StatBar } from '@/components/ui/stat-bar';
+import { SubjectXpBar } from '@/components/SubjectXpBar';
 import { cn } from '@/lib/utils';
 
 interface ProfileData {
