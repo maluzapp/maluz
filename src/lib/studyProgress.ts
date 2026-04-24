@@ -57,16 +57,44 @@ export async function awardStudyProgress({
   }
 
   // Estudo livre alimenta a trilha em paralelo:
-  // se o usuário NÃO veio explicitamente de um nó, mas existe um nó "available"
-  // na trilha da matéria estudada, concluímos esse nó automaticamente.
+  // se o usuário NÃO veio explicitamente de um nó, garantimos que existe uma trilha
+  // dessa matéria (criando automaticamente se necessário) e completamos o próximo nó disponível.
   let effectiveNodeId = trackNodeId;
   if (!effectiveNodeId) {
-    const { data: tracks } = await supabase
+    let { data: tracks } = await supabase
       .from('learning_tracks')
       .select('id')
       .eq('profile_id', profileId)
       .eq('subject', subject);
-    const trackIds = (tracks || []).map((t) => t.id);
+    let trackIds = (tracks || []).map((t) => t.id);
+
+    // Auto-cria trilha desta matéria se ainda não existir uma para o ano do perfil.
+    if (trackIds.length === 0) {
+      try {
+        const { data: profileRow } = await supabase
+          .from('profiles')
+          .select('school_year')
+          .eq('id', profileId)
+          .maybeSingle();
+        const targetYear = profileRow?.school_year || year;
+        if (targetYear) {
+          const { data: { session } } = await supabase.auth.getSession();
+          await supabase.functions.invoke('generate-track', {
+            headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined,
+            body: { profile_id: profileId, subject, school_year: targetYear },
+          });
+          const { data: newTracks } = await supabase
+            .from('learning_tracks')
+            .select('id')
+            .eq('profile_id', profileId)
+            .eq('subject', subject);
+          trackIds = (newTracks || []).map((t) => t.id);
+        }
+      } catch (e) {
+        console.error('Auto-create track failed:', e);
+      }
+    }
+
     if (trackIds.length > 0) {
       const { data: availableNode } = await supabase
         .from('track_nodes')
